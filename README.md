@@ -147,19 +147,139 @@ statis. Pilihan yang sesuai:
 
 ```
 .
-├── index.html, *.html        prototipe desain (acuan, jangan diubah)
-├── css/, js/, admin/         aset prototipe (acuan, jangan diubah)
-└── backend/                  aplikasi Laravel 13
-    ├── app/Http/Controllers/  controller publik + Admin/
-    ├── app/Http/Middleware/   EnsureAdmin (alias "admin"), SecurityHeaders
-    ├── app/Models/            ProfilDesa, JenisSurat, Persyaratan, Pengajuan, ...
-    ├── app/Services/          PengajuanService, VerifikasiService
-    ├── app/Support/           SiteProfile — profil desa untuk seluruh view
-    ├── resources/views/       tampilan Blade (publik & admin)
-    ├── database/              migrasi, seeder, factory
-    ├── routes/web.php         seluruh route publik & admin
-    └── tests/                 pengujian otomatis
+├── README.md                     dokumentasi (satu-satunya berkas .md di repo)
+│
+├── index.html                    ── prototipe desain (acuan, JANGAN diubah) ──
+├── profil.html
+├── informasi.html
+├── potensi.html
+├── kontak.html
+├── pelayanan.html
+├── pelayanan-domisili.html
+├── pelayanan-ktp.html
+├── pelayanan-kematian.html
+├── pelayanan-keramaian.html
+├── pelayanan-tidak-mampu.html
+├── pelayanan-usaha.html
+├── pengajuan.html
+├── pengajuan-berhasil.html
+├── kebijakan-privasi.html
+├── pemberitahuan-data.html
+├── css/                          aset CSS prototipe
+├── js/                           aset JavaScript prototipe
+├── admin/                        halaman admin prototipe
+│
+└── backend/                      ── aplikasi Laravel 13 ──
+    ├── app/
+    │   ├── Enums/
+    │   │   ├── RoleAdmin.php              peran admin + aturan kewenangan
+    │   │   └── StatusPengajuan.php        status + aturan transisi
+    │   ├── Http/
+    │   │   ├── Controllers/
+    │   │   │   ├── PageController.php             halaman publik
+    │   │   │   ├── PengajuanController.php        form & simpan pengajuan
+    │   │   │   └── Admin/
+    │   │   │       ├── AuthController.php         login / logout
+    │   │   │       ├── RingkasanController.php    dashboard
+    │   │   │       ├── PengajuanController.php    verifikasi pengajuan
+    │   │   │       ├── JenisSuratController.php   kelola jenis surat
+    │   │   │       ├── KontenController.php       kelola konten website
+    │   │   │       ├── ProfilController.php       kelola profil desa
+    │   │   │       ├── AkunController.php         kelola akun admin
+    │   │   │       └── LogController.php          log aktivitas
+    │   │   ├── Middleware/
+    │   │   │   ├── EnsureAdmin.php        wajib login + akun aktif
+    │   │   │   └── SecurityHeaders.php    CSP, X-Frame-Options, nosniff, dll
+    │   │   └── Requests/
+    │   │       ├── StorePengajuanRequest.php          validasi form warga
+    │   │       └── Admin/
+    │   │           ├── LoginRequest.php               validasi + throttle login
+    │   │           └── UpdateStatusPengajuanRequest.php
+    │   ├── Models/
+    │   │   ├── ProfilDesa.php          identitas desa
+    │   │   ├── JenisSurat.php          jenis layanan surat
+    │   │   ├── PersyaratanSurat.php    syarat tiap jenis surat
+    │   │   ├── Pengajuan.php           pengajuan warga
+    │   │   ├── DokumenPengajuan.php    berkas unggahan (privat)
+    │   │   ├── RiwayatPengajuan.php    jejak perubahan status
+    │   │   ├── KontenWebsite.php       konten halaman publik
+    │   │   ├── LogAktivitas.php        audit trail admin
+    │   │   └── User.php                akun admin (3 peran)
+    │   ├── Providers/
+    │   │   └── AppServiceProvider.php  view composer $profil, route binding
+    │   ├── Services/
+    │   │   ├── PengajuanService.php    nomor referensi, transaksi, normalisasi
+    │   │   └── VerifikasiService.php   transisi status + log
+    │   └── Support/
+    │       └── SiteProfile.php         profil desa untuk seluruh view
+    │
+    ├── bootstrap/
+    │   ├── app.php                     registrasi middleware & routing
+    │   └── providers.php
+    │
+    ├── config/                         konfigurasi Laravel (10 berkas)
+    │   └── filesystems.php             disk "local" — 'serve' => false (penting)
+    │
+    ├── database/
+    │   ├── factories/
+    │   │   └── UserFactory.php
+    │   ├── migrations/                 8 migrasi: users, cache, jobs, profil,
+    │   │                               jenis surat, pengajuan, konten
+    │   └── seeders/
+    │       ├── DatabaseSeeder.php      orkestrator seeder
+    │       ├── ProfilDesaSeeder.php
+    │       ├── JenisSuratSeeder.php
+    │       ├── AdminSeeder.php         sandi dari ADMIN_SEED_PASSWORD
+    │       ├── KontenWebsiteSeeder.php
+    │       └── DemoPengajuanSeeder.php hanya jalan di local & testing
+    │
+    ├── public/                         document root
+    │   ├── index.php
+    │   ├── .htaccess
+    │   ├── robots.txt
+    │   └── favicon.ico
+    │
+    ├── resources/
+    │   ├── css/                        app.css, site.css, style.css
+    │   ├── js/                         app.js, site.js, main.js
+    │   └── views/
+    │       ├── layouts/                public, admin, auth + partials/
+    │       ├── components/             admin-topbar
+    │       ├── pages/                  beranda, profil, informasi, potensi,
+    │       │                           kontak, pelayanan/, pengajuan/, privasi/
+    │       └── admin/                  login, ringkasan, pengajuan/, jenis-surat/,
+    │                                   konten/, profil/, akun/, log/
+    │
+    ├── routes/
+    │   ├── web.php                     33 route publik & admin
+    │   └── console.php
+    │
+    ├── storage/                        dokumen warga di app/private (tidak di repo)
+    │
+    ├── tests/
+    │   ├── Feature/
+    │   │   ├── PengajuanTest.php        alur pengajuan warga
+    │   │   ├── AdminAuthTest.php        login, throttle, akun nonaktif
+    │   │   ├── AdminPengajuanTest.php   verifikasi & batasan peran
+    │   │   ├── KeamananTest.php         header, dokumen privat, enumerasi
+    │   │   └── SeederTest.php           seeder demo tidak masuk produksi
+    │   ├── Unit/ExampleTest.php
+    │   └── TestCase.php
+    │
+    ├── .env.example                template konfigurasi (tanpa nilai rahasia)
+    ├── .gitignore                  mengabaikan .env, *.md, konfigurasi agen AI
+    ├── artisan
+    ├── composer.json / composer.lock
+    ├── package.json / package-lock.json
+    ├── vite.config.js
+    ├── phpunit.xml
+    └── .editorconfig / .gitattributes / .npmrc
 ```
+
+Berkas berikut **tidak ada di repositori** dan dibuat saat instalasi:
+`backend/.env`, `backend/vendor/`, `backend/node_modules/`,
+`backend/public/build/`, `backend/public/storage/`,
+`backend/database/database.sqlite`, dan isi `backend/storage/`.
 
 Nomor referensi memakai format `SBM-<tahun>-<urut 4 digit>`, mengikuti
 prototipe (`admin/ringkasan.html`). Ubah `PengajuanService::nomorBerikutnya()`
