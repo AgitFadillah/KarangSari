@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log Aktivitas · Dashboard Admin Desa Sukamaju</title>
+  <meta name="description" content="Catatan aktivitas penting admin Desa Sukamaju untuk keperluan audit: waktu, pelaku, tindakan, dan subjek.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .log-search { max-width: 430px; margin-bottom: 20px; }
+    .log-table { min-width: 880px; }
+
+    .log-subjek {
+      background: none; border: none; padding: 0; cursor: pointer;
+      font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+      font-size: .8125rem; color: var(--navy-900); text-align: left;
+      text-decoration: underline dotted var(--gray-500); text-underline-offset: 4px;
+    }
+    .log-subjek:hover { color: var(--blue-600); }
+
+    .log-empty {
+      display: none; text-align: center; padding: 40px 16px;
+      color: var(--gray-500); font-size: .9375rem;
+    }
+
+    .panel-foot {
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+      flex-wrap: wrap; border-top: 1px solid var(--gray-200);
+      margin-top: 4px; padding-top: 18px;
+      font-size: .875rem; color: var(--gray-500);
+    }
+
+    .log-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 36px; }
+    @media (max-width: 860px) { .log-cols { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="admin-shell">
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="admin-brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M4 18h16M6 18v-8h3v8M11 18v-8h3v8M16 18v-8h3v8M12 3l9 5H3l9-5z"/></svg>
+        </div>
+        <div>
+          <div class="brand-name">Desa Sukamaju</div>
+          <div class="brand-sub">DASHBOARD ADMIN</div>
+        </div>
+      </div>
+      <nav class="admin-nav" aria-label="Menu admin">
+        <div class="admin-nav-label">OPERASIONAL</div>
+        <a href="ringkasan.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Ringkasan
+        </a>
+        <a href="pengajuan.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>
+          Pengajuan Surat
+          <span class="badge badge-gray">2</span>
+        </a>
+        <div class="admin-nav-label">PENGATURAN</div>
+        <a href="jenis-surat.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+          Jenis Surat
+        </a>
+        <a href="konten-website.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>
+          Konten Website
+        </a>
+        <a href="profil-kontak.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Profil &amp; Kontak
+        </a>
+        <a href="akun-admin.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Akun Admin
+        </a>
+        <a href="log-aktivitas.html" class="active" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          Log Aktivitas
+        </a>
+        <div class="admin-help">
+          <b>Butuh bantuan?</b>
+          Panduan singkat alur verifikasi dan pengelolaan surat.
+          <a href="../pelayanan.html#cara">Buka panduan →</a>
+        </div>
+      </nav>
+      <a href="akun-admin.html" class="admin-user">
+        <div class="avatar">SW</div>
+        <div>
+          <div class="admin-user-name">Sari Wulandari</div>
+          <div class="admin-user-role">Administrator</div>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="margin-left:auto;opacity:.5"><path d="M6 9l6 6 6-6"/></svg>
+      </a>
+    </aside>
+
+    <div class="admin-main">
+      <header class="admin-topbar">
+        <button class="admin-menu-btn" id="adminMenuBtn" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="adminSidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div>
+          <div class="breadcrumb"><a href="ringkasan.html">Admin</a><span class="sep">/</span><span>Log Aktivitas</span></div>
+          <h1>Log Aktivitas</h1>
+        </div>
+        <form class="search" action="pengajuan.html" method="get" role="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="search" name="q" placeholder="Cari pengajuan..." aria-label="Cari pengajuan">
+        </form>
+        <a href="pengajuan.html" class="admin-bell" aria-label="2 pengajuan menunggu tindakan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <span class="admin-bell-dot"></span>
+        </a>
+        <a href="akun-admin.html" class="admin-user-chip">
+          <div class="avatar">SW</div>
+          <div>
+            <div class="name">Sari W.</div>
+            <div class="role">Admin</div>
+          </div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="color:var(--gray-500)"><path d="M6 9l6 6 6-6"/></svg>
+        </a>
+      </header>
+
+      <main class="admin-content">
+        <div class="admin-page-head">
+          <div>
+            <p class="sub">Catatan tindakan penting admin untuk keperluan audit.</p>
+            <div class="count" id="logCount">8 aktivitas ditampilkan</div>
+          </div>
+          <button type="button" class="btn btn-outline" id="unduhLog">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            Unduh log
+          </button>
+        </div>
+
+        <div class="notice notice-blue" id="logNotice" role="status" style="display:none;margin-bottom:22px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
+          <div><b id="logNoticeTitle">Log diunduh (contoh).</b> <span id="logNoticeText"></span></div>
+        </div>
+
+        <div class="panel">
+          <div class="search-box log-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input type="search" id="logSearch" placeholder="Cari pelaku, tindakan, atau subjek..." aria-label="Cari aktivitas">
+          </div>
+          <div class="table-wrap">
+            <table class="data log-table">
+              <thead>
+                <tr>
+                  <th>Waktu</th>
+                  <th>Pelaku</th>
+                  <th>Tindakan</th>
+                  <th>Subjek</th>
+                  <th>Keterangan</th>
+                </tr>
+              </thead>
+              <tbody id="logBody">
+                <tr>
+                  <td>31 Okt 2026, 08.12</td>
+                  <td>
+                    <div class="cell-avatar">
+                      <div class="avatar">SW</div>
+                      <div class="cell-main">Sari Wulandari</div>
+                    </div>
+                  </td>
+                  <td>Login ke dashboard</td>
+                  <td>
+                    <button type="button" class="log-subjek" data-modal-open="modalLog" data-subjek="dashboard admin" aria-label="Lihat detail aktivitas login ke dashboard">dashboard admin</button>
+                  </td>
+                  <td><span class="badge badge-blue">info</span></td>
+                </tr>
+                <tr>
+                  <td>30 Okt 2026, 16.05</td>
+                  <td>
+                    <div class="cell-avatar">
+                      <div class="avatar">RP</div>
+                      <div class="cell-main">Rangga Pratama</div>
+                    </div>
+                  </td>
+                  <td>Memverifikasi pengajuan (Disetujui)</td>
+                  <td>
+                    <button type="button" class="log-subjek" data-modal-open="modalLog" data-subjek="SBM-2026-0006" aria-label="Lihat detail aktivitas verifikasi pengajuan SBM-2026-0006">SBM-2026-0006</button>
+                  </td>
+                  <td><span class="badge badge-green">sukses</span></td>
+                </tr>
+                <tr>
+                  <td>29 Okt 2026, 15.10</td>
+                  <td>
+                    <div class="cell-avatar">
+                      <div class="avatar">SW</div>
+                      <div class="cell-main">Sari Wulandari</div>
+                    </div>
+                  </td>
+                  <td>Meminta perbaikan pengajuan</td>
+                  <td>
+                    <button type="button" class="log-subjek" data-modal-open="modalLog" data-subjek="SBM-2026-0007" aria-label="Lihat detail aktivitas perbaikan pengajuan SBM-2026-0007">SBM-2026-0007</button>
+                  </td>
+                  <td><span class="badge badge-green">sukses</span></td>
+                </tr>
+                <tr>
+                  <td>29 Okt 2026, 10.22</td>
+                  <td>
+                    <div class="cell-avatar">
+                      <div class="avatar">SW</div>
+                      <div class="cell-main">Sari Wulandari</div>
+                    </div>
+                  </td>
+                  <td>Menerbitkan berita</td>
+                  <td>
+                    <button type="button" class="log-subjek" data-modal-open="modalLog" data-subjek="Pengumuman penerimaan BLT Desa tahap 2" aria-label="Lihat detail aktivitas penerbitan berita BLT Desa tahap 2">Pengumuman penerimaan BLT Desa tahap 2</button>
+                  </td>
+                  <td><span class="badge badge-green">sukses</span></td>
+                </tr>
+                <tr>
+                  <td>28 Okt 2026, 09.41</td>
+                  <td>
+                    <div class="cell-avatar">
+                      <div class="avatar">RP</div>
+                      <div class="cell-main">Rangga Pratama</div>
+                    </div>
+                  </td>
+                  <td>Menolak pengajuan (NIK tidak cocok)</td>
+                  <td>
+                    <button type="button" class="log-subjek" data-modal-open="modalLog" data-subjek="SBM-2026-0003" aria-label="Lihat detail aktivitas penolakan pengajuan SBM-2026-0003">SBM-2026-0003</button>
+                  </td>
+                  <td><span class="badge badge-green">sukses</span></td>
+                </tr>
+                <tr>
+                  <td>25 Okt 2026, 13.15</td>
+                  <td>
+                    <div class="cell-avatar">
+                      <div class="avatar">DL</div>
+                      <div class="cell-main">Dewi Lestari</div>
+                    </div>
+                  </td>
+                  <td>Menambah artikel</td>
+                  <td>
+                    <button type="button" class="log-subjek" data-modal-open="modalLog" data-subjek="Jadwal Posyandu November" aria-label="Lihat detail aktivitas penambahan artikel Jadwal Posyandu November">Jadwal Posyandu November</button>
+                  </td>
+                  <td><span class="badge badge-green">sukses</span></td>
+                </tr>
+                <tr>
+                  <td>18 Okt 2026, 10.02</td>
+                  <td>
+                    <div class="cell-avatar">
+                      <div class="avatar">SW</div>
+                      <div class="cell-main">Sari Wulandari</div>
+                    </div>
+                  </td>
+                  <td>Mengubah jam layanan kontak</td>
+                  <td>
+                    <button type="button" class="log-subjek" data-modal-open="modalLog" data-subjek="profil-kontak" aria-label="Lihat detail aktivitas perubahan jam layanan kontak">profil-kontak</button>
+                  </td>
+                  <td><span class="badge badge-green">sukses</span></td>
+                </tr>
+                <tr>
+                  <td>12 Okt 2026, 09.20</td>
+                  <td>
+                    <div class="cell-avatar">
+                      <div class="avatar">SW</div>
+                      <div class="cell-main">Sari Wulandari</div>
+                    </div>
+                  </td>
+                  <td>Menonaktifkan akun</td>
+                  <td>
+                    <button type="button" class="log-subjek" data-modal-open="modalLog" data-subjek="bambang" aria-label="Lihat detail aktivitas penonaktifan akun bambang">bambang</button>
+                  </td>
+                  <td><span class="badge badge-amber">peringatan</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="log-empty" id="logEmpty">Tidak ada aktivitas yang cocok dengan pencarian.</p>
+          <div class="panel-foot">
+            <span>Log tidak dapat diubah atau dihapus dari antarmuka admin.</span>
+            <span>Retensi log menunggu kebijakan desa.</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Aktivitas yang dicatat</h2>
+              <p>Jenis tindakan yang masuk ke log pada versi berikutnya.</p>
+            </div>
+          </div>
+          <div class="log-cols">
+            <ul class="doc-bullets">
+              <li>Persetujuan, penolakan, dan permintaan perbaikan.</li>
+              <li>Pembuatan atau perubahan jenis surat.</li>
+              <li>Akses dokumen privat oleh admin.</li>
+            </ul>
+            <ul class="doc-bullets">
+              <li>Perubahan status pengajuan dan dokumen.</li>
+              <li>Publikasi dan perubahan konten website.</li>
+              <li>Perubahan profil desa dan pengaturan akun.</li>
+            </ul>
+          </div>
+        </div>
+      </main>
+
+      <footer class="admin-foot">
+        <span>Sistem Informasi Desa Sukamaju · Versi prototipe 1.0</span>
+        <span>Data pada dashboard adalah contoh dan tidak memuat data warga sebenarnya.</span>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalLog">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="logTitle">
+      <div class="modal-head">
+        <h2 id="logTitle">Detail aktivitas</h2>
+        <button type="button" class="modal-close" data-modal-close aria-label="Tutup">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="kv-row"><div class="k">Waktu</div><div class="v" id="logDWaktu"></div></div>
+      <div class="kv-row"><div class="k">Pelaku</div><div class="v" id="logDPelaku"></div></div>
+      <div class="kv-row"><div class="k">Tindakan</div><div class="v" id="logDTindakan"></div></div>
+      <div class="kv-row"><div class="k">Subjek</div><div class="v code" id="logDSubjek"></div></div>
+      <div class="kv-row"><div class="k">Keterangan</div><div class="v" id="logDKet"></div></div>
+      <a href="detail-pengajuan.html" class="btn btn-outline btn-sm mt-16" id="logLink" style="display:none">Buka detail pengajuan</a>
+      <div class="note-box mt-16">Entri log bersifat baca-saja pada prototipe ini dan tidak dapat diubah atau dihapus.</div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-primary" data-modal-close>Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script>
+    (function () {
+      var logBody = document.getElementById('logBody');
+      var rows = Array.prototype.slice.call(logBody.querySelectorAll('tr'));
+      var logSearch = document.getElementById('logSearch');
+      var logCount = document.getElementById('logCount');
+      var logEmpty = document.getElementById('logEmpty');
+      var notice = document.getElementById('logNotice');
+      var noticeTitle = document.getElementById('logNoticeTitle');
+      var noticeText = document.getElementById('logNoticeText');
+
+      function norm(s) {
+        return s.replace(/\s+/g, ' ').trim();
+      }
+
+      function showNotice(title, text) {
+        noticeTitle.textContent = title;
+        noticeText.textContent = text;
+        notice.style.display = 'flex';
+        notice.scrollIntoView({ block: 'nearest' });
+      }
+
+      // Pencarian
+      logSearch.addEventListener('input', function () {
+        var q = logSearch.value.trim().toLowerCase();
+        var visible = 0;
+        rows.forEach(function (tr) {
+          var cocok = !q || tr.textContent.toLowerCase().indexOf(q) !== -1;
+          tr.style.display = cocok ? '' : 'none';
+          if (cocok) visible++;
+        });
+        logCount.textContent = q
+          ? visible + ' dari ' + rows.length + ' aktivitas ditampilkan'
+          : rows.length + ' aktivitas ditampilkan';
+        logEmpty.style.display = visible ? 'none' : 'block';
+      });
+
+      // Detail baris
+      logBody.addEventListener('click', function (e) {
+        var btn = e.target.closest('.log-subjek');
+        if (!btn) return;
+        var tr = btn.closest('tr');
+        var c = tr.children;
+        document.getElementById('logDWaktu').textContent = norm(c[0].textContent);
+        document.getElementById('logDPelaku').textContent = norm(c[1].textContent);
+        document.getElementById('logDTindakan').textContent = norm(c[2].textContent);
+        document.getElementById('logDSubjek').textContent = btn.dataset.subjek;
+        document.getElementById('logDKet').textContent = norm(c[4].textContent);
+        var link = document.getElementById('logLink');
+        if (/^SBM-\d{4}-\d{4}$/.test(btn.dataset.subjek)) {
+          link.href = 'detail-pengajuan.html?id=' + encodeURIComponent(btn.dataset.subjek);
+          link.style.display = '';
+        } else {
+          link.style.display = 'none';
+        }
+      });
+
+      // Unduh log (CSV dari baris yang sedang ditampilkan)
+      document.getElementById('unduhLog').addEventListener('click', function () {
+        var lines = [['Waktu', 'Pelaku', 'Tindakan', 'Subjek', 'Keterangan']];
+        var jumlah = 0;
+        rows.forEach(function (tr) {
+          if (tr.style.display === 'none') return;
+          var c = tr.children;
+          lines.push([
+            norm(c[0].textContent),
+            norm(c[1].textContent),
+            norm(c[2].textContent),
+            norm(c[3].textContent),
+            norm(c[4].textContent)
+          ]);
+          jumlah++;
+        });
+        var csv = lines.map(function (cols) {
+          return cols.map(function (v) {
+            return '"' + v.replace(/"/g, '""') + '"';
+          }).join(';');
+        }).join('\r\n');
+        var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'log-aktivitas-sukamaju.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showNotice('Log diunduh (contoh).', jumlah + ' baris aktivitas ditulis ke berkas CSV log-aktivitas-sukamaju.csv. Isinya adalah data contoh.');
+      });
+    })();
+  </script>
+</body>
+</html>
