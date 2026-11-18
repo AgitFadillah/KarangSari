@@ -47,9 +47,14 @@ Aplikasi ini adalah hasil migrasi dari prototipe statis tersebut.
 
 ## Kebutuhan
 
-- PHP 8.3+ dengan ekstensi `pdo_sqlite`, `fileinfo`, `gd`
+- PHP 8.3+ dengan ekstensi `pdo_sqlite` (pengembangan), `pdo_pgsql`
+  (produksi), `fileinfo`, `gd`, `zip`, `mbstring`
 - Composer
 - Node.js 20+ (untuk aset Vite)
+
+Produksi memakai **PostgreSQL**, bukan SQLite. Lihat
+[`docs/SIAP-PRODUCTION.md`](docs/SIAP-PRODUCTION.md) bagian 3 untuk alasannya
+dan cara menguji dengan PostgreSQL.
 
 ## Instalasi
 
@@ -72,10 +77,10 @@ sebagai isi awal tabel `profil_desas` **dan** sebagai cadangan bila basis data
 belum siap — setelah instalasi, ubah lewat menu *Profil & Kontak*:
 
 ```
-DESA_NAMA="Desa KarangSari"
-DESA_KECAMATAN=
-DESA_KABUPATEN=
-DESA_PROVINSI=
+DESA_NAMA="Desa Karang Sari"
+DESA_KECAMATAN="Jati Agung"
+DESA_KABUPATEN="Lampung Selatan"
+DESA_PROVINSI="Lampung"
 DESA_PREFIX_REFERENSI=KRS      # awalan nomor referensi -> KRS-2026-0001
 DESA_KODE_SURAT=DS-KRS         # awalan kode pada pratinjau surat
 ```
@@ -139,10 +144,26 @@ status oleh warga (tanpa membocorkan NIK/alamat), autentikasi admin (throttle,
 akun nonaktif), transisi status pengajuan beserta batasan peran, verifikasi
 dokumen per berkas, CRUD konten desa (berita, potensi, statistik, perangkat),
 sorotan berita pada halaman Informasi, panduan admin, akses dokumen privat,
-seeder, dan header keamanan.
+seeder, header keamanan, zona waktu WIB, dan ketahanan formulir admin terhadap
+masukan berbentuk array.
 
 `HalamanPublikTest` juga memastikan seluruh halaman publik tetap dapat
 dirender meski belum ada satu pun data konten (kondisi setelah instalasi baru).
+
+### Menguji dengan PostgreSQL
+
+Produksi memakai PostgreSQL, sedangkan `phpunit.xml` memakai SQLite in-memory.
+Perbedaan perilaku keduanya menyembunyikan beberapa bug nyata (tanggal tidak
+sah, `LIKE` case-sensitive, `bigint` menolak string kosong), jadi sebelum
+deploy jalankan juga:
+
+```bash
+DB_PORT=5432 DB_DATABASE=karangsari_test DB_USERNAME=postgres DB_PASSWORD=... \
+  php artisan test --configuration=phpunit-pgsql.xml
+```
+
+> `RefreshDatabase` **mengosongkan** basis data yang dipakai. Arahkan ke basis
+> data khusus pengujian, jangan ke basis data produksi.
 
 ## Alur pengajuan singkat
 
@@ -206,14 +227,33 @@ Aplikasi ini **tidak bisa dijalankan di GitHub Pages** karena membutuhkan PHP
 dan basis data di sisi server, sedangkan GitHub Pages hanya menyajikan berkas
 statis. Pilihan yang sesuai:
 
-- Shared hosting PHP + MySQL (paling ekonomis dan umum untuk situs desa)
-- VPS dengan Nginx + PHP-FPM + MySQL/Postgres
+- **Railway** — target deploy aplikasi ini. Konfigurasi siap pakai ada di
+  `backend/railway.json` dan `backend/deploy-start.sh`; langkah lengkapnya di
+  [`docs/SIAP-PRODUCTION.md`](docs/SIAP-PRODUCTION.md) bagian 4b.
+- VPS dengan Nginx + PHP-FPM + PostgreSQL
+- Shared hosting PHP + MySQL (paling ekonomis, tetapi perhatikan batas unggah)
 - Platform terkelola seperti Laravel Cloud
 
 **Supabase** dapat dipakai sebagai **database Postgres + Storage** (bucket
 privat), tetapi Supabase **tidak menjalankan PHP**. Backend Laravel tetap harus
 di-host di layanan PHP. Konfigurasi contoh ada di
 `backend/.env.production.example` (`DB_CONNECTION=pgsql`, `DOKUMEN_DISK=s3`).
+
+### Deploy ke Railway (ringkas)
+
+1. Buat service dari repositori ini, **Root Directory: `backend`**.
+2. Tambahkan plugin **PostgreSQL**, lalu isi variabel `DB_*` dari referensi
+   `${{Postgres.PGHOST}}` dan seterusnya.
+3. Isi `APP_ENV=production`, `APP_DEBUG=false`, `APP_KEY` (dari
+   `php artisan key:generate --show`), `APP_URL`, `TRUSTED_PROXIES=*`,
+   `SESSION_SECURE_COOKIE=true`, `APP_TIMEZONE=Asia/Jakarta`.
+4. Pasang **volume** pada `storage/` agar dokumen warga tidak hilang setiap
+   deploy, atau set `DOKUMEN_DISK=s3`.
+5. Setelah deploy pertama, jalankan `php artisan db:seed --force` **sekali**
+   lewat tab Shell untuk mengisi profil desa, jenis surat, dan akun admin.
+
+Rincian, termasuk batas unggah berkas dan alasan tiap variabel, ada di
+[`docs/SIAP-PRODUCTION.md`](docs/SIAP-PRODUCTION.md).
 
 ## Struktur
 
