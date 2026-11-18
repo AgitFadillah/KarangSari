@@ -65,7 +65,7 @@ echo "[start] Menunggu basis data siap dan menjalankan migrasi..."
 #     SQLSTATE[42P01]: Undefined table: relation "cache" does not exist
 #
 # Perintah itu gagal, cache config tidak pernah terhapus, dan seluruh proses
-# start memakai nilai hasil build — persis masalah yang ingin dicegah. Karena
+# start memakai nilai hasil build - persis masalah yang ingin dicegah. Karena
 # itu dipakai perintah yang hanya menyentuh berkas di disk.
 php artisan config:clear  || echo "[start] Peringatan: config:clear gagal."
 php artisan route:clear   || echo "[start] Peringatan: route:clear gagal."
@@ -103,7 +103,7 @@ done
 # dokumen warga tidak hilang setiap deploy), isi folder asli dari image
 # TERTUTUPI oleh volume kosong. Akibatnya Laravel kehilangan
 # storage/framework/{cache,sessions,views} dan berhenti dengan galat
-# "Please provide a valid cache path" — container crash berulang tanpa
+# "Please provide a valid cache path" - container crash berulang tanpa
 # petunjuk yang jelas. Membuat ulang foldernya di sini membuat volume
 # kosong tetap bisa dipakai.
 mkdir -p \
