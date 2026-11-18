@@ -98,6 +98,27 @@ php artisan event:clear   || echo "[start] Peringatan: event:clear gagal."
 php artisan clear-compiled || echo "[start] Peringatan: clear-compiled gagal."
 
 # ---------------------------------------------------------------------------
+# Jaring pengaman: susun alamat basis data dari variabel PG* bila perlu.
+# ---------------------------------------------------------------------------
+# Layanan PostgreSQL di Railway menyediakan PGHOST, PGPORT, PGDATABASE, PGUSER,
+# dan PGPASSWORD. Bila variabel-variabel itu sudah terbaca oleh aplikasi
+# (misalnya lewat Shared Variable) tetapi DB_URL belum diisi, tidak ada alasan
+# untuk gagal: alamatnya bisa disusun sendiri dari nilai yang sudah ada.
+#
+# Nilai yang sudah diisi pengguna TIDAK pernah ditimpa. Blok ini diletakkan
+# sebelum diagnostik supaya log menampilkan alamat yang benar-benar dipakai.
+if [ -z "${DB_URL:-}" ] && [ -n "${PGHOST:-}" ]; then
+    echo "[start] DB_URL kosong, menyusun alamat dari variabel PG*..."
+    export DB_CONNECTION="${DB_CONNECTION:-pgsql}"
+    export DB_HOST="${DB_HOST:-${PGHOST}}"
+    export DB_PORT="${DB_PORT:-${PGPORT:-5432}}"
+    export DB_DATABASE="${DB_DATABASE:-${PGDATABASE:-railway}}"
+    export DB_USERNAME="${DB_USERNAME:-${PGUSER:-postgres}}"
+    export DB_PASSWORD="${DB_PASSWORD:-${PGPASSWORD:-}}"
+    echo "[start] Alamat tersusun: host=${DB_HOST} port=${DB_PORT} nama=${DB_DATABASE}"
+fi
+
+# ---------------------------------------------------------------------------
 # Laporkan konfigurasi yang benar-benar diterima aplikasi.
 # ---------------------------------------------------------------------------
 # Tanpa ini, bila container mati saat start, satu-satunya cara mengetahui
@@ -110,18 +131,29 @@ php artisan clear-compiled || echo "[start] Peringatan: clear-compiled gagal."
 echo "[start] Memeriksa konfigurasi..."
 php artisan tinker --execute='
     $url = (string) env("APP_URL");
+    $dbUrl = (string) env("DB_URL");
     echo "  APP_ENV        = ".env("APP_ENV").PHP_EOL;
     echo "  APP_DEBUG      = ".(env("APP_DEBUG") ? "true" : "false").PHP_EOL;
     echo "  APP_URL        = ".$url.PHP_EOL;
     echo "  APP_URL bersih = ".(($url === trim($url) && strpos($url, chr(34)) === false) ? "ya" : "TIDAK (ada kutip/baris baru)").PHP_EOL;
     echo "  APP_KEY        = ".(str_starts_with((string) env("APP_KEY"), "base64:") ? "base64 (dikenali)" : "TIDAK DIKENALI").PHP_EOL;
     echo "  DB_CONNECTION  = ".env("DB_CONNECTION").PHP_EOL;
-    echo "  DB_URL terisi  = ".(env("DB_URL") ? "ya" : "TIDAK").PHP_EOL;
+    echo "  DB_URL terisi  = ".($dbUrl !== "" ? "ya" : "TIDAK").PHP_EOL;
+    echo "  DB_URL panjang = ".strlen($dbUrl)." karakter".PHP_EOL;
+    echo "  DB_URL mentah  = ".(str_contains($dbUrl, "{{") ? "YA, masih teks referensi yang tidak ter-resolve" : "tidak").PHP_EOL;
     echo "  DB host        = ".config("database.connections.".config("database.default").".host").PHP_EOL;
     echo "  DB nama        = ".config("database.connections.".config("database.default").".database").PHP_EOL;
     echo "  SESSION_DRIVER = ".env("SESSION_DRIVER").PHP_EOL;
     echo "  DOKUMEN_DISK   = ".config("desa.disk_dokumen").PHP_EOL;
     echo "  Volume storage = ".(is_dir(storage_path("app")) && is_writable(storage_path("app")) ? "siap & bisa ditulis" : "TIDAK BISA DITULIS").PHP_EOL;
+    $kunci = [];
+    foreach (getenv() as $nama => $nilai) {
+        if (preg_match("/^(DB_|PG|DATABASE)/", (string) $nama) === 1) {
+            $kunci[] = $nama;
+        }
+    }
+    sort($kunci);
+    echo "  Variabel DB/PG = ".(count($kunci) > 0 ? implode(", ", $kunci) : "tidak ada").PHP_EOL;
 ' 2>&1 || echo "[start] Peringatan: pemeriksaan konfigurasi gagal dijalankan."
 
 echo "[start] Menguji koneksi basis data..."

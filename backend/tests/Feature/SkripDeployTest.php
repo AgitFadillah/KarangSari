@@ -375,7 +375,8 @@ class SkripDeployTest extends TestCase
         unset($env['Path']);
         $env['PATH'] = $palsu . PATH_SEPARATOR . $pathAsli;
 
-        foreach (['DB_URL', 'DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD'] as $kunci) {
+        foreach (['DB_URL', 'DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD',
+            'PGHOST', 'PGPORT', 'PGDATABASE', 'PGUSER', 'PGPASSWORD'] as $kunci) {
             unset($env[$kunci]);
         }
 
@@ -470,6 +471,76 @@ class SkripDeployTest extends TestCase
             1,
             $kode,
             'Dengan DB_URL terisi, skrip tidak boleh berhenti dengan kode gagal.'
+        );
+    }
+
+    /**
+     * Bila DB_URL kosong tetapi variabel PG* tersedia, skrip menyusun sendiri
+     * alamat koneksinya.
+     *
+     * Layanan PostgreSQL di Railway menyediakan PGHOST, PGPORT, PGDATABASE,
+     * PGUSER, dan PGPASSWORD. Ketika nilai-nilai itu sudah terbaca aplikasi
+     * (misalnya lewat Shared Variable) tetapi DB_URL belum diisi, tidak ada
+     * alasan untuk gagal: alamatnya bisa disusun dari yang sudah ada.
+     *
+     * Ini juga jaring pengaman terakhir bila mekanisme referensi
+     * ${{Service.DATABASE_URL}} ternyata tidak berjalan: cukup bagikan variabel
+     * PG* ke service aplikasi, dan aplikasi tetap bisa menyambung.
+     */
+    public function test_skrip_start_menyusun_alamat_dari_variabel_pg(): void
+    {
+        [$kode, $keluaran] = $this->jalankanSkripStart([
+            'DB_CONNECTION' => 'pgsql',
+            'PGHOST' => 'postgres.railway.internal',
+            'PGPORT' => '5432',
+            'PGDATABASE' => 'railway',
+            'PGUSER' => 'postgres',
+            'PGPASSWORD' => 'rahasia-uji',
+        ]);
+
+        $this->assertStringContainsString(
+            'host=postgres.railway.internal',
+            $keluaran,
+            'Skrip harus menyusun alamat basis data dari variabel PG* ketika DB_URL kosong. '
+            . 'Keluaran: ' . $keluaran
+        );
+
+        $this->assertStringContainsString(
+            'artisan migrate',
+            $keluaran,
+            'Setelah alamat tersusun dari variabel PG*, skrip harus melanjutkan ke migrate.'
+        );
+
+        $this->assertStringNotContainsString(
+            'DB_URL kosong dan DB_HOST tidak diisi',
+            $keluaran,
+            'Skrip tidak boleh berhenti cepat bila alamat sebenarnya bisa disusun dari variabel PG*.'
+        );
+
+        $this->assertNotSame(
+            1,
+            $kode,
+            'Dengan variabel PG* tersedia, skrip tidak boleh berhenti dengan kode gagal.'
+        );
+    }
+
+    /**
+     * Nilai yang sudah diisi pengguna tidak boleh ditimpa oleh jaring pengaman.
+     */
+    public function test_skrip_start_tidak_menimpa_db_url_yang_sudah_diisi(): void
+    {
+        [, $keluaran] = $this->jalankanSkripStart([
+            'DB_CONNECTION' => 'pgsql',
+            'DB_URL' => 'postgresql://pengguna:rahasia@postgres.railway.internal:5432/railway',
+            'PGHOST' => 'host-lain.yang.tidak.dipakai',
+            'PGDATABASE' => 'nama-lain',
+        ]);
+
+        $this->assertStringNotContainsString(
+            'Alamat tersusun',
+            $keluaran,
+            'Jaring pengaman PG* hanya boleh dipakai ketika DB_URL kosong. Bila DB_URL sudah '
+            . 'diisi, nilainya harus dipakai apa adanya.'
         );
     }
 }
