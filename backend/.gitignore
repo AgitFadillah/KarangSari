@@ -35,3 +35,21 @@ Thumbs.db
 /.mcp.json
 /boost.json
 /opencode.json
+
+# -----------------------------------------------------------------------------
+# Sisa pengujian manual
+# -----------------------------------------------------------------------------
+# Berkas yang dibuat saat menguji aplikasi lewat curl/HTTP. Beberapa di antaranya
+# berisi hal sensitif dan TIDAK boleh masuk repositori:
+#
+#   c_*.txt   -> cookie jar curl (berisi token sesi admin)
+#   tok*.txt  -> token CSRF / kode akses
+#   rev.txt   -> nomor referensi + kode akses pengajuan warga
+#   resp.html -> tangkapan halaman yang bisa memuat data pribadi
+#   *-uji.png -> contoh berkas unggahan (KTP, foto)
+/c_*.txt
+/tok*.txt
+/rev.txt
+/resp*.html
+/jahat.html
+/*-uji.png

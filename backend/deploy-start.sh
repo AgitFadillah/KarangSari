@@ -43,6 +43,21 @@ fi
 
 echo "[start] Menunggu basis data siap dan menjalankan migrasi..."
 
+# ---------------------------------------------------------------------------
+# Buang cache config hasil build SEBELUM menyentuh basis data.
+# ---------------------------------------------------------------------------
+# Railpack menjalankan "php artisan config:cache" pada tahap build. Nilai
+# seperti DB_URL, APP_URL, dan APP_KEY saat itu ikut TERBAKED di dalam
+# bootstrap/cache/config.php, dan variabel runtime diabaikan selama berkas
+# cache itu ada.
+#
+# Akibatnya, bila variabel diubah di dashboard lalu container dijalankan ulang
+# tanpa build ulang, Laravel tetap memakai nilai lama. Yang lebih berbahaya:
+# "migrate" di bawah bisa menyambung ke basis data yang salah. Karena itu
+# cache dibuang dulu, sehingga seluruh proses start memakai variabel runtime.
+# Cache dibangun ulang oleh "optimize" di akhir skrip ini.
+php artisan optimize:clear >/dev/null 2>&1 || echo "[start] Peringatan: optimize:clear gagal (lanjut dengan cache lama)."
+
 percobaan=0
 batas=10
 
@@ -56,8 +71,9 @@ while :; do
 
     if [ "$percobaan" -ge "$batas" ]; then
         echo "[start] GAGAL: migrasi tidak berhasil setelah $batas percobaan."
-        echo "[start] Periksa variabel DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD,"
-        echo "[start] dan pastikan layanan PostgreSQL sudah dibuat serta terhubung ke service ini."
+        echo "[start] Periksa variabel DB_URL (disarankan) atau DB_HOST, DB_PORT,"
+        echo "[start] DB_DATABASE, DB_USERNAME, DB_PASSWORD, dan pastikan layanan"
+        echo "[start] PostgreSQL sudah dibuat serta terhubung ke service ini."
         exit 1
     fi
 
