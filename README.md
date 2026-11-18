@@ -242,8 +242,9 @@ di-host di layanan PHP. Konfigurasi contoh ada di
 ### Deploy ke Railway (ringkas)
 
 1. Buat service dari repositori ini, **Root Directory: `backend`**.
-2. Tambahkan plugin **PostgreSQL**, lalu isi variabel `DB_*` dari referensi
-   `${{Postgres.PGHOST}}` dan seterusnya.
+2. Tambahkan plugin **PostgreSQL**, lalu set `DB_CONNECTION=pgsql` dan
+   `DB_URL=${{Postgres.DATABASE_URL}}` (satu variabel ini sudah memuat host,
+   port, nama basis data, user, dan sandi).
 3. Isi `APP_ENV=production`, `APP_DEBUG=false`, `APP_KEY` (dari
    `php artisan key:generate --show`), `APP_URL`, `TRUSTED_PROXIES=*`,
    `SESSION_SECURE_COOKIE=true`, `APP_TIMEZONE=Asia/Jakarta`.
