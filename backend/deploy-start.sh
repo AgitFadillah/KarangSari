@@ -41,6 +41,30 @@ if [ -z "${APP_KEY:-}" ]; then
     exit 1
 fi
 
+# ---------------------------------------------------------------------------
+# Pastikan folder storage yang dibutuhkan Laravel ada.
+# ---------------------------------------------------------------------------
+# Langkah ini HARUS paling awal, sebelum perintah artisan apa pun.
+#
+# Bila volume persisten dipasang pada "storage/" (cara yang disarankan agar
+# dokumen warga tidak hilang setiap deploy), isi folder asli dari image
+# TERTUTUPI oleh volume kosong. Akibatnya Laravel kehilangan
+# storage/framework/{cache,sessions,views} dan storage/logs, lalu berhenti
+# dengan galat "Please provide a valid cache path" atau gagal menulis log.
+#
+# Dulu folder ini dibuat SETELAH "migrate". Itu tidak cukup: bila migrasi
+# menyentuh galat apa pun, Laravel mencoba menulis log ke storage/logs yang
+# belum ada, sehingga container mati sebelum foldernya sempat dibuat.
+mkdir -p \
+    storage/app/private \
+    storage/app/public \
+    storage/app/temp \
+    storage/framework/cache/data \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/logs \
+    bootstrap/cache
+
 echo "[start] Menunggu basis data siap dan menjalankan migrasi..."
 
 # ---------------------------------------------------------------------------
@@ -97,24 +121,8 @@ while :; do
 done
 
 # ---------------------------------------------------------------------------
-# Pastikan folder storage yang dibutuhkan Laravel ada.
+# Folder storage sudah dibuat di awal skrip (lihat bagian atas).
 # ---------------------------------------------------------------------------
-# Bila volume persisten dipasang pada "storage/" (cara yang disarankan agar
-# dokumen warga tidak hilang setiap deploy), isi folder asli dari image
-# TERTUTUPI oleh volume kosong. Akibatnya Laravel kehilangan
-# storage/framework/{cache,sessions,views} dan berhenti dengan galat
-# "Please provide a valid cache path" - container crash berulang tanpa
-# petunjuk yang jelas. Membuat ulang foldernya di sini membuat volume
-# kosong tetap bisa dipakai.
-mkdir -p \
-    storage/app/private \
-    storage/app/public \
-    storage/app/temp \
-    storage/framework/cache/data \
-    storage/framework/sessions \
-    storage/framework/views \
-    storage/logs \
-    bootstrap/cache
 
 # Foto perangkat desa disimpan di disk "public". Symlink ini tidak tersimpan
 # di repositori dan hilang setiap container diganti, jadi dibuat ulang di sini.

@@ -117,6 +117,51 @@ class SkripDeployTest extends TestCase
     }
 
     /**
+     * Folder storage harus dibuat SEBELUM perintah artisan apa pun.
+     *
+     * Bila volume persisten dipasang pada "storage/", isi folder asli dari
+     * image tertutupi oleh volume kosong. Laravel lalu kehilangan
+     * storage/logs dan storage/framework/{cache,sessions,views}.
+     *
+     * Kalau folder itu baru dibuat setelah "migrate", satu galat saja saat
+     * migrasi sudah cukup untuk mematikan container: Laravel mencoba menulis
+     * log ke folder yang belum ada. Itu gejalanya sama membingungkan dengan
+     * bug "cache" sebelumnya — build sukses, container mati.
+     */
+    public function test_folder_storage_dibuat_sebelum_perintah_artisan(): void
+    {
+        $perintah = implode("\n", $this->barisPerintah($this->skrip('deploy-start.sh')));
+
+        $posisiMkdir = strpos($perintah, 'storage/framework/sessions');
+        $posisiMigrate = strpos($perintah, 'migrate --force');
+        $posisiClear = strpos($perintah, 'config:clear');
+
+        $this->assertNotFalse(
+            $posisiMkdir,
+            'deploy-start.sh harus membuat folder storage (storage/framework/sessions dan '
+            . 'sebagainya). Tanpa itu, volume kosong di /app/storage membuat aplikasi mati '
+            . 'dengan "Please provide a valid cache path".'
+        );
+
+        $this->assertNotFalse($posisiMigrate, 'deploy-start.sh harus menjalankan "migrate --force".');
+        $this->assertNotFalse($posisiClear, 'deploy-start.sh harus menjalankan "config:clear".');
+
+        $this->assertLessThan(
+            $posisiMigrate,
+            $posisiMkdir,
+            'Folder storage harus dibuat SEBELUM migrate. Kalau dibuat sesudahnya, galat apa pun '
+            . 'saat migrasi tidak bisa dicatat ke storage/logs dan container mati lebih awal.'
+        );
+
+        $this->assertLessThan(
+            $posisiClear,
+            $posisiMkdir,
+            'Folder storage harus dibuat SEBELUM config:clear, karena perintah artisan itu pun '
+            . 'sudah membutuhkan storage/logs untuk mencatat galat.'
+        );
+    }
+
+    /**
      * Skrip dijalankan oleh "sh" di Linux (Railway). Berkas dengan akhir baris
      * CRLF membuat sh gagal dengan pesan seperti:
      *
