@@ -97,6 +97,43 @@ php artisan view:clear    || echo "[start] Peringatan: view:clear gagal."
 php artisan event:clear   || echo "[start] Peringatan: event:clear gagal."
 php artisan clear-compiled || echo "[start] Peringatan: clear-compiled gagal."
 
+# ---------------------------------------------------------------------------
+# Laporkan konfigurasi yang benar-benar diterima aplikasi.
+# ---------------------------------------------------------------------------
+# Tanpa ini, bila container mati saat start, satu-satunya cara mengetahui
+# penyebabnya adalah menebak dari dashboard. Log ini menjawab pertanyaan yang
+# paling sering muncul sekaligus: apakah DB_URL terpasang, apakah basis data
+# bisa dihubungi, dan apakah ada nilai yang membawa kutip atau baris baru.
+#
+# Rahasia tidak pernah dicetak: kata sandi hanya ditampilkan sebagai
+# "terisi"/"kosong", dan APP_KEY hanya sebagai awalan "base64:".
+echo "[start] Memeriksa konfigurasi..."
+php artisan tinker --execute='
+    $url = (string) env("APP_URL");
+    echo "  APP_ENV        = ".env("APP_ENV").PHP_EOL;
+    echo "  APP_DEBUG      = ".(env("APP_DEBUG") ? "true" : "false").PHP_EOL;
+    echo "  APP_URL        = ".$url.PHP_EOL;
+    echo "  APP_URL bersih = ".(($url === trim($url) && strpos($url, chr(34)) === false) ? "ya" : "TIDAK (ada kutip/baris baru)").PHP_EOL;
+    echo "  APP_KEY        = ".(str_starts_with((string) env("APP_KEY"), "base64:") ? "base64 (dikenali)" : "TIDAK DIKENALI").PHP_EOL;
+    echo "  DB_CONNECTION  = ".env("DB_CONNECTION").PHP_EOL;
+    echo "  DB_URL terisi  = ".(env("DB_URL") ? "ya" : "TIDAK").PHP_EOL;
+    echo "  DB host        = ".config("database.connections.".config("database.default").".host").PHP_EOL;
+    echo "  DB nama        = ".config("database.connections.".config("database.default").".database").PHP_EOL;
+    echo "  SESSION_DRIVER = ".env("SESSION_DRIVER").PHP_EOL;
+    echo "  DOKUMEN_DISK   = ".config("desa.disk_dokumen").PHP_EOL;
+    echo "  Volume storage = ".(is_dir(storage_path("app")) && is_writable(storage_path("app")) ? "siap & bisa ditulis" : "TIDAK BISA DITULIS").PHP_EOL;
+' 2>&1 || echo "[start] Peringatan: pemeriksaan konfigurasi gagal dijalankan."
+
+echo "[start] Menguji koneksi basis data..."
+php artisan tinker --execute='
+    try {
+        Illuminate\Support\Facades\DB::connection()->getPdo();
+        echo "  Koneksi basis data: BERHASIL".PHP_EOL;
+    } catch (Throwable $e) {
+        echo "  Koneksi basis data: GAGAL -> ".$e->getMessage().PHP_EOL;
+    }
+' 2>&1 || echo "[start] Peringatan: uji koneksi basis data gagal dijalankan."
+
 percobaan=0
 batas=10
 
