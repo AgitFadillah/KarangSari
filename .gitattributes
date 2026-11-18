@@ -1,0 +1,52 @@
+# =============================================================================
+#  Atribut berkas repositori Website Desa KarangSari
+# =============================================================================
+#  Tujuan utama: memastikan skrip shell tetap memakai akhir baris LF (Unix)
+#  meskipun repositori ini dikembangkan di Windows.
+#
+#  Kenapa penting?
+#  Bila deploy-start.sh tersimpan dengan akhir baris CRLF, Linux membacanya
+#  sebagai "/bin/sh\r" dan skrip gagal dijalankan ("not found" atau galat
+#  sintaks). Gejalanya membingungkan karena berkasnya terlihat baik-baik saja
+#  di Windows. Aturan di bawah memaksa LF untuk skrip, dan menormalkan berkas
+#  teks lain agar riwayat git tidak dipenuhi perubahan akhir baris.
+# =============================================================================
+
+# Skrip shell WAJIB LF.
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Berkas atribut ini sendiri juga LF.
+.gitattributes text eol=lf
+
+# Berkas konfigurasi & kode: LF agar konsisten di semua sistem.
+*.php text eol=lf
+*.blade.php text eol=lf
+*.js text eol=lf
+*.css text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.xml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.env* text eol=lf
+*.example text eol=lf
+*.ini text eol=lf
+Dockerfile text eol=lf
+.dockerignore text eol=lf
+
+# Berkas biner: jangan diubah sama sekali.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.docx binary
+*.xlsx binary
+*.pdf binary
+*.zip binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary

@@ -1,0 +1,47 @@
+# =============================================================================
+#  .dockerignore — berkas yang tidak perlu ikut ke build Railway
+# =============================================================================
+#  Railway (Railpack) mengirim konteks build dari repositori. Mengecualikan
+#  folder besar membuat build jauh lebih cepat dan mencegah berkas lokal
+#  (termasuk .env berisi rahasia) ikut terkirim.
+# =============================================================================
+
+# Rahasia — JANGAN pernah masuk konteks build.
+.env
+.env.*
+!.env.example
+!.env.production.example
+
+# Dependensi: dipasang ulang di server, versi lokal bisa beda platform.
+vendor/
+node_modules/
+
+# Hasil build lokal: dibuat ulang oleh "npm run build" di server.
+public/build/
+public/hot
+
+# Basis data lokal (berisi data warga sungguhan di komputer dev).
+database/*.sqlite
+database/*.sqlite3
+database/*.sqlite-shm
+database/*.sqlite-wal
+
+# Dokumen warga & log: data pribadi, tidak boleh ikut ke build.
+storage/app/private/*
+storage/app/public/perangkat/*
+storage/app/temp/*
+storage/logs/*
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+!storage/app/private/.gitignore
+!storage/app/public/.gitignore
+
+# Berkas pengembangan & cache
+.phpunit.result.cache
+.phpunit.cache/
+.phpactor.json
+_ide_helper.php
+.git/
+.gitignore
+.dockerignore
