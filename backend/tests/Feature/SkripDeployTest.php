@@ -162,6 +162,76 @@ class SkripDeployTest extends TestCase
     }
 
     /**
+     * `railway.json` harus ada di ROOT repositori, bukan hanya di backend/.
+     *
+     * Dokumentasi Railway: "The Railway Config File does not follow the Root
+     * Directory path. You have to specify the absolute path for the
+     * railway.json or railway.toml file."
+     *
+     * Artinya dengan Root Directory = /backend, Railway tetap mencari
+     * railway.json di ROOT repo. Berkas yang hanya ada di backend/ tidak
+     * pernah dibaca. Akibatnya startCommand, healthcheckPath, dan
+     * restartPolicy di dalamnya diabaikan seluruhnya.
+     *
+     * Ini pernah terjadi dan gejalanya menyesatkan: build sukses, deploy
+     * dilaporkan "successful" hanya dalam 12 detik, tetapi container tidak
+     * pernah menjalankan skrip start sehingga tidak ada proses yang
+     * mendengarkan port - Railway membalas 502 tanpa petunjuk apa pun.
+     */
+    public function test_railway_json_ada_di_root_repositori(): void
+    {
+        $root = dirname(__DIR__, 3);
+        $berkas = $root . '/railway.json';
+
+        $this->assertFileExists(
+            $berkas,
+            'railway.json harus ada di ROOT repositori. Railway tidak membaca berkas ini '
+            . 'dari dalam Root Directory (/backend), sehingga tanpa berkas di root, '
+            . 'startCommand "sh deploy-start.sh" tidak pernah dipakai dan container tidak '
+            . 'pernah menjalankan aplikasi.'
+        );
+
+        $isi = (string) file_get_contents($berkas);
+        $konfig = json_decode($isi, true);
+
+        $this->assertIsArray($konfig, 'railway.json di root harus berupa JSON yang valid.');
+
+        $start = (string) ($konfig['deploy']['startCommand'] ?? '');
+        $build = (string) ($konfig['build']['buildCommand'] ?? '');
+
+        $this->assertStringContainsString(
+            'deploy-start.sh',
+            $start,
+            'startCommand di railway.json (root) harus menjalankan deploy-start.sh.'
+        );
+
+        $this->assertStringContainsString(
+            'build.sh',
+            $build,
+            'buildCommand di railway.json (root) harus menjalankan build.sh.'
+        );
+
+        // Perintah harus tetap benar baik dijalankan dari root repo maupun dari
+        // dalam /backend, karena keduanya mungkin terjadi tergantung bagaimana
+        // Railway menerapkan Root Directory.
+        foreach (['startCommand' => $start, 'buildCommand' => $build] as $nama => $perintah) {
+            $this->assertStringContainsString(
+                'cd backend',
+                $perintah,
+                "{$nama} di railway.json (root) harus menangani kemungkinan dijalankan dari "
+                . 'root repo, dengan masuk ke folder backend lebih dulu.'
+            );
+        }
+
+        $this->assertSame(
+            '/up',
+            $konfig['deploy']['healthcheckPath'] ?? null,
+            'healthcheckPath di railway.json (root) harus "/up" agar Railway menunggu '
+            . 'aplikasi benar-benar siap sebelum menganggap deploy berhasil.'
+        );
+    }
+
+    /**
      * Skrip dijalankan oleh "sh" di Linux (Railway). Berkas dengan akhir baris
      * CRLF membuat sh gagal dengan pesan seperti:
      *
