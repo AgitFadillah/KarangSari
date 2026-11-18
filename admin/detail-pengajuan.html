@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detail Pengajuan · Dashboard Admin Desa Sukamaju</title>
+  <meta name="description" content="Detail pengajuan surat pada dashboard admin Desa Sukamaju: data pemohon, dokumen persyaratan, riwayat status, dan preview surat.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    #actionNotice, #statusNote { display: none; }
+    #actionNotice.show, #statusNote.show { display: flex; }
+    .detail-head-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+    .field-block { padding: 12px 0; border-bottom: 1px solid var(--gray-200); min-width: 0; }
+    .field-block .label-cap { margin: 0 0 4px; }
+    .field-block b { display: block; font-size: .95rem; font-weight: 700; color: var(--gray-900); overflow-wrap: anywhere; }
+    .data-list > * { min-width: 0; }
+    .doc-file .dz-meta { min-width: 0; }
+    .detail-letter { font-size: .75rem; padding: 28px 26px; }
+    .detail-letter .letter-inst span { display: block; }
+    .detail-letter .letter-fields .doc-row { grid-template-columns: 104px 10px 1fr; }
+    .doc-actions { display: flex; gap: 12px; }
+    .doc-actions .btn { flex: 1; justify-content: center; }
+    .action-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+  </style>
+</head>
+<body>
+  <div class="admin-shell">
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="admin-brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M4 18h16M6 18v-8h3v8M11 18v-8h3v8M16 18v-8h3v8M12 3l9 5H3l9-5z"/></svg>
+        </div>
+        <div>
+          <div class="brand-name">Desa Sukamaju</div>
+          <div class="brand-sub">DASHBOARD ADMIN</div>
+        </div>
+      </div>
+      <nav class="admin-nav" aria-label="Menu admin">
+        <div class="admin-nav-label">OPERASIONAL</div>
+        <a href="ringkasan.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Ringkasan
+        </a>
+        <a href="pengajuan.html" class="active" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>
+          Pengajuan Surat
+          <span class="badge badge-gray">2</span>
+        </a>
+        <div class="admin-nav-label">PENGATURAN</div>
+        <a href="jenis-surat.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+          Jenis Surat
+        </a>
+        <a href="konten-website.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>
+          Konten Website
+        </a>
+        <a href="profil-kontak.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Profil &amp; Kontak
+        </a>
+        <a href="akun-admin.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Akun Admin
+        </a>
+        <a href="log-aktivitas.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          Log Aktivitas
+        </a>
+        <div class="admin-help">
+          <b>Butuh bantuan?</b>
+          Panduan singkat alur verifikasi dan pengelolaan surat.
+          <a href="../pelayanan.html#cara">Buka panduan →</a>
+        </div>
+      </nav>
+      <a href="akun-admin.html" class="admin-user">
+        <div class="avatar">SW</div>
+        <div>
+          <div class="admin-user-name">Sari Wulandari</div>
+          <div class="admin-user-role">Administrator</div>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="margin-left:auto;opacity:.5"><path d="M6 9l6 6 6-6"/></svg>
+      </a>
+    </aside>
+
+    <div class="admin-main">
+      <header class="admin-topbar">
+        <button class="admin-menu-btn" id="adminMenuBtn" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="adminSidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div>
+          <div class="breadcrumb"><a href="ringkasan.html">Admin</a><span class="sep">/</span><span>Detail Pengajuan</span></div>
+          <h1>Detail Pengajuan</h1>
+        </div>
+        <form class="search" action="pengajuan.html" method="get" role="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="search" name="q" placeholder="Cari pengajuan..." aria-label="Cari pengajuan">
+        </form>
+        <a href="pengajuan.html" class="admin-bell" aria-label="2 pengajuan menunggu verifikasi">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <span class="admin-bell-dot"></span>
+        </a>
+        <a href="akun-admin.html" class="admin-user-chip">
+          <div class="avatar">SW</div>
+          <div>
+            <div class="name">Sari W.</div>
+            <div class="role">Admin</div>
+          </div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="color:var(--gray-500)"><path d="M6 9l6 6 6-6"/></svg>
+        </a>
+      </header>
+
+      <main class="admin-content">
+        <div class="notice notice-blue" id="actionNotice" role="status">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
+          <span id="noticeText"></span>
+        </div>
+
+        <div class="admin-page-head greeting">
+          <div>
+            <a href="pengajuan.html" class="back-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              Kembali ke daftar pengajuan
+            </a>
+            <div class="detail-head-row">
+              <h2 id="dRef">SBM-2026-0008</h2>
+              <span class="badge badge-amber" id="dStatus">Menunggu Verifikasi</span>
+            </div>
+            <p class="sub" id="dSub">Surat Keterangan Domisili · diajukan 30 Okt 2026, 09.14</p>
+          </div>
+          <div class="action-row">
+            <button type="button" class="btn btn-outline btn-sm" data-copy="#dWa">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--green-600)"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.4L3 20.5l1.7-5.5A8.4 8.4 0 1 1 21 11.5z"/></svg>
+              Salin nomor WhatsApp
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" id="btnCetakHead">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>
+              Cetak
+            </button>
+            <button type="button" class="btn btn-amber-outline btn-sm" data-modal-open="modalPerbaikan">Minta perbaikan</button>
+            <button type="button" class="btn btn-danger-outline btn-sm" data-modal-open="modalTolak">Tolak</button>
+            <button type="button" class="btn btn-primary btn-sm" data-modal-open="modalSetujui">Setujui</button>
+          </div>
+        </div>
+
+        <div class="admin-grid-2">
+          <div>
+            <div class="notice notice-amber" id="statusNote" role="note">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+              <span id="statusNoteText"></span>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>Data pemohon</h2>
+                  <p>Nilai formulir tersimpan sebagai snapshot pengajuan.</p>
+                </div>
+                <span class="badge badge-gray">Formulir v1</span>
+              </div>
+              <div class="data-list">
+                <div class="field-block">
+                  <div class="label-cap">NAMA LENGKAP</div>
+                  <b id="dNama">Budi Santoso</b>
+                </div>
+                <div class="field-block">
+                  <div class="label-cap">NIK</div>
+                  <b id="dNik" class="code">3201121508870003</b>
+                </div>
+                <div class="field-block">
+                  <div class="label-cap">TEMPAT LAHIR</div>
+                  <b id="dTempat">Bogor</b>
+                </div>
+                <div class="field-block">
+                  <div class="label-cap">TANGGAL LAHIR</div>
+                  <b id="dTanggal">1987-08-15</b>
+                </div>
+                <div class="field-block">
+                  <div class="label-cap">JENIS KELAMIN</div>
+                  <b id="dJk">Laki-laki</b>
+                </div>
+                <div class="field-block">
+                  <div class="label-cap">ALAMAT LENGKAP</div>
+                  <b id="dAlamat">Kp. Pasir Angin RT 02/RW 05</b>
+                </div>
+                <div class="field-block">
+                  <div class="label-cap">KEPERLUAN SURAT</div>
+                  <b id="dKeperluan">Keterangan domisili untuk administrasi sekolah</b>
+                </div>
+                <div class="field-block">
+                  <div class="label-cap">NOMOR WHATSAPP</div>
+                  <b id="dWa" class="code">081234567890</b>
+                </div>
+              </div>
+              <div class="field-block" style="border-bottom:none">
+                <div class="label-cap">PERSETUJUAN PRIVASI</div>
+                <b>Versi 2026-01 · disetujui saat pengiriman</b>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>Dokumen persyaratan</h2>
+                  <p>File privat. Hanya dapat dibuka admin yang berwenang.</p>
+                </div>
+                <span class="badge badge-gray" id="docCount">3 berkas</span>
+              </div>
+              <div id="docList">
+                <div class="doc-file">
+                  <div class="icon-tile" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+                  </div>
+                  <div class="dz-meta">
+                    <div class="dz-name">KTP pemohon</div>
+                    <div class="dz-size">ktp-budi-santoso.jpg · 842 KB</div>
+                  </div>
+                  <span class="badge badge-green">terverifikasi</span>
+                  <button type="button" class="btn btn-outline btn-sm" data-doc="0">Lihat</button>
+                </div>
+                <div class="doc-file">
+                  <div class="icon-tile" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+                  </div>
+                  <div class="dz-meta">
+                    <div class="dz-name">Kartu Keluarga</div>
+                    <div class="dz-size">kk-budi-santoso.pdf · 1,2 MB</div>
+                  </div>
+                  <span class="badge badge-green">terverifikasi</span>
+                  <button type="button" class="btn btn-outline btn-sm" data-doc="1">Lihat</button>
+                </div>
+                <div class="doc-file">
+                  <div class="icon-tile" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+                  </div>
+                  <div class="dz-meta">
+                    <div class="dz-name">Surat pengantar RT/RW</div>
+                    <div class="dz-size">surat-pengantar-rw05.pdf · 310 KB</div>
+                  </div>
+                  <span class="badge badge-amber">menunggu</span>
+                  <button type="button" class="btn btn-outline btn-sm" data-doc="2">Lihat</button>
+                </div>
+              </div>
+              <p class="note-box mt-16">Pemeriksaan file dilakukan sesuai jenis dan ukuran yang diizinkan. Dokumen asli tetap perlu dibawa saat pengambilan surat.</p>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                <h2>Riwayat status</h2>
+                <span class="badge badge-gray">Audit trail</span>
+              </div>
+              <div class="timeline">
+                <div class="timeline-item">
+                  <span class="timeline-dot" aria-hidden="true"></span>
+                  <div class="between">
+                    <b>Menunggu Verifikasi</b>
+                    <span class="badge badge-gray">Warga</span>
+                  </div>
+                  <div class="timeline-meta" id="tl1Meta">30 Okt 2026, 09.14</div>
+                  <p class="small muted mt-8">Pengajuan dikirim melalui website.</p>
+                </div>
+                <div class="timeline-item" id="tl2" style="display:none">
+                  <span class="timeline-dot green" id="tl2Dot" aria-hidden="true"></span>
+                  <div class="between">
+                    <b id="tl2Title">Disetujui</b>
+                    <span class="badge badge-gray">Admin</span>
+                  </div>
+                  <div class="timeline-meta" id="tl2Meta">31 Okt 2026, 08.15</div>
+                  <p class="small muted mt-8" id="tl2Desc">Diperbarui oleh admin.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>Preview surat</h2>
+                  <p>Dokumen contoh dari data pengajuan</p>
+                </div>
+                <div class="flex gap-8">
+                  <span class="badge badge-gray">v1</span>
+                  <span class="badge badge-amber">Draft</span>
+                </div>
+              </div>
+              <div class="letter detail-letter">
+                <div class="letter-head">
+                  <div class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M4 18h16M6 18v-8h3v8M11 18v-8h3v8M16 18v-8h3v8M12 3l9 5H3l9-5z"/></svg>
+                  </div>
+                  <div class="letter-inst">
+                    <b>Pemerintah Desa Sukamaju</b>
+                    <span>Kecamatan Cisarua · Kabupaten Bogor</span>
+                    <span>Jl. Raya Puncak No. 24, Sukamaju, 16750</span>
+                  </div>
+                  <div style="width:52px;flex:none" aria-hidden="true"></div>
+                </div>
+                <div class="letter-title" id="letterTitle">SURAT KETERANGAN DOMISILI</div>
+                <div class="letter-no" id="letterNo">Nomor: 470/____/DS-SKM/2026</div>
+                <p>Yang bertanda tangan di bawah ini, Kepala Desa Sukamaju, Kecamatan Cisarua, Kabupaten Bogor, menerangkan bahwa:</p>
+                <div class="letter-fields">
+                  <div class="doc-row"><span class="l">Nama lengkap</span><span>:</span><span class="v" id="letterNama">Budi Santoso</span></div>
+                  <div class="doc-row"><span class="l">NIK</span><span>:</span><span class="v" id="letterNik">3201121508870003</span></div>
+                  <div class="doc-row"><span class="l">Tempat lahir</span><span>:</span><span class="v" id="letterTempat">Bogor</span></div>
+                  <div class="doc-row"><span class="l">Tanggal lahir</span><span>:</span><span class="v" id="letterTgl">1987-08-15</span></div>
+                  <div class="doc-row"><span class="l">Jenis kelamin</span><span>:</span><span class="v" id="letterJk">Laki-laki</span></div>
+                </div>
+                <p>Orang tersebut benar warga Desa Sukamaju dan berdomisili di alamat sebagaimana tercantum di atas.</p>
+                <p>Surat keterangan ini dibuat untuk keperluan <b id="letterKeperluan">Keterangan domisili untuk administrasi sekolah</b>.</p>
+                <p>Demikian surat keterangan ini dibuat dengan sebenarnya untuk dipergunakan sebagaimana mestinya.</p>
+                <div class="between mt-16" style="align-items:flex-end">
+                  <div>
+                    Ditetapkan di Bogor
+                    <div class="muted">Tanggal: <span id="letterTanggal">30 Okt 2026, 09.14</span></div>
+                  </div>
+                  <div class="letter-sign">
+                    Kepala Desa Sukamaju
+                    <div class="letter-stamp" aria-hidden="true">DESA SUKAMAJU</div>
+                    <div class="sign-name">H. Asep Sunandar</div>
+                  </div>
+                </div>
+                <div class="letter-foot">Dokumen ini dicetak dari sistem informasi desa. Surat resmi tetap ditandatangani basah oleh pejabat berwenang.</div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h2 class="summary-title">Nomor surat</h2>
+              <input type="text" id="nomorSurat" value="470/____/DS-SKM/2026" aria-label="Nomor surat">
+              <p class="field-help">Mengikuti tata penomoran resmi desa.</p>
+              <div class="doc-actions mt-16">
+                <button type="button" class="btn btn-outline btn-sm" id="btnPdf">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 11l5 5 5-5M4 21h16"/></svg>
+                  Unduh PDF
+                </button>
+                <button type="button" class="btn btn-primary btn-sm" id="btnCetak">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>
+                  Cetak dokumen
+                </button>
+              </div>
+              <p class="field-help">Prototipe: kedua tombol membuka dialog cetak. Pilih &ldquo;Simpan sebagai PDF&rdquo; untuk menyimpan berkas.</p>
+            </div>
+
+            <div class="panel">
+              <h2 class="summary-title">Informasi pengajuan</h2>
+              <div class="kv-row"><span class="k">Referensi</span><span class="v code" id="iRef">SBM-2026-0008</span></div>
+              <div class="kv-row"><span class="k">Jenis surat</span><span class="v" id="iJenis">Surat Keterangan Domisili</span></div>
+              <div class="kv-row"><span class="k">Template</span><span class="v" id="iTemplate">Domisili · v2</span></div>
+              <div class="kv-row"><span class="k">Status dokumen</span><span class="v" id="iDok">draft</span></div>
+              <div class="kv-row"><span class="k">Hak akses</span><span class="v">Privat admin</span></div>
+              <p class="note-box mt-16">Persetujuan admin bukan pengesahan surat. Surat baru sah setelah ditandatangani basah oleh pejabat berwenang.</p>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="admin-foot">
+        <span>Sistem Informasi Desa Sukamaju · Versi prototipe 1.0</span>
+        <span>Data pada dashboard adalah contoh dan tidak memuat data warga sebenarnya.</span>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalSetujui">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="setujuiTitle">
+      <div class="modal-head">
+        <h2 id="setujuiTitle">Setujui dan terbitkan surat?</h2>
+        <button type="button" class="modal-close" data-modal-close aria-label="Tutup">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <p class="muted">Pengajuan <b id="setujuiRef">SBM-2026-0008</b> ditandai disetujui dan masuk ke antrean pencetakan dengan nomor surat yang sedang diisi.</p>
+      <div class="notice notice-gray mt-16">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
+        <span>Prototipe: tindakan ini hanya mengubah tampilan di peramban Anda. Tidak ada data yang dikirim atau disimpan.</span>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" data-modal-close>Batal</button>
+        <button type="button" class="btn btn-primary" id="confirmSetujui">Ya, setujui</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalPerbaikan">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="perbaikanTitle">
+      <div class="modal-head">
+        <h2 id="perbaikanTitle">Minta perbaikan dokumen?</h2>
+        <button type="button" class="modal-close" data-modal-close aria-label="Tutup">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <p class="muted">Status pengajuan <b id="perbaikanRef">SBM-2026-0008</b> berubah menjadi Perlu Perbaikan. Warga perlu mengunggah ulang dokumen yang ditandai.</p>
+      <div class="field mt-16">
+        <label for="notePerbaikan">Catatan untuk pemohon</label>
+        <textarea id="notePerbaikan" placeholder="Contoh: Foto tempat usaha buram, mohon unggah ulang."></textarea>
+        <p class="field-help">Catatan hanya tampil di halaman ini sebagai simulasi.</p>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" data-modal-close>Batal</button>
+        <button type="button" class="btn btn-amber-outline" id="confirmPerbaikan">Kirim permintaan perbaikan</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalTolak">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="tolakTitle">
+      <div class="modal-head">
+        <h2 id="tolakTitle">Tolak pengajuan ini?</h2>
+        <button type="button" class="modal-close" data-modal-close aria-label="Tutup">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <p class="muted">Pengajuan <b id="tolakRef">SBM-2026-0008</b> akan ditandai ditolak dan pemohon dapat mengajukan ulang dengan data yang benar.</p>
+      <div class="field mt-16">
+        <label for="noteTolak">Alasan penolakan</label>
+        <textarea id="noteTolak" placeholder="Contoh: NIK tidak cocok dengan Kartu Keluarga."></textarea>
+        <p class="field-help">Alasan hanya tampil di halaman ini sebagai simulasi.</p>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" data-modal-close>Batal</button>
+        <button type="button" class="btn btn-danger-outline" id="confirmTolak">Ya, tolak pengajuan</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalDok">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dokTitle">
+      <div class="modal-head">
+        <h2 id="dokTitle">KTP pemohon</h2>
+        <button type="button" class="modal-close" data-modal-close aria-label="Tutup">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <p class="note-box" id="dokFile">ktp-budi-santoso.jpg · 842 KB</p>
+      <p class="muted mt-16" id="dokStatus">Status: terverifikasi</p>
+      <div class="notice notice-gray mt-16">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
+        <span>Prototipe: berkas contoh tidak berisi gambar asli. Pada versi produksi berkas dibuka dari penyimpanan privat desa.</span>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" data-modal-close>Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script>
+    (function () {
+      var TONE = {
+        'Menunggu Verifikasi': 'badge-amber',
+        'Perlu Perbaikan': 'badge-red',
+        'Ditolak': 'badge-red',
+        'Disetujui': 'badge-green',
+        'Sedang Diproses': 'badge-blue',
+        'Siap Diambil': 'badge-green',
+        'Selesai': 'badge-gray'
+      };
+
+      var DATA = {
+        'SBM-2026-0008': {
+          nama: 'Budi Santoso', layanan: 'Surat Keterangan Domisili', masuk: '30 Okt 2026, 09.14',
+          status: 'Menunggu Verifikasi', wa: '081234567890',
+          alamat: 'Kp. Pasir Angin RT 02/RW 05',
+          keperluan: 'Keterangan domisili untuk administrasi sekolah',
+          nik: '3201121508870003', tempat: 'Bogor', lahir: '1987-08-15', jk: 'Laki-laki',
+          template: 'Domisili · v2', dok: 'draft', note: '',
+          docs: [
+            ['KTP pemohon', 'ktp-budi-santoso.jpg', '842 KB', 'terverifikasi'],
+            ['Kartu Keluarga', 'kk-budi-santoso.pdf', '1,2 MB', 'terverifikasi'],
+            ['Surat pengantar RT/RW', 'surat-pengantar-rw05.pdf', '310 KB', 'menunggu']
+          ]
+        },
+        'SBM-2026-0007': {
+          nama: 'Siti Aminah', layanan: 'Surat Keterangan Usaha', masuk: '29 Okt 2026, 14.02',
+          status: 'Perlu Perbaikan', wa: '081322114477',
+          alamat: 'Kp. Cisarua RT 04/RW 02',
+          keperluan: 'Pengajuan izin usaha warung kelontong',
+          nik: '3201125209900004', tempat: 'Bogor', lahir: '1990-09-12', jk: 'Perempuan',
+          template: 'Usaha · v3', dok: 'revisi', note: 'Foto tempat usaha buram, mohon unggah ulang.',
+          docs: [
+            ['KTP pemohon', 'ktp-siti-aminah.jpg', '760 KB', 'terverifikasi'],
+            ['Kartu Keluarga', 'kk-siti-aminah.pdf', '1,1 MB', 'terverifikasi'],
+            ['Foto tempat usaha', 'foto-warung-siti.jpg', '640 KB', 'perlu perbaikan']
+          ]
+        },
+        'SBM-2026-0006': {
+          nama: 'Ahmad Fauzi', layanan: 'Surat Keterangan Tidak Mampu', masuk: '28 Okt 2026, 10.35',
+          status: 'Disetujui', wa: '085711229080',
+          alamat: 'Dusun Cileunca RT 01/RW 03',
+          keperluan: 'Keringanan biaya sekolah anak',
+          nik: '3201121007850012', tempat: 'Bogor', lahir: '1985-07-10', jk: 'Laki-laki',
+          template: 'Tidak Mampu · v2', dok: 'sah', note: '',
+          docs: [
+            ['KTP pemohon', 'ktp-ahmad-fauzi.jpg', '812 KB', 'terverifikasi'],
+            ['Kartu Keluarga', 'kk-ahmad-fauzi.pdf', '1,3 MB', 'terverifikasi'],
+            ['Surat pengantar RT/RW', 'surat-pengantar-rw03.pdf', '298 KB', 'terverifikasi']
+          ]
+        },
+        'SBM-2026-0005': {
+          nama: 'Rina Marlina', layanan: 'Surat Keterangan Domisili', masuk: '27 Okt 2026, 11.08',
+          status: 'Sedang Diproses', wa: '089533112200',
+          alamat: 'Kp. Pasir Angin RT 05/RW 05',
+          keperluan: 'Persyaratan administrasi kepesertaan BPJS',
+          nik: '3201124509920021', tempat: 'Sukabumi', lahir: '1992-09-05', jk: 'Perempuan',
+          template: 'Domisili · v2', dok: 'draft', note: '',
+          docs: [
+            ['KTP pemohon', 'ktp-rina-marlina.jpg', '705 KB', 'terverifikasi'],
+            ['Kartu Keluarga', 'kk-rina-marlina.pdf', '1,2 MB', 'terverifikasi'],
+            ['Surat pengantar RT/RW', 'surat-pengantar-rw05b.pdf', '302 KB', 'menunggu']
+          ]
+        },
+        'SBM-2026-0004': {
+          nama: 'Dedi Kurniawan', layanan: 'Surat Izin Keramaian', masuk: '24 Okt 2026, 08.52',
+          status: 'Siap Diambil', wa: '081844556677',
+          alamat: 'Kp. Karang Tengah RT 02/RW 01',
+          keperluan: 'Izin penyelenggaraan hajatan pernikahan',
+          nik: '3201121406880008', tempat: 'Bogor', lahir: '1988-06-14', jk: 'Laki-laki',
+          template: 'Keramaian · v1', dok: 'sah', note: '',
+          docs: [
+            ['KTP pemohon', 'ktp-dedi-kurniawan.jpg', '840 KB', 'terverifikasi'],
+            ['Kartu Keluarga', 'kk-dedi-kurniawan.pdf', '1,4 MB', 'terverifikasi'],
+            ['Rancangan acara', 'rancangan-acara-dedi.pdf', '520 KB', 'terverifikasi']
+          ]
+        },
+        'SBM-2026-0003': {
+          nama: 'Samsul Arifin', layanan: 'Surat Keterangan KTP', masuk: '22 Okt 2026, 13.20',
+          status: 'Ditolak', wa: '081290901212',
+          alamat: 'Dusun Cileunca RT 06/RW 03',
+          keperluan: 'Pengantar penerbitan KTP baru',
+          nik: '3201120307800015', tempat: 'Bogor', lahir: '1980-07-03', jk: 'Laki-laki',
+          template: 'KTP · v2', dok: 'ditolak', note: 'NIK tidak cocok dengan Kartu Keluarga.',
+          docs: [
+            ['KTP pemohon', 'ktp-samsul-arifin.jpg', '688 KB', 'terverifikasi'],
+            ['Kartu Keluarga', 'kk-samsul-arifin.pdf', '1,1 MB', 'perlu perbaikan']
+          ]
+        },
+        'SBM-2026-0002': {
+          nama: 'Nurhayati', layanan: 'Surat Keterangan Tidak Mampu', masuk: '20 Okt 2026, 09.45',
+          status: 'Selesai', wa: '081288776655',
+          alamat: 'Kp. Mekarjaya RT 03/RW 06',
+          keperluan: 'Keringanan biaya pengobatan di puskesmas',
+          nik: '3201124804830019', tempat: 'Cisarua', lahir: '1983-04-08', jk: 'Perempuan',
+          template: 'Tidak Mampu · v2', dok: 'arsip', note: '',
+          docs: [
+            ['KTP pemohon', 'ktp-nurhayati.jpg', '726 KB', 'terverifikasi'],
+            ['Kartu Keluarga', 'kk-nurhayati.pdf', '1,2 MB', 'terverifikasi']
+          ]
+        },
+        'SBM-2026-0001': {
+          nama: 'Agus Setiawan', layanan: 'Surat Keterangan Domisili', masuk: '18 Okt 2026, 10.10',
+          status: 'Selesai', wa: '081277665544',
+          alamat: 'Kp. Pasir Angin RT 01/RW 05',
+          keperluan: 'Persyaratan pembukaan rekening bank',
+          nik: '3201120901870006', tempat: 'Bogor', lahir: '1987-01-09', jk: 'Laki-laki',
+          template: 'Domisili · v2', dok: 'arsip', note: '',
+          docs: [
+            ['KTP pemohon', 'ktp-agus-setiawan.jpg', '799 KB', 'terverifikasi'],
+            ['Kartu Keluarga', 'kk-agus-setiawan.pdf', '1,3 MB', 'terverifikasi']
+          ]
+        }
+      };
+
+      function isi(id, teks) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = teks;
+      }
+
+      function tutupModal(tombol) {
+        var overlay = tombol.closest('.modal-overlay');
+        if (overlay) overlay.classList.remove('open');
+      }
+
+      function beriNotisi(teks, warna) {
+        var box = document.getElementById('actionNotice');
+        box.className = 'notice notice-' + warna + ' show';
+        isi('noticeText', teks);
+      }
+
+      var params = new URLSearchParams(window.location.search);
+      var paramId = params.get('id');
+      var ref = DATA[paramId] ? paramId : 'SBM-2026-0008';
+      var data = DATA[ref];
+      var docs = data.docs;
+      var statusKini = data.status;
+
+      function renderDokumen() {
+        var html = '';
+        docs.forEach(function (d, i) {
+          var tone = d[3] === 'terverifikasi' ? 'badge-green' : (d[3] === 'menunggu' ? 'badge-amber' : 'badge-red');
+          html += '<div class="doc-file">'
+            + '<div class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>'
+            + '<div class="dz-meta"><div class="dz-name">' + d[0] + '</div><div class="dz-size">' + d[1] + ' · ' + d[2] + '</div></div>'
+            + '<span class="badge ' + tone + '">' + d[3] + '</span>'
+            + '<button type="button" class="btn btn-outline btn-sm" data-doc="' + i + '">Lihat</button>'
+            + '</div>';
+        });
+        document.getElementById('docList').innerHTML = html;
+      }
+
+      function setBadge(status) {
+        var el = document.getElementById('dStatus');
+        el.className = 'badge ' + (TONE[status] || 'badge-gray');
+        el.textContent = status;
+      }
+
+      function setRiwayat(status, catatan, titik) {
+        if (status === 'Menunggu Verifikasi') {
+          document.getElementById('tl2').style.display = 'none';
+          return;
+        }
+        document.getElementById('tl2').style.display = '';
+        isi('tl2Title', status);
+        isi('tl2Desc', catatan || 'Diperbarui oleh admin (simulasi prototipe).');
+        var dot = document.getElementById('tl2Dot');
+        dot.className = 'timeline-dot' + (titik ? ' green' : '');
+      }
+
+      isi('dRef', ref);
+      isi('iRef', ref);
+      isi('setujuiRef', ref);
+      isi('perbaikanRef', ref);
+      isi('tolakRef', ref);
+      isi('dSub', data.layanan + ' · diajukan ' + data.masuk);
+      setBadge(data.status);
+      isi('dNama', data.nama);
+      isi('dNik', data.nik);
+      isi('dTempat', data.tempat);
+      isi('dTanggal', data.lahir);
+      isi('dJk', data.jk);
+      isi('dAlamat', data.alamat);
+      isi('dKeperluan', data.keperluan);
+      isi('dWa', data.wa);
+      isi('docCount', docs.length + ' berkas');
+      isi('iJenis', data.layanan);
+      isi('iTemplate', data.template);
+      isi('iDok', data.dok);
+      isi('letterTitle', data.layanan.toUpperCase());
+      isi('letterNama', data.nama);
+      isi('letterNik', data.nik);
+      isi('letterTempat', data.tempat);
+      isi('letterTgl', data.lahir);
+      isi('letterJk', data.jk);
+      isi('letterKeperluan', data.keperluan);
+      isi('letterTanggal', data.masuk);
+      isi('tl1Meta', data.masuk);
+      renderDokumen();
+
+      if (data.note) {
+        isi('statusNoteText', 'Catatan admin: ' + data.note);
+        document.getElementById('statusNote').classList.add('show');
+        setRiwayat(data.status, data.note, false);
+      } else {
+        setRiwayat(data.status, '', data.status === 'Disetujui' || data.status === 'Siap Diambil' || data.status === 'Selesai');
+      }
+
+      var nomor = document.getElementById('nomorSurat');
+      nomor.addEventListener('input', function () {
+        isi('letterNo', 'Nomor: ' + (nomor.value.trim() || '470/____/DS-SKM/2026'));
+      });
+
+      function cetak() { window.print(); }
+      document.getElementById('btnCetakHead').addEventListener('click', cetak);
+      document.getElementById('btnCetak').addEventListener('click', cetak);
+      document.getElementById('btnPdf').addEventListener('click', cetak);
+
+      document.getElementById('docList').addEventListener('click', function (e) {
+        var tombol = e.target.closest('[data-doc]');
+        if (!tombol) return;
+        var d = docs[parseInt(tombol.getAttribute('data-doc'), 10)];
+        if (!d) return;
+        isi('dokTitle', d[0]);
+        isi('dokFile', d[1] + ' · ' + d[2]);
+        isi('dokStatus', 'Status: ' + d[3]);
+        document.getElementById('modalDok').classList.add('open');
+      });
+
+      document.getElementById('confirmSetujui').addEventListener('click', function () {
+        tutupModal(this);
+        statusKini = 'Disetujui';
+        setBadge(statusKini);
+        isi('iDok', 'sah');
+        document.getElementById('statusNote').classList.remove('show');
+        setRiwayat(statusKini, 'Disetujui oleh admin (simulasi prototipe).', true);
+        beriNotisi('Simulasi prototipe: ' + ref + ' ditandai Disetujui di halaman ini. Tidak ada data yang dikirim ke server.', 'green');
+      });
+
+      document.getElementById('confirmPerbaikan').addEventListener('click', function () {
+        var catatan = document.getElementById('notePerbaikan').value.trim() || 'Dokumen perlu diperbaiki oleh pemohon.';
+        tutupModal(this);
+        statusKini = 'Perlu Perbaikan';
+        setBadge(statusKini);
+        isi('iDok', 'revisi');
+        isi('statusNoteText', 'Catatan perbaikan: ' + catatan);
+        document.getElementById('statusNote').classList.add('show');
+        setRiwayat(statusKini, catatan, false);
+        beriNotisi('Simulasi prototipe: permintaan perbaikan untuk ' + ref + ' ditampilkan di halaman ini. Tidak ada pesan yang dikirim ke pemohon.', 'amber');
+        document.getElementById('notePerbaikan').value = '';
+      });
+
+      document.getElementById('confirmTolak').addEventListener('click', function () {
+        var alasan = document.getElementById('noteTolak').value.trim() || 'Pengajuan ditolak oleh admin.';
+        tutupModal(this);
+        statusKini = 'Ditolak';
+        setBadge(statusKini);
+        isi('iDok', 'ditolak');
+        isi('statusNoteText', 'Alasan penolakan: ' + alasan);
+        document.getElementById('statusNote').classList.add('show');
+        setRiwayat(statusKini, alasan, false);
+        beriNotisi('Simulasi prototipe: ' + ref + ' ditandai Ditolak di halaman ini. Tidak ada data yang dikirim ke server.', 'red');
+        document.getElementById('noteTolak').value = '';
+      });
+    })();
+  </script>
+</body>
+</html>

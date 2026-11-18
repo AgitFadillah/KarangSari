@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profil Desa · Desa Sukamaju</title>
+  <meta name="description" content="Mengenal Desa Sukamaju: sejarah, visi & misi, struktur pemerintahan, serta wilayah dan geografis.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .profile-tabs {
+      background: var(--white); border-top: 1px solid var(--gray-200); border-bottom: 1px solid var(--gray-200);
+      position: sticky; top: 76px; z-index: 40;
+    }
+    .profile-tabs .container { display: flex; gap: 28px; overflow-x: auto; }
+    .profile-tabs { position: sticky; }
+    @media (max-width: 720px) {
+      .profile-tabs .container { padding-right: 40px; gap: 22px; }
+      .profile-tabs::after {
+        content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 48px;
+        background: linear-gradient(90deg, transparent, var(--white)); pointer-events: none;
+      }
+    }
+    .profile-tabs a {
+      padding: 16px 2px; font-size: .9375rem; font-weight: 500; color: var(--gray-600);
+      text-decoration: none; white-space: nowrap; border-bottom: 2.5px solid transparent; margin-bottom: -1px;
+    }
+    .profile-tabs a:hover { color: var(--navy-900); }
+    .profile-tabs a.active { font-weight: 700; color: var(--navy-900); border-bottom-color: var(--navy-900); }
+
+    .stat-cards-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .stat-mini {
+      background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-md);
+      padding: 22px 24px;
+    }
+    .stat-mini-label { font-size: .6875rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--gray-500); margin-bottom: 8px; }
+    .stat-mini-value { font-size: 1.5rem; font-weight: 800; color: var(--navy-900); line-height: 1.15; }
+    .stat-mini-value small { font-size: .9rem; font-weight: 600; color: var(--gray-600); }
+
+    .misi-list { display: flex; flex-direction: column; }
+    .misi-item { display: flex; gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--gray-200); align-items: flex-start; }
+    .misi-item:last-child { border-bottom: none; }
+    .misi-num { font-size: .8125rem; font-weight: 800; color: var(--blue-600); letter-spacing: .06em; padding-top: 2px; flex: none; }
+    .misi-item p { font-size: .9375rem; color: var(--gray-900); }
+
+    .data-note { font-size: .8125rem; color: var(--gray-500); margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="container">
+      <div class="topbar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V8l9-6 9 6v13"/><path d="M9 21v-6h6v6"/></svg>
+        <span>Pemerintah Kabupaten Bogor · Kecamatan Cisarua</span>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <span>Pelayanan Senin–Jumat, 08.00–15.00 WIB</span>
+        </div>
+        <div class="topbar-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.9.7A2 2 0 0 1 22 16.9z"/></svg>
+          <span>(0251) 830 1122</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header / Nav -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand">
+        <div class="brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M4 18h16M6 18v-8h3v8M11 18v-8h3v8M16 18v-8h3v8M12 3l9 5H3l9-5z"/></svg>
+        </div>
+        <div>
+          <div class="brand-name">Desa Sukamaju</div>
+          <div class="brand-sub">Kabupaten Bogor, Jawa Barat</div>
+        </div>
+      </a>
+      <nav class="main-nav" id="mainNav">
+        <a href="index.html">Beranda</a>
+        <a href="profil.html" class="active">Profil Desa</a>
+        <a href="informasi.html">Informasi</a>
+        <a href="potensi.html">Potensi</a>
+        <a href="pelayanan.html">Pelayanan</a>
+        <a href="kontak.html">Kontak</a>
+      </nav>
+      <a href="pelayanan.html" class="btn btn-primary btn-sm">Ajukan Surat</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Page Hero -->
+  <section class="page-hero">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="index.html">Beranda</a>
+        <span class="sep">/</span>
+        <span>Profil Desa</span>
+      </nav>
+      <div class="page-hero-row">
+        <div>
+          <div class="eyebrow">Profil Desa</div>
+          <h1>Mengenal Sukamaju, dari sejarah hingga wilayahnya.</h1>
+        </div>
+        <p class="page-hero-note">Informasi pada halaman ini masih berupa contoh sampai pemerintah desa menyerahkan profil resmi, logo, dan dokumentasi terbaru.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tab Navigasi -->
+  <nav class="profile-tabs">
+    <div class="container">
+      <a href="#sejarah" class="active">Sejarah</a>
+      <a href="#visi-misi">Visi &amp; Misi</a>
+      <a href="#struktur">Struktur Pemerintahan</a>
+      <a href="#wilayah">Wilayah &amp; Geografis</a>
+    </div>
+  </nav>
+
+  <!-- Sejarah -->
+  <section class="section" id="sejarah">
+    <div class="container">
+      <div class="eyebrow">Sejarah Desa</div>
+      <h2 style="margin-bottom:48px">Tumbuh dari kebun dan musyawarah warga.</h2>
+      <div class="two-col">
+        <div class="stat-cards-2x2">
+          <div class="stat-mini">
+            <div class="stat-mini-label">Berdiri</div>
+            <div class="stat-mini-value">1908</div>
+          </div>
+          <div class="stat-mini">
+            <div class="stat-mini-label">Dusun</div>
+            <div class="stat-mini-value">4</div>
+          </div>
+          <div class="stat-mini">
+            <div class="stat-mini-label">Luas</div>
+            <div class="stat-mini-value">1.284 <small>ha</small></div>
+          </div>
+          <div class="stat-mini">
+            <div class="stat-mini-label">Ketinggian</div>
+            <div class="stat-mini-value">900–1.240 <small>mdpl</small></div>
+          </div>
+        </div>
+        <div>
+          <p>Desa Sukamaju berdiri pada awal abad ke-20 sebagai permukiman petani di lereng selatan Gunung Gede. Nama Sukamaju dipilih dari musyawarah warga yang berharap desa ini tumbuh makmur.</p>
+          <div class="quote">
+            "Tanahnya subur, airnya mengalir sepanjang tahun. Yang perlu dijaga adalah cara kita mengelolanya bersama."
+          </div>
+          <p>Hingga hari ini, pertanian sayur, kopi, dan wisata alam menjadi tiga pilar penghidupan warga. Pemerintah desa terus mendorong pengelolaan potensi lokal yang berkelanjutan dan pelayanan administrasi yang lebih mudah diakses.</p>
+          <p class="data-note">Narasi sejarah masih menunggu validasi dan dokumen resmi dari pemerintah desa.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Visi & Misi -->
+  <section class="section section-tint" id="visi-misi">
+    <div class="container">
+      <div class="eyebrow">Visi &amp; Misi</div>
+      <h2 style="margin-bottom:48px">Arah pembangunan desa.</h2>
+      <div class="two-col">
+        <div class="card" style="margin-top:0">
+          <div class="eyebrow" style="margin-bottom:14px">Visi</div>
+          <p style="font-size:1.15rem;font-weight:600;line-height:1.55;color:var(--navy-900)">Mewujudkan Desa Sukamaju yang mandiri, sejahtera, dan berbudaya melalui pelayanan publik yang terbuka serta pengelolaan potensi lokal yang berkelanjutan.</p>
+        </div>
+        <div class="card" style="margin-top:0">
+          <div class="eyebrow" style="margin-bottom:6px">Misi</div>
+          <div class="misi-list">
+            <div class="misi-item">
+              <span class="misi-num">01</span>
+              <p>Menyelenggarakan pelayanan administrasi yang cepat, jelas, dan tanpa biaya tambahan.</p>
+            </div>
+            <div class="misi-item">
+              <span class="misi-num">02</span>
+              <p>Mengembangkan pertanian dan UMKM warga melalui pendampingan dan akses pasar.</p>
+            </div>
+            <div class="misi-item">
+              <span class="misi-num">03</span>
+              <p>Menjaga kelestarian lingkungan serta daya dukung kawasan wisata alam.</p>
+            </div>
+            <div class="misi-item">
+              <span class="misi-num">04</span>
+              <p>Meningkatkan transparansi anggaran dan pembangunan melalui informasi terbuka.</p>
+            </div>
+            <div class="misi-item">
+              <span class="misi-num">05</span>
+              <p>Memperkuat partisipasi warga dalam musyawarah dan kegiatan sosial.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Struktur Pemerintahan -->
+  <section class="section" id="struktur">
+    <div class="container">
+      <div class="eyebrow">Struktur Pemerintahan</div>
+      <h2>Orang-orang yang melayani di kantor desa.</h2>
+      <p class="lead" style="margin:16px 0 48px">Susunan nama dan jabatan berikut adalah ilustrasi sampai daftar resmi diterima dari pemerintah desa.</p>
+      <div class="people-grid">
+        <div class="person-card">
+          <div class="avatar navy">AS</div>
+          <div class="person-name">H. Asep Sunandar</div>
+          <div class="person-role">Kepala Desa</div>
+        </div>
+        <div class="person-card">
+          <div class="avatar">DR</div>
+          <div class="person-name">Dewi Ratnasari</div>
+          <div class="person-role">Sekretaris Desa</div>
+        </div>
+        <div class="person-card">
+          <div class="avatar">RH</div>
+          <div class="person-name">Rudi Hartono</div>
+          <div class="person-role">Kasi Pemerintahan</div>
+        </div>
+        <div class="person-card">
+          <div class="avatar">NY</div>
+          <div class="person-name">Neng Yuliana</div>
+          <div class="person-role">Kasi Kesejahteraan</div>
+        </div>
+        <div class="person-card">
+          <div class="avatar">AG</div>
+          <div class="person-name">Agus Setiawan</div>
+          <div class="person-role">Kasi Pelayanan</div>
+        </div>
+        <div class="person-card">
+          <div class="avatar">LS</div>
+          <div class="person-name">Lilis Suryani</div>
+          <div class="person-role">Kaur Keuangan</div>
+        </div>
+        <div class="person-card">
+          <div class="avatar">BP</div>
+          <div class="person-name">Bayu Permana</div>
+          <div class="person-role">Kaur Umum</div>
+        </div>
+        <div class="person-card">
+          <div class="avatar green">DM</div>
+          <div class="person-name">Deden Mulyana</div>
+          <div class="person-role">Ketua BPD</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Wilayah & Geografis -->
+  <section class="section section-tint" id="wilayah">
+    <div class="container">
+      <div class="eyebrow">Wilayah &amp; Geografis</div>
+      <h2 style="margin-bottom:48px">Batas wilayah dan penggunaan lahan.</h2>
+      <div class="two-col">
+        <div class="card" style="margin-top:0">
+          <h3 style="margin-bottom:12px">Batas wilayah</h3>
+          <dl class="dl-rows">
+            <div class="dl-row">
+              <dt>Utara</dt>
+              <dd>Desa Cibeureum</dd>
+            </div>
+            <div class="dl-row">
+              <dt>Timur</dt>
+              <dd>Desa Tugu Selatan</dd>
+            </div>
+            <div class="dl-row">
+              <dt>Selatan</dt>
+              <dd>Kecamatan Megamendung</dd>
+            </div>
+            <div class="dl-row">
+              <dt>Barat</dt>
+              <dd>Desa Cilember</dd>
+            </div>
+          </dl>
+          <p class="data-note">Luas wilayah 1.284 hektare, berada pada ketinggian 900–1.240 meter di atas permukaan laut.</p>
+        </div>
+        <div class="card" style="margin-top:0">
+          <h3 style="margin-bottom:24px">Penggunaan lahan</h3>
+          <div class="bars">
+            <div>
+              <div class="bar-row-top"><b>Kebun dan pertanian</b><span>58%</span></div>
+              <div class="bar-track"><div class="bar-fill" data-width="58%"></div></div>
+            </div>
+            <div>
+              <div class="bar-row-top"><b>Hutan lindung</b><span>27%</span></div>
+              <div class="bar-track"><div class="bar-fill b2" data-width="27%"></div></div>
+            </div>
+            <div>
+              <div class="bar-row-top"><b>Permukiman</b><span>11%</span></div>
+              <div class="bar-track"><div class="bar-fill b3" data-width="11%"></div></div>
+            </div>
+            <div>
+              <div class="bar-row-top"><b>Fasilitas umum</b><span>4%</span></div>
+              <div class="bar-track"><div class="bar-fill b4" data-width="4%"></div></div>
+            </div>
+          </div>
+          <p class="data-note">Angka penggunaan lahan adalah ilustrasi dan akan diperbarui setelah data resmi desa tersedia.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="brand">
+            <div class="brand-mark">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M4 18h16M6 18v-8h3v8M11 18v-8h3v8M16 18v-8h3v8M12 3l9 5H3l9-5z"/></svg>
+            </div>
+            <div>
+              <div class="brand-name">Desa Sukamaju</div>
+              <div class="brand-sub">Kecamatan Cisarua · Kabupaten Bogor</div>
+            </div>
+          </div>
+          <p>Layanan digital resmi Pemerintah Desa Sukamaju. Buktikan cinta pada tanah sendiri dengan menghadiri musyawarah desa secara rutin.</p>
+          <div class="footer-badges">
+            <span class="badge badge-dark">Terhubung · Versi 2.1</span>
+            <span class="badge badge-dark">Data Terupdate 2026</span>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Layanan</h4>
+          <ul>
+            <li><a href="pelayanan-domisili.html">Keterangan Domisili</a></li>
+            <li><a href="pelayanan-usaha.html">Keterangan Usaha</a></li>
+            <li><a href="pelayanan-tidak-mampu.html">Keterangan Tidak Mampu</a></li>
+            <li><a href="pelayanan.html#katalog">Katalog Semua Surat</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Informasi</h4>
+          <ul>
+            <li><a href="informasi.html">Berita & Agenda</a></li>
+            <li><a href="informasi.html#pengumuman">Pengumuman</a></li>
+            <li><a href="potensi.html">Potensi Desa</a></li>
+            <li><a href="profil.html#struktur">Perangkat Desa</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Kontak</h4>
+          <ul class="footer-contact">
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+              <span>Jl. Raya Sukamaju No. 1, Kecamatan Cisarua, Kabupaten Bogor 16750</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.9.7A2 2 0 0 1 22 16.9z"/></svg>
+              <span>(0251) 830 1122</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+              <span>pemdes@sukamaju.desa.id</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              <span>Senin–Jumat · 08.00–15.00 WIB<br>Jumat tutup 11.00–13.00</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Pemerintah Desa Sukamaju. Hak cipta dilindungi.</span>
+        <div class="footer-bottom-links">
+          <a href="informasi.html">Arsip</a>
+          <a href="kontak.html">Kontak</a>
+          <a href="admin/login.html">Admin</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    // Active state untuk tab profil saat scroll
+    document.addEventListener('DOMContentLoaded', () => {
+      const links = document.querySelectorAll('.profile-tabs a');
+      const sections = ['sejarah', 'visi-misi', 'struktur', 'wilayah']
+        .map(id => document.getElementById(id)).filter(Boolean);
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+          }
+        });
+      }, { rootMargin: '-30% 0px -60% 0px' });
+      sections.forEach(s => observer.observe(s));
+      links.forEach(l => l.addEventListener('click', () => {
+        links.forEach(x => x.classList.remove('active'));
+        l.classList.add('active');
+      }));
+    });
+  </script>
+</body>
+</html>

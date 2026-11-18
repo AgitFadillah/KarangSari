@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Desa Sukamaju · Layanan Digital Resmi</title>
+  <meta name="description" content="Website resmi Desa Sukamaju. Ajukan surat dari rumah, cek status, lihat potensi desa.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Seksi kontak beranda */
+    .hc-card {
+      display: grid; grid-template-columns: 1fr 1fr;
+      background: var(--white); border: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg); overflow: hidden;
+    }
+    .hc-info { padding: 44px 48px; }
+    .hc-eyebrow {
+      font-size: .75rem; font-weight: 800; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--blue-600);
+    }
+    .hc-info h2 { font-size: 1.75rem; margin-top: 10px; }
+    .hc-lead { color: var(--gray-600); font-size: .9375rem; margin: 10px 0 28px; max-width: 44ch; }
+    .hc-row { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 20px; }
+    .hc-ic {
+      width: 40px; height: 40px; border-radius: var(--radius-sm); flex: none;
+      display: grid; place-items: center;
+    }
+    .hc-ic svg { width: 19px; height: 19px; }
+    .hc-ic.blue { background: var(--blue-100); color: var(--blue-600); }
+    .hc-ic.green { background: var(--green-100); color: var(--green-600); }
+    .hc-k {
+      font-size: .6875rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--gray-500); margin-bottom: 3px;
+    }
+    .hc-v { font-size: .9375rem; font-weight: 600; color: var(--navy-900); line-height: 1.5; }
+    .hc-btns { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+
+    .hc-map {
+      position: relative; min-height: 430px;
+      background:
+        repeating-linear-gradient(0deg, transparent 0 59px, rgba(255,255,255,.55) 59px 61px),
+        repeating-linear-gradient(90deg, transparent 0 59px, rgba(255,255,255,.55) 59px 61px),
+        #DCE9F5;
+    }
+    .hc-road { position: absolute; background: var(--white); border-radius: 6px; }
+    .hc-road.r1 { top: 30%; left: 0; right: 0; height: 16px; }
+    .hc-road.r2 { top: 0; bottom: 0; left: 56%; width: 14px; }
+    .hc-road.r3 { top: 68%; left: 0; right: 0; height: 10px; opacity: .75; }
+    .hc-road.r4 { top: 0; bottom: 0; left: 20%; width: 9px; opacity: .75; }
+    .hc-pin {
+      position: absolute; top: 42%; left: 55%; transform: translate(-50%, -100%);
+      display: flex; flex-direction: column; align-items: center; gap: 12px; z-index: 2;
+    }
+    .hc-pin-badge {
+      width: 54px; height: 54px; border-radius: 50%; background: var(--navy-900);
+      color: var(--white); display: grid; place-items: center;
+      box-shadow: 0 10px 24px rgba(11,31,58,.35);
+    }
+    .hc-pin-badge svg { width: 24px; height: 24px; }
+    .hc-tooltip {
+      background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-md); padding: 10px 16px; text-align: center; white-space: nowrap;
+    }
+    .hc-tooltip b { display: block; font-size: .8125rem; color: var(--navy-900); }
+    .hc-tooltip span { font-size: .75rem; color: var(--gray-500); }
+    .hc-maps {
+      position: absolute; right: 16px; bottom: 16px; z-index: 2;
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-sm);
+      padding: 10px 18px; font-size: .8125rem; font-weight: 700; color: var(--navy-900);
+      box-shadow: var(--shadow-sm);
+    }
+    .hc-maps:hover { box-shadow: var(--shadow-md); text-decoration: none; }
+    .hc-maps svg { width: 14px; height: 14px; }
+
+    @media (max-width: 900px) {
+      .hc-card { grid-template-columns: 1fr; }
+      .hc-info { padding: 30px 26px; }
+      .hc-map { min-height: 280px; }
+    }
+
+    /* Hero */
+    .hero { padding-top: 76px; }
+    .hero p.lead { max-width: 512px; }
+    .hero-checks { gap: 24px; }
+    .hero-check { font-size: .8125rem; gap: 8px; }
+
+    /* Kartu contoh surat */
+    .doc-stack { max-width: 440px; margin-left: auto; }
+    .doc-card { padding: 22px 24px 26px; }
+    .doc-head { border-bottom: 2px solid var(--navy-900); padding-bottom: 14px; }
+    .doc-inst .brand-mark { width: 32px; height: 32px; }
+    .doc-inst .brand-mark svg { width: 16px; height: 16px; }
+    .doc-inst-name { font-size: .5625rem; letter-spacing: .04em; }
+    .pg-draft {
+      background: var(--white); border: 1px solid var(--gray-200); color: var(--gray-600);
+      font-size: .625rem; padding: 4px 10px; text-transform: uppercase; letter-spacing: .08em;
+    }
+    .doc-title {
+      font-size: .8125rem; letter-spacing: .1em; text-transform: uppercase;
+      text-decoration: underline; text-underline-offset: 5px; margin-top: 18px;
+    }
+    .doc-number { font-size: .6875rem; margin-bottom: 14px; }
+    .doc-body { font-size: .6875rem; }
+    .pg-doc-rows {
+      background: var(--gray-100); border-radius: var(--radius-sm);
+      padding: 8px 12px; margin: 10px 0;
+    }
+    .pg-doc-rows .doc-row { grid-template-columns: 1fr auto; gap: 16px; padding: 5px 0; }
+    .pg-doc-rows .doc-row .v { text-align: right; }
+    .doc-sign { font-size: .6875rem; margin-top: 18px; }
+    .doc-stamp {
+      width: 64px; height: 64px; border: 1.5px solid rgba(46,109,164,.35);
+      font-size: .4375rem; letter-spacing: .06em; right: 22px; bottom: 22px;
+    }
+    .doc-toast { left: -16px; bottom: -22px; padding: 8px 16px 8px 8px; gap: 10px; }
+    .doc-toast-icon { width: 30px; height: 30px; }
+    .doc-toast-icon svg { width: 16px; height: 16px; }
+    .doc-toast-title { font-size: .8125rem; }
+    .doc-toast-sub { font-size: .6875rem; }
+
+    /* Sekilas desa: statistik selebar kontainer */
+    .pg-stats {
+      border: 1px solid var(--gray-200); border-top: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg); margin-top: 56px; padding: 0; overflow: hidden;
+    }
+    .pg-stats .stat { padding: 24px 26px; }
+    .pg-stats .stat:first-child { padding-left: 26px; }
+    .pg-stats .stat-value { display: inline; font-size: 1.75rem; }
+    .pg-stats .stat-unit {
+      display: inline; font-size: .8125rem; font-weight: 600;
+      color: var(--gray-500); margin-left: 6px;
+    }
+
+    /* Pelayanan: dua kolom */
+    .pg-serv { display: grid; grid-template-columns: 1.25fr 2fr; gap: 64px; align-items: start; }
+    @media (max-width: 1024px) { .pg-serv { grid-template-columns: 1fr; gap: 40px; } }
+
+    /* Alur pengajuan */
+    .pg-alur .step:first-child::after {
+      content: ''; position: absolute; top: 25px; left: 52px; right: -28px;
+      height: 2px; background: var(--navy-900); border-radius: 2px;
+    }
+
+    /* Informasi desa */
+    .pg-info-head {
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      padding-bottom: 24px; margin-bottom: 40px;
+    }
+    .pg-info .news-grid { grid-template-columns: 1.35fr 1fr; gap: 60px; }
+    .pg-news-feature { background: transparent; }
+    .pg-news-feature .news-feature-img { border-radius: var(--radius-lg); min-height: 355px; gap: 16px; }
+    .pg-news-feature .news-feature-body { padding: 26px 0 0; }
+    .pg-news-date { color: rgba(255,255,255,.85); font-size: .8125rem; font-weight: 600; }
+    .pg-news-side { border-top: 1px solid rgba(255,255,255,.12); border-bottom: 1px solid rgba(255,255,255,.12); }
+    .pg-news-side .news-date {
+      width: 46px; border: none; padding: 0; text-align: left;
+    }
+    .pg-news-side .news-date-num { font-size: .875rem; }
+    .pg-news-side .news-date-mon { font-size: .625rem; color: rgba(255,255,255,.5); }
+    .pg-news-side .news-item { align-items: center; }
+
+    /* Potensi */
+    .pg-pot .potensi-card:nth-child(2) { background: var(--gray-100); }
+    .pg-pot .potensi-card:nth-child(2) .badge {
+      background: var(--white); border: 1px solid var(--gray-200); color: var(--navy-900);
+    }
+    .potensi-card:not(.potensi-card-dark) h3 { color: var(--navy-900); }
+    .pg-pot .potensi-card-dark .badge { background: rgba(255,255,255,.12); color: var(--white); }
+    .pg-pot .potensi-owner { font-weight: 700; justify-content: space-between; gap: 12px; }
+    .pg-pot .potensi-card-dark .potensi-owner {
+      border-top: 1px solid rgba(255,255,255,.14); padding-top: 18px;
+      font-weight: 500; color: rgba(255,255,255,.72);
+    }
+    .pg-pot .potensi-card-dark svg.art {
+      width: 170px; height: 170px; top: -44px; right: -34px;
+      color: rgba(255,255,255,.14);
+    }
+
+    /* Pengumuman + agenda */
+    .pg-col-head {
+      display: flex; justify-content: space-between; align-items: flex-end; gap: 24px;
+      border-bottom: 1px solid var(--gray-200); padding-bottom: 16px;
+    }
+    .pg-col-head h2 { font-size: clamp(1.6rem, 3vw, 2.25rem); }
+    .pg-ann-item {
+      display: flex; align-items: center; gap: 14px; padding: 16px 0;
+      border-bottom: 1px solid var(--gray-200); text-decoration: none; color: inherit;
+    }
+    .pg-ann-item:hover { text-decoration: none; }
+    .pg-ann-item:hover .pg-ann-title { color: var(--blue-600); }
+    .pg-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; background: #A9CBE8; }
+    .pg-dot.red { background: var(--red-600); }
+    .pg-ann-body { flex: 1; }
+    .pg-ann-title { font-weight: 700; font-size: .9375rem; color: var(--navy-900); transition: color .15s; }
+    .pg-ann-item .news-meta { margin-top: 4px; }
+    .pg-ann-arrow { color: #C3CCD8; font-size: 1rem; flex: none; }
+
+    .pg-agenda-list { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
+    .pg-agenda-item {
+      display: flex; align-items: center; gap: 15px; padding: 15px 16px;
+      background: var(--white); border: 1px solid var(--gray-200);
+      border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+      text-decoration: none; color: inherit;
+    }
+    .pg-agenda-item:hover { text-decoration: none; box-shadow: var(--shadow-md); }
+    .pg-agenda-date {
+      width: 55px; height: 55px; flex: none; border-radius: var(--radius-sm);
+      background: var(--blue-100); display: grid; place-content: center; text-align: center;
+    }
+    .pg-agenda-date .d { font-size: 1.25rem; font-weight: 800; color: var(--navy-900); line-height: 1; }
+    .pg-agenda-date .m { font-size: .625rem; font-weight: 700; letter-spacing: .06em; color: var(--blue-600); margin-top: 4px; }
+    .pg-agenda-item:first-child .pg-agenda-date { background: var(--navy-900); }
+    .pg-agenda-item:first-child .pg-agenda-date .d { color: var(--white); }
+    .pg-agenda-item:first-child .pg-agenda-date .m { color: var(--blue-500); }
+    .pg-agenda-title { font-weight: 700; font-size: .9375rem; color: var(--navy-900); }
+    .pg-agenda-meta { font-size: .8125rem; color: var(--gray-500); margin-top: 3px; }
+
+    /* Kontak beranda: peta bergaya Figma */
+    .hc-map { background: #FAFCFE; }
+    .hc-map-art { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
+    .hc-map .hc-road { display: none; }
+    .hc-map::before {
+      content: ''; position: absolute; inset: 0; opacity: .7;
+      background-image:
+        repeating-linear-gradient(0deg, transparent 0 68px, #E7EFF7 68px 69px),
+        repeating-linear-gradient(90deg, transparent 0 68px, #E7EFF7 68px 69px);
+    }
+    .hc-map .hc-pin, .hc-map .hc-maps { z-index: 3; }
+
+    /* Footer: judul kolom tanpa huruf kapital */
+    .footer-col h4 { text-transform: none; letter-spacing: 0; font-size: .9375rem; margin-bottom: 16px; }
+    .footer-col li { margin-bottom: 16px; }
+
+    @media (max-width: 1024px) {
+      .pg-info .news-grid { grid-template-columns: 1fr; gap: 40px; }
+      .doc-stack { max-width: 440px; margin: 0 auto; }
+    }
+  </style>
+  <style>
+    .sk-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: center; }
+    .sk-left h2 { margin-top: 12px; }
+    .sk-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .sk-stat { background: var(--gray-100); border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: 22px 24px; }
+    .sk-stat-value { font-size: 2rem; font-weight: 800; color: var(--navy-900); line-height: 1.1; }
+    .sk-stat-label { font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gray-500); margin-top: 8px; }
+    .sk-stat-unit { font-size: .8125rem; color: var(--gray-600); margin-top: 2px; }
+    @media (max-width: 900px) { .sk-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="container">
+      <div class="topbar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V8l9-6 9 6v13"/><path d="M9 21v-6h6v6"/></svg>
+        <span>Pemerintah Kabupaten Bogor · Kecamatan Cisarua</span>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <span>Pelayanan Senin–Jumat, 08.00–15.00 WIB</span>
+        </div>
+        <div class="topbar-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.9.7A2 2 0 0 1 22 16.9z"/></svg>
+          <span>(0251) 830 1122</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header / Nav -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand">
+        <div class="brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M4 18h16M6 18v-8h3v8M11 18v-8h3v8M16 18v-8h3v8M12 3l9 5H3l9-5z"/></svg>
+        </div>
+        <div>
+          <div class="brand-name">Desa Sukamaju</div>
+          <div class="brand-sub">Kabupaten Bogor, Jawa Barat</div>
+        </div>
+      </a>
+      <nav class="main-nav" id="mainNav">
+        <a href="index.html" class="active">Beranda</a>
+        <a href="profil.html">Profil Desa</a>
+        <a href="informasi.html">Informasi</a>
+        <a href="potensi.html">Potensi</a>
+        <a href="pelayanan.html">Pelayanan</a>
+        <a href="kontak.html">Kontak</a>
+      </nav>
+      <a href="pelayanan.html" class="btn btn-primary btn-sm">Ajukan Surat</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-body">
+        <div class="reveal visible">
+          <div class="eyebrow">Pemerintah Desa Sukamaju</div>
+          <h1>Layanan desa, kini bisa dimulai dari rumah.</h1>
+          <p class="lead">Ajukan surat keterangan, pantau perkembangan pengajuanmu, dan temukan informasi desa, semua tanpa harus datang dan antre berkali-kali di kantor desa.</p>
+          <div class="hero-actions">
+            <a href="pelayanan.html" class="btn btn-white">
+              Ajukan surat sekarang
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+            </a>
+            <a href="pelayanan.html" class="btn btn-outline-light">Lihat jenis layanan</a>
+          </div>
+          <div class="hero-checks">
+            <div class="hero-check">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-2 15-5-5 1.4-1.4L10 14.2l7.6-7.6L19 8l-9 9z"/></svg>
+              Tanpa akun
+            </div>
+            <div class="hero-check">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-2 15-5-5 1.4-1.4L10 14.2l7.6-7.6L19 8l-9 9z"/></svg>
+              Nomor referensi otomatis
+            </div>
+            <div class="hero-check">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-2 15-5-5 1.4-1.4L10 14.2l7.6-7.6L19 8l-9 9z"/></svg>
+              Diinformasikan via WhatsApp
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual reveal visible">
+          <div class="doc-stack">
+            <div class="doc-shadow"></div>
+            <div class="doc-card">
+              <div class="doc-head">
+                <div class="doc-inst">
+                  <div class="brand-mark">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M4 18h16M6 18v-8h3v8M11 18v-8h3v8M16 18v-8h3v8M12 3l9 5H3l9-5z"/></svg>
+                  </div>
+                  <div class="doc-inst-name">Pemerintah Desa Sukamaju<br>Kecamatan Cisarua · Kabupaten Bogor</div>
+                </div>
+                <span class="badge badge-gray">Draft</span>
+              </div>
+              <div class="doc-title">Surat Keterangan Domisili</div>
+              <div class="doc-number">Nomor: 470/024/DS-SKM/2026</div>
+              <div class="doc-body">
+                <p style="margin-bottom:12px">Yang bertanda tangan di bawah ini menerangkan bahwa:</p>
+                <div class="doc-row"><span class="l">Nama</span><span>:</span><span class="v">Rina Marlina</span></div>
+                <div class="doc-row"><span class="l">NIK</span><span>:</span><span class="v">320125509940001</span></div>
+                <div class="doc-row"><span class="l">Alamat</span><span>:</span><span class="v">Perum Puncak Asri Blok B2, RT 07/RW 02</span></div>
+                <p style="margin-top:14px">Benar yang bersangkutan berdomisili di wilayah Desa Sukamaju. Surat ini dibuat untuk melengkapi berkas lamaran kerja.</p>
+              </div>
+              <div class="doc-sign">
+                <div>Ditetapkan di Bogor<br>3 November 2026<br><span class="doc-sign-name">H. Rachmat Hidayat</span><br>Kepala Desa Sukamaju</div>
+                <div class="doc-stamp">Lembar Kesatu<br>Pemerintah Desa</div>
+              </div>
+            </div>
+
+            <div class="doc-toast">
+              <div class="doc-toast-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
+              </div>
+              <div>
+                <div class="doc-toast-title">Pengajuan diterima</div>
+                <div class="doc-toast-sub">Ref: SBM-2026-0009</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Links -->
+  <div class="container">
+    <div class="quicklinks reveal visible">
+      <div class="quicklinks-grid">
+        <a href="profil.html" class="quicklink">
+          <div class="quicklink-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M4 18h16M6 18v-8h3v8M11 18v-8h3v8M16 18v-8h3v8M12 3l9 5H3l9-5z"/></svg>
+          </div>
+          <div>
+            <div class="quicklink-title">Profil desa
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="quicklink-sub">Sejarah, visi, dan wilayah</div>
+          </div>
+        </a>
+        <a href="informasi.html" class="quicklink">
+          <div class="quicklink-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h13a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3V4z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+          </div>
+          <div>
+            <div class="quicklink-title">Berita & agenda
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="quicklink-sub">Kabar terbaru dari desa</div>
+          </div>
+        </a>
+        <a href="potensi.html" class="quicklink">
+          <div class="quicklink-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22v-8M12 14c-4 0-7-3-7-8 5 0 7 3 7 8zM12 14c4 0 7-3 7-8-5 0-7 3-7 8z"/></svg>
+          </div>
+          <div>
+            <div class="quicklink-title">Potensi desa
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="quicklink-sub">UMKM, wisata, pertanian</div>
+          </div>
+        </a>
+        <a href="kontak.html" class="quicklink">
+          <div class="quicklink-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          </div>
+          <div>
+            <div class="quicklink-title">Kontak & lokasi
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="quicklink-sub">Alamat dan jam pelayanan</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sekilas Desa -->
+  <section class="section">
+    <div class="container">
+      <div class="sk-grid">
+        <div class="sk-left">
+          <div class="eyebrow">Sekilas Desa</div>
+          <h2>Desa di kaki Gunung Gede, tumbuh dari pertanian dan kebersamaan warga.</h2>
+          <a href="profil.html" class="btn btn-primary" style="margin-top:24px">
+            Kenali Desa Sukamaju
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+          </a>
+        </div>
+        <div class="sk-stats">
+          <div class="sk-stat">
+            <div class="sk-stat-value"><span data-counter="4812">0</span></div>
+            <div class="sk-stat-label">Penduduk</div>
+            <div class="sk-stat-unit">jiwa terdata</div>
+          </div>
+          <div class="sk-stat">
+            <div class="sk-stat-value"><span data-counter="1356">0</span></div>
+            <div class="sk-stat-label">Kepala Keluarga</div>
+            <div class="sk-stat-unit">KK aktif</div>
+          </div>
+          <div class="sk-stat">
+            <div class="sk-stat-value"><span data-counter="1284">0</span></div>
+            <div class="sk-stat-label">Luas Wilayah</div>
+            <div class="sk-stat-unit">hektare</div>
+          </div>
+          <div class="sk-stat">
+            <div class="sk-stat-value">4</div>
+            <div class="sk-stat-label">Dusun</div>
+            <div class="sk-stat-unit">dusun</div>
+          </div>
+        </div>
+      </div>
+      <p class="lead" style="margin-top:32px;max-width:72ch">Sukamaju dikenal sebagai penghasil kopi arabika dan sayur dataran tinggi. Sebagian besar warga bekerja di sektor pertanian dan perkebunan, dengan dukungan irigasi dan koperasi desa yang aktif.</p>
+    </div>
+  </section>
+
+  <!-- Pelayanan Administrasi -->
+  <section class="section section-tint">
+    <div class="container">
+      <div class="section-head-row" style="margin-bottom:48px">
+        <div>
+          <div class="eyebrow">Pelayanan</div>
+          <h2>Surat keterangan yang bisa diajukan hari ini</h2>
+        </div>
+        <p class="page-hero-note">Enam jenis surat tersedia. Masing-masing memiliki syarat khusus, tapi cukup KTP dan KK untuk memulai.</p>
+      </div>
+      <div class="service-list">
+        <a href="pelayanan-domisili.html" class="service-row">
+          <span class="service-code">470</span>
+          <div>
+            <div class="service-name">Surat Keterangan Domisili</div>
+            <div class="service-desc">Bukti resmi tempat tinggal di wilayah desa</div>
+          </div>
+          <div class="service-eta">2 hari kerja<br><span class="muted">1 hari jika lengkap</span></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </a>
+        <a href="pelayanan-usaha.html" class="service-row">
+          <span class="service-code">471</span>
+          <div>
+            <div class="service-name">Surat Keterangan Usaha</div>
+            <div class="service-desc">Legalisasi usaha untuk bank dan perizinan</div>
+          </div>
+          <div class="service-eta">2 hari kerja<br><span class="muted">wajib verifikasi lapangan</span></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </a>
+        <a href="pelayanan-tidak-mampu.html" class="service-row">
+          <span class="service-code">472</span>
+          <div>
+            <div class="service-name">Keterangan Tidak Mampu</div>
+            <div class="service-desc">Untuk bantuan sosial, beasiswa, keringanan</div>
+          </div>
+          <div class="service-eta">3 hari kerja<br><span class="muted">perlu data RT/RW</span></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </a>
+        <a href="pelayanan-ktp.html" class="service-row">
+          <span class="service-code">473</span>
+          <div>
+            <div class="service-name">Pengantar KTP / KK</div>
+            <div class="service-desc">Pengantar untuk perekaman dokumen kependudukan</div>
+          </div>
+          <div class="service-eta">1 hari kerja<br><span class="muted">langsung selesai</span></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </a>
+      </div>
+      <div style="text-align:center;margin-top:40px">
+        <a href="pelayanan.html" class="btn btn-primary">Lihat semua jenis layanan</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Alur Pengajuan -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head center" style="margin-bottom:56px">
+        <div class="eyebrow" style="justify-content:center">Alur Pengajuan</div>
+        <h2>Cukup 4 langkah, tanpa akun</h2>
+        <p class="lead" style="margin:16px auto 0;max-width:560px">Sistem mengirim nomor referensi ke WhatsApp-mu sebagai bukti pengajuan. Cek status kapan saja lewat halaman ini.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h3>Pilih layanan</h3>
+          <p>Klik jenis surat yang dibutuhkan dari katalog layanan.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h3>Isi formulir</h3>
+          <p>Isi data diri, alamat, dan kartu identitas (KTP & KK).</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h3>Dapatkan nomor</h3>
+          <p>Simpane nomor referensi dari WhatsApp kami.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <h3>Cek status</h3>
+          <p>Masukkan nomor untuk melihat progres surat.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Informasi Desa (dark) -->
+  <section class="section section-dark">
+    <div class="container">
+      <div class="section-head-row" style="margin-bottom:48px">
+        <div>
+          <div class="eyebrow">Informasi Desa</div>
+          <h2>Kabar terbaru dari Sukamaju</h2>
+        </div>
+        <a href="informasi.html" class="btn btn-outline-light btn-sm">Semua berita & agenda</a>
+      </div>
+      <div class="news-grid">
+        <a href="informasi.html" class="news-feature">
+          <div class="news-feature-img">
+            <svg class="art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M3 21h18M4 18h16M6 18v-8h3v8M11 18v-8h3v8M16 18v-8h3v8M12 3l9 5H3l9-5z"/></svg>
+            <span class="badge badge-navy" style="background:var(--blue-500)">Berita Utama</span>
+          </div>
+          <div class="news-feature-body">
+            <h3>Musyawarah Desa Penyusunan RKPDes 2027 Digelar 8 November</h3>
+            <p>Hasil musyawarah menetapkan prioritas pembangunan irigasi dan perbaikan jalan lingkung di Dusun Krajan.</p>
+            <div class="news-meta">
+              <span>Pemerintah Desa</span><span class="dot"></span><span>28 Oktober 2026</span>
+            </div>
+          </div>
+        </a>
+        <div class="news-side">
+          <a href="informasi.html" class="news-item">
+            <div>
+              <div class="news-meta">Berita</div>
+              <h3>Vaksinasi DH Booster Digelar di Poskesdes</h3>
+              <div class="news-meta">26 Okt · 09.00 WIB</div>
+            </div>
+          </a>
+          <a href="informasi.html" class="news-item">
+            <div>
+              <div class="news-meta">Agenda</div>
+              <h3>Gotong Royong Bersih Saluran Irigasi</h3>
+              <div class="news-meta">01 Nov · 07.00 WIB</div>
+            </div>
+          </a>
+          <a href="informasi.html" class="news-item">
+            <div>
+              <div class="news-meta">Berita</div>
+              <h3>Kelompok Tani Panen Raya, Hasil Naik 15%</h3>
+              <div class="news-meta">24 Okt · Laporan Panen</div>
+            </div>
+          </a>
+          <div style="margin-top:auto;padding-top:20px">
+            <a href="informasi.html" class="panel-link" style="color:var(--blue-500)">Lihat arsip informasi →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Potensi Desa -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head-row" style="margin-bottom:48px">
+        <div>
+          <div class="eyebrow">Potensi</div>
+          <h2>Kekayaan Sukamaju</h2>
+          <p class="lead" style="margin-top:10px">Dari kopi di lereng gunung sampai kerajinan tangan, sebagian besar ekonomi warga bertumpu pada tiga sektor ini.</p>
+        </div>
+        <a href="potensi.html" class="btn btn-outline btn-sm">Jelajah potensi lengkap</a>
+      </div>
+      <div class="potensi-grid">
+        <a href="potensi.html" class="potensi-card potensi-card-dark">
+          <svg class="art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 22v-8M12 14c-4 0-7-3-7-8 5 0 7 3 7 8zM12 14c4 0 7-3 7-8-5 0-7 3-7 8z"/></svg>
+          <span class="badge badge-dark">Perkebunan</span>
+          <h3>Kopi Arabika Lereng Puncak</h3>
+          <p>Komoditas unggulan dari kebun rakyat: 380 ha dan 120 petani, dijual ke roastery lokal dan ekspor.</p>
+          <div class="potensi-owner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg>
+            Kelompok Tani Lereng Puncak
+          </div>
+        </a>
+        <a href="potensi.html" class="potensi-card">
+          <svg class="art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 3c-4 0-8 3-8 8 0 3 2 5 4 6v4h8v-4c2-1 4-3 4-6 0-5-4-8-8-8z"/><path d="M12 21v1"/></svg>
+          <span class="badge badge-blue">Wisata</span>
+          <h3>Curug Cileunca</h3>
+          <p>Air terjun 40 meter di hutan pinus rakyat. Trekking pendek untuk keluarga, piknik, dan kemping terbatas.</p>
+          <div class="potensi-owner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            Pokdarwis Sukamaju
+          </div>
+        </a>
+        <a href="potensi.html" class="potensi-card">
+          <svg class="art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M21 10c0 7-9 11-9 11s-9-4-9-11a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span class="badge badge-green">Kerajinan</span>
+          <h3>Kerajinan Bambu Pak Asep</h3>
+          <p>Anyaman bambu untuk pasar tradisional dan suvenir. 25 pengrajin produktif dari Dusun Cimanggu.</p>
+          <div class="potensi-owner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            UMKM Bambu Cimanggu
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pengumuman + Agenda -->
+  <section class="section section-tint">
+    <div class="container">
+      <div class="two-col">
+        <div>
+          <div class="eyebrow">Pengumuman</div>
+          <h2>Pengumuman resmi dari kantor desa</h2>
+          <div class="card" style="margin-top:24px">
+            <div class="between" style="margin-bottom:16px">
+              <h3>Penutupan pelayanan 17–19 November (libur tahsin)</h3>
+              <span class="badge badge-amber">Segera</span>
+            </div>
+            <p class="muted small">Selama tiga hari pengajuan akan dialihkan ke sistem darurat melalui WhatsApp.</p>
+            <div class="panel-link" style="margin-top:14px">Selengkapnya →</div>
+          </div>
+          <div class="card">
+            <div class="between" style="margin-bottom:16px">
+              <h3>Pengisian data keluarga (Prodeskel) mulai 10 November</h3>
+              <span class="badge badge-blue">Penting</span>
+            </div>
+            <p class="muted small">Warga diminta menyiapkan KK dan KTP untuk pendataan ulang.</p>
+            <div class="panel-link" style="margin-top:14px">Selengkapnya →</div>
+          </div>
+        </div>
+        <div>
+          <div class="eyebrow">Agenda</div>
+          <h2>Tiga kegiatan terdekat</h2>
+          <div class="card" style="margin-top:24px">
+            <div class="news-item news-item-light" style="border-bottom:none;padding:0 0 18px">
+              <div class="news-date">
+                <div class="news-date-num">08</div>
+                <div class="news-date-mon">NOV</div>
+              </div>
+              <div style="flex:1">
+                <h3>Musyawarah Rancangan RKPDes 2027</h3>
+                <div class="news-meta">Aula Balai Desa · 09.00–12.00 WIB</div>
+              </div>
+            </div>
+            <div class="news-item news-item-light" style="border-bottom:none;padding:0 0 18px">
+              <div class="news-date">
+                <div class="news-date-num">12</div>
+                <div class="news-date-mon">NOV</div>
+              </div>
+              <div style="flex:1">
+                <h3>Penyaluran Bantuan Sosial</h3>
+                <div class="news-meta">Kantor Pos Desa · 08.00 WIB</div>
+              </div>
+            </div>
+            <div class="news-item news-item-light" style="border-bottom:none;padding:0;">
+              <div class="news-date">
+                <div class="news-date-num">16</div>
+                <div class="news-date-mon">NOV</div>
+              </div>
+              <div style="flex:1">
+                <h3>Kelas Digital UMKM Batch 3</h3>
+                <div class="news-meta">Balai Pelatihan · 13.00–16.00 WIB</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Kontak -->
+  <section class="section" style="padding-top:48px">
+    <div class="container">
+      <div class="hc-card">
+        <div class="hc-info">
+          <div class="hc-eyebrow">Kontak</div>
+          <h2>Datang atau hubungi kami</h2>
+          <p class="hc-lead">Petugas desa siap membantu pada jam pelayanan. Untuk pertanyaan singkat, WhatsApp menjadi jalur tercepat.</p>
+
+          <div class="hc-row">
+            <div class="hc-ic blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            </div>
+            <div>
+              <div class="hc-k">Alamat</div>
+              <div class="hc-v">Jl. Raya Puncak No. 24, Desa Sukamaju<br>Kec. Cisarua, Kab. Bogor 16750</div>
+            </div>
+          </div>
+
+          <div class="hc-row">
+            <div class="hc-ic blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            </div>
+            <div>
+              <div class="hc-k">Jam pelayanan</div>
+              <div class="hc-v">Senin–Kamis 08.00–15.00<br>Jumat 08.00–11.30</div>
+            </div>
+          </div>
+
+          <div class="hc-row">
+            <div class="hc-ic green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.6 8.6 0 0 1-3.8-.9L3 21l2-5.4a8.3 8.3 0 0 1-1-4A8.4 8.4 0 0 1 12.5 3.2 8.4 8.4 0 0 1 21 11.5z"/></svg>
+            </div>
+            <div>
+              <div class="hc-k">Telepon &amp; WhatsApp</div>
+              <div class="hc-v">(0251) 830 1122 · 0812–3456–7890</div>
+            </div>
+          </div>
+
+          <div class="hc-btns">
+            <a href="https://wa.me/6281234567890" target="_blank" rel="noopener" class="btn btn-primary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.6 8.6 0 0 1-3.8-.9L3 21l2-5.4a8.3 8.3 0 0 1-1-4A8.4 8.4 0 0 1 12.5 3.2 8.4 8.4 0 0 1 21 11.5z"/></svg>
+              Chat WhatsApp desa
+            </a>
+            <a href="kontak.html" class="btn btn-outline">Lihat halaman kontak</a>
+          </div>
+        </div>
+
+        <div class="hc-map">
+          <div class="hc-road r1"></div>
+          <div class="hc-road r2"></div>
+          <div class="hc-road r3"></div>
+          <div class="hc-road r4"></div>
+          <div class="hc-pin">
+            <div class="hc-pin-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            </div>
+            <div class="hc-tooltip">
+              <b>Kantor Desa Sukamaju</b>
+              <span>Jl. Raya Puncak No. 24</span>
+            </div>
+          </div>
+          <a class="hc-maps" href="https://maps.google.com/?q=Kantor+Desa+Sukamaju+Cisarua+Bogor" target="_blank" rel="noopener">
+            Buka di Google Maps
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="brand">
+            <div class="brand-mark">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M4 18h16M6 18v-8h3v8M11 18v-8h3v8M16 18v-8h3v8M12 3l9 5H3l9-5z"/></svg>
+            </div>
+            <div>
+              <div class="brand-name">Desa Sukamaju</div>
+              <div class="brand-sub">Kecamatan Cisarua · Kabupaten Bogor</div>
+            </div>
+          </div>
+          <p>Layanan digital resmi Pemerintah Desa Sukamaju. Buktikan cinta pada tanah sendiri dengan menghadiri musyawarah desa secara rutin.</p>
+          <div class="footer-badges">
+            <span class="badge badge-dark">Terhubung · Versi 2.1</span>
+            <span class="badge badge-dark">Data Terupdate 2026</span>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Layanan</h4>
+          <ul>
+            <li><a href="pelayanan-domisili.html">Keterangan Domisili</a></li>
+            <li><a href="pelayanan-usaha.html">Keterangan Usaha</a></li>
+            <li><a href="pelayanan-tidak-mampu.html">Keterangan Tidak Mampu</a></li>
+            <li><a href="pelayanan.html#katalog">Katalog Semua Surat</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Informasi</h4>
+          <ul>
+            <li><a href="informasi.html">Berita & Agenda</a></li>
+            <li><a href="informasi.html#pengumuman">Pengumuman</a></li>
+            <li><a href="potensi.html">Potensi Desa</a></li>
+            <li><a href="profil.html#struktur">Perangkat Desa</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Kontak</h4>
+          <ul class="footer-contact">
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+              <span>Jl. Raya Sukamaju No. 1, Kecamatan Cisarua, Kabupaten Bogor 16750</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.9.7A2 2 0 0 1 22 16.9z"/></svg>
+              <span>(0251) 830 1122</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+              <span>pemdes@sukamaju.desa.id</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              <span>Senin–Jumat · 08.00–15.00 WIB<br>Jumat tutup 11.00–13.00</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Pemerintah Desa Sukamaju. Hak cipta dilindungi.</span>
+        <div class="footer-bottom-links">
+          <a href="informasi.html">Arsip</a>
+          <a href="kontak.html">Kontak</a>
+          <a href="admin/login.html">Admin</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

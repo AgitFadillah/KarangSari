@@ -1,0 +1,129 @@
+/* ============================================================
+   Dropdown kustom (pengganti <select> bawaan browser)
+   ------------------------------------------------------------
+   Markup yang dihasilkan JS (lihat resources/js/pilih-kustom.js):
+
+     <div class="pilih" data-pilih>
+       <button type="button" class="pilih-tombol" ...>
+         <span class="pilih-nilai">Label</span>
+         <svg class="pilih-panah">…</svg>
+       </button>
+       <ul class="pilih-menu" role="listbox" hidden> … </ul>
+       <input type="hidden" name="…" value="…">   (bila select asli punya name)
+     </div>
+
+   Gaya sengaja mengikuti token tema (navy + blue) supaya seragam
+   dengan tombol dan kolom isian lain.
+   ============================================================ */
+
+.pilih {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Tombol pemicu: tampil persis seperti kolom isian bertema. */
+.pilih-tombol {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; text-align: left;
+  padding: 12px 15px;
+  border: 1.5px solid #C6D4E2;
+  border-radius: var(--radius-sm);
+  background: #FBFCFE;
+  color: var(--navy-900);
+  font-size: .9375rem; font-weight: 500; line-height: 1.35;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+  min-height: 46px;
+}
+.pilih-tombol:hover {
+  border-color: var(--blue-500);
+  background: var(--white);
+}
+.pilih-tombol:focus-visible,
+.pilih-tombol[aria-expanded="true"] {
+  outline: none;
+  border-color: var(--blue-600);
+  background: var(--white);
+  box-shadow: 0 0 0 4px rgba(46, 109, 164, .16);
+}
+.pilih-nilai {
+  flex: 1 1 auto; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* Placeholder (opsi pertama yang kosong) ditampilkan lebih redup. */
+.pilih-nilai.kosong { color: #94A3B4; font-weight: 400; }
+
+.pilih-panah {
+  width: 16px; height: 16px; flex: none;
+  color: var(--gray-600);
+  transition: transform .18s ease;
+}
+.pilih-tombol[aria-expanded="true"] .pilih-panah { transform: rotate(180deg); }
+
+/* Daftar opsi */
+.pilih-menu {
+  position: absolute; z-index: 70;
+  top: calc(100% + 6px); left: 0; right: 0;
+  max-height: 264px; overflow-y: auto;
+  margin: 0; padding: 6px;
+  list-style: none;
+  background: var(--white);
+  border: 1px solid #C6D4E2;
+  border-radius: var(--radius-md);
+  box-shadow: 0 12px 32px -8px rgba(11, 31, 58, .28);
+}
+.pilih-menu[hidden] { display: none; }
+/* Bila terlalu mepet bawah layar, menu dibuka ke atas. */
+.pilih.atas .pilih-menu {
+  top: auto; bottom: calc(100% + 6px);
+}
+
+.pilih-opsi {
+  display: flex; align-items: center; gap: 9px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: .9375rem; color: var(--navy-900);
+  cursor: pointer; user-select: none;
+  line-height: 1.4;
+}
+.pilih-opsi:hover { background: var(--gray-100); }
+.pilih-opsi[aria-selected="true"] {
+  background: var(--blue-100);
+  font-weight: 600;
+  color: var(--navy-900);
+}
+.pilih-opsi[aria-selected="true"]::after {
+  content: ''; margin-left: auto; flex: none;
+  width: 16px; height: 16px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E") center / contain no-repeat;
+  color: var(--blue-600);
+}
+/* Opsi yang sedang difokuskan lewat keyboard */
+.pilih-opsi.aktif { background: var(--gray-100); }
+.pilih-opsi[aria-selected="true"].aktif { background: var(--blue-100); }
+
+/* Varian kecil: dipakai pada baris filter agar tidak mendominasi. */
+.pilih-sm .pilih-tombol {
+  padding: 9px 13px; min-height: 38px; font-size: .875rem;
+}
+.pilih-sm .pilih-menu { max-height: 232px; }
+.pilih-sm .pilih-opsi { padding: 8px 10px; font-size: .875rem; }
+
+/* Di dalam baris filter, lebar menyesuaikan induknya. */
+.filter-row .pilih { width: auto; min-width: 168px; flex: 1 1 auto; max-width: 320px; }
+
+/* Nonaktif */
+.pilih[data-nonaktif] .pilih-tombol {
+  background: var(--gray-100); color: var(--gray-600);
+  border-color: var(--gray-200); cursor: not-allowed;
+}
+
+/* Select asli disembunyikan tapi tetap ada untuk validasi form
+   (mis. atribut `required`) dan fallback bila JS mati. */
+select.data-pilih-asli {
+  position: absolute !important;
+  width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}

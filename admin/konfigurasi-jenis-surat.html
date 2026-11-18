@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Konfigurasi Jenis Surat · Dashboard Admin Desa Sukamaju</title>
+  <meta name="description" content="Konfigurasi jenis surat pada dashboard admin Desa Sukamaju.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 720px) { .form-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="admin-shell">
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="admin-brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M4 18h16M6 18v-8h3v8M11 18v-8h3v8M16 18v-8h3v8M12 3l9 5H3l9-5z"/></svg>
+        </div>
+        <div>
+          <div class="brand-name">Desa Sukamaju</div>
+          <div class="brand-sub">DASHBOARD ADMIN</div>
+        </div>
+      </div>
+      <nav class="admin-nav" aria-label="Menu admin">
+        <div class="admin-nav-label">OPERASIONAL</div>
+        <a href="ringkasan.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Ringkasan
+        </a>
+        <a href="pengajuan.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>
+          Pengajuan Surat
+          <span class="badge badge-gray">2</span>
+        </a>
+        <div class="admin-nav-label">PENGATURAN</div>
+        <a href="jenis-surat.html" class="active" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+          Jenis Surat
+        </a>
+        <a href="konten-website.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>
+          Konten Website
+        </a>
+        <a href="profil-kontak.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Profil &amp; Kontak
+        </a>
+        <a href="akun-admin.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Akun Admin
+        </a>
+        <a href="log-aktivitas.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          Log Aktivitas
+        </a>
+        <div class="admin-help">
+          <b>Butuh bantuan?</b>
+          Panduan singkat alur verifikasi dan pengelolaan surat.
+          <a href="../pelayanan.html#cara">Buka panduan →</a>
+        </div>
+      </nav>
+      <a href="akun-admin.html" class="admin-user">
+        <div class="avatar">SW</div>
+        <div>
+          <div class="admin-user-name">Sari Wulandari</div>
+          <div class="admin-user-role">Administrator</div>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="margin-left:auto;opacity:.5"><path d="M6 9l6 6 6-6"/></svg>
+      </a>
+    </aside>
+
+    <div class="admin-main">
+      <header class="admin-topbar">
+        <button class="admin-menu-btn" id="adminMenuBtn" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="adminSidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div>
+          <div class="breadcrumb"><a href="ringkasan.html">Admin</a><span class="sep">/</span><a href="jenis-surat.html">Jenis Surat</a><span class="sep">/</span><span>Konfigurasi</span></div>
+          <h1>Konfigurasi Jenis Surat</h1>
+        </div>
+        <form class="search" action="pengajuan.html" method="get" role="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="search" name="q" placeholder="Cari pengajuan..." aria-label="Cari pengajuan">
+        </form>
+        <a href="pengajuan.html" class="admin-bell" aria-label="2 pengajuan menunggu tindakan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <span class="admin-bell-dot"></span>
+        </a>
+        <a href="akun-admin.html" class="admin-user-chip">
+          <div class="avatar">SW</div>
+          <div>
+            <div class="name">Sari W.</div>
+            <div class="role">Admin</div>
+          </div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="color:var(--gray-500)"><path d="M6 9l6 6 6-6"/></svg>
+        </a>
+      </header>
+
+      <main class="admin-content">
+        <div class="admin-page-head">
+          <div>
+            <p class="sub">Atur kode, persyaratan, dan template surat untuk jenis surat yang dipilih.</p>
+          </div>
+          <a href="jenis-surat.html" class="btn btn-outline btn-sm">Kembali ke daftar</a>
+        </div>
+
+        <div class="panel">
+          <form id="formKonfig">
+            <div class="form-grid">
+              <div class="field mb-16">
+                <label for="kode">Kode jenis surat</label>
+                <input type="text" id="kode" name="kode" value="SKD" required>
+              </div>
+              <div class="field mb-16">
+                <label for="nama">Nama jenis surat</label>
+                <input type="text" id="nama" name="nama" value="Surat Keterangan Domisili" required>
+              </div>
+            </div>
+            <div class="field mb-16">
+              <label for="deskripsi">Deskripsi</label>
+              <textarea id="deskripsi" name="deskripsi" rows="3">Keterangan domisili warga Desa Sukamaju.</textarea>
+            </div>
+            <div class="field mb-16">
+              <label for="persyaratan">Persyaratan (satu per baris)</label>
+              <textarea id="persyaratan" name="persyaratan" rows="4">Fotokopi KTP
+Fotokopi KK
+Surat pengantar RT/RW</textarea>
+            </div>
+            <div class="field mb-16">
+              <label for="status">Status</label>
+              <select id="status" name="status">
+                <option selected>Aktif</option>
+                <option>Nonaktif</option>
+              </select>
+            </div>
+            <div class="field mb-16">
+              <label for="template">Template surat</label>
+              <textarea id="template" name="template" rows="6">Yang bertanda tangan di bawah ini ...</textarea>
+            </div>
+            <div class="panel-foot">
+              <span>Perubahan hanya disimpan pada tampilan halaman ini.</span>
+              <button type="submit" class="btn btn-primary">Simpan konfigurasi</button>
+            </div>
+          </form>
+        </div>
+
+        <p id="notice" class="list-note" role="status" style="display:none"></p>
+      </main>
+
+      <footer class="admin-foot">
+        <span>Sistem Informasi Desa Sukamaju · Versi prototipe 1.0</span>
+        <span>Data pada dashboard adalah contoh dan tidak memuat data warga sebenarnya.</span>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script>
+    (function () {
+      var form = document.getElementById('formKonfig');
+      var notice = document.getElementById('notice');
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        notice.textContent = 'Konfigurasi disimpan (contoh). Perubahan tidak disimpan ke server.';
+        notice.style.display = 'block';
+      });
+    })();
+  </script>
+</body>
+</html>

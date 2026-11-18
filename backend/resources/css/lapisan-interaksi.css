@@ -1,0 +1,185 @@
+/* ============================================================
+   Lapisan interaksi: border & glow yang lebih terlihat
+   ------------------------------------------------------------
+   Semua komponen interaktif (kartu, tombol, kolom isian) memakai
+   garis tepi bernuansa tema agar tidak terlihat samar di layar
+   perangkat desa. Warna diambil dari token yang sudah ada.
+   ============================================================ */
+
+/* ---------- 1. Kolom isian ---------- */
+input[type=text], input[type=password], input[type=email], input[type=tel],
+input[type=date], input[type=search], input[type=number], input[type=url],
+input[type=time], textarea, .input {
+  border: 1.5px solid #C6D4E2;
+  background: #FBFCFE;
+  color: var(--navy-900);
+  font-weight: 500;
+  box-shadow: inset 0 1px 2px rgba(11, 31, 58, .04);
+}
+input::placeholder, textarea::placeholder {
+  color: #94A3B4;
+  font-weight: 400;
+  opacity: 1;
+}
+input[type=text]:hover, input[type=password]:hover, input[type=email]:hover,
+input[type=tel]:hover, input[type=date]:hover, input[type=search]:hover,
+input[type=number]:hover, input[type=url]:hover, input[type=time]:hover,
+textarea:hover {
+  border-color: var(--blue-500);
+  background: var(--white);
+}
+input:focus, textarea:focus, .input:focus {
+  outline: none;
+  border-color: var(--blue-600);
+  background: var(--white);
+  box-shadow: 0 0 0 4px rgba(46, 109, 164, .16);
+}
+input:disabled, textarea:disabled, input[readonly] {
+  background: var(--gray-100);
+  color: var(--gray-600);
+  border-color: var(--gray-200);
+  cursor: not-allowed;
+}
+
+/* ---------- 2. Tombol ---------- */
+.btn {
+  border: 1.5px solid transparent;
+}
+.btn-primary {
+  border-color: var(--navy-900);
+  box-shadow: 0 2px 8px rgba(11, 31, 58, .18);
+}
+.btn-primary:hover {
+  border-color: var(--blue-600);
+  box-shadow: 0 4px 16px rgba(46, 109, 164, .32);
+}
+.btn-white {
+  border-color: var(--white);
+  box-shadow: var(--shadow-sm);
+}
+.btn-white:hover { border-color: var(--blue-500); }
+.btn-outline {
+  border-color: #B9C9D9;
+  background: var(--white);
+  color: var(--navy-900);
+}
+.btn-outline:hover {
+  border-color: var(--blue-600);
+  background: var(--blue-100);
+  color: var(--navy-900);
+}
+.btn-outline-light {
+  border-color: rgba(255, 255, 255, .55);
+  background: rgba(255, 255, 255, .06);
+}
+.btn-outline-light:hover {
+  border-color: var(--white);
+  background: rgba(255, 255, 255, .16);
+}
+.btn-green { border-color: var(--green-600); box-shadow: 0 2px 8px rgba(31, 157, 99, .22); }
+.btn-green:hover { box-shadow: 0 4px 16px rgba(31, 157, 99, .32); }
+.btn-danger-outline { background: var(--white); }
+.btn-danger-outline:hover { background: var(--red-100); }
+.btn-amber-outline { background: var(--white); }
+.btn-amber-outline:hover { background: var(--amber-100); }
+
+/* Tombol tanpa teks (ikon saja) tetap punya garis tepi yang jelas. */
+.btn-icon, .pw-toggle {
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-sm);
+}
+.btn-icon:hover, .pw-toggle:hover {
+  border-color: var(--blue-500);
+  background: var(--blue-100);
+}
+
+/* ---------- 3. Kartu & panel ---------- */
+.card,
+.panel,
+.contact-card,
+.stat-mini,
+.hc-card {
+  border: 1px solid #D8E2EC;
+  box-shadow: 0 1px 2px rgba(11, 31, 58, .05), 0 1px 12px -6px rgba(11, 31, 58, .10);
+}
+
+/* Kartu yang bisa diklik: garis tepi menyala saat disorot. */
+a.card,
+a.news-item,
+a.pg-ann-item,
+a.pg-agenda-item,
+.quicklink,
+.service-row,
+.potensi-card,
+.pub-link,
+.person-card,
+.news-item-light {
+  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+a.card:hover,
+a.pg-agenda-item:hover {
+  border-color: var(--blue-500);
+  box-shadow: 0 6px 22px -6px rgba(46, 109, 164, .38);
+}
+.quicklink { border: 1px solid #D8E2EC; }
+.quicklink:hover {
+  border-color: var(--blue-500);
+  box-shadow: 0 6px 22px -8px rgba(46, 109, 164, .38);
+}
+.service-row { border: 1px solid #D8E2EC; }
+.service-row:hover {
+  border-color: var(--blue-500);
+  box-shadow: 0 6px 22px -8px rgba(46, 109, 164, .34);
+}
+.potensi-card { border: 1px solid #D8E2EC; }
+.potensi-card:hover {
+  border-color: var(--blue-500);
+  box-shadow: 0 8px 26px -8px rgba(46, 109, 164, .4);
+}
+.person-card { border: 1px solid #D8E2EC; }
+.person-card:hover { border-color: var(--blue-500); }
+.pub-link:hover { border-color: var(--blue-600); background: var(--blue-100); }
+.stat-mini { border-color: #D8E2EC; }
+.news-item-light:hover { border-color: var(--blue-500); }
+
+/* Panel admin: garis tepi bawah lebih tegas sebagai pemisah kartu. */
+.panel { border-bottom-color: #C9D7E4; }
+
+/* ---------- 4. Tabel ---------- */
+.table-wrap > table { border: 1px solid #D8E2EC; }
+table thead th {
+  background: var(--gray-100);
+  color: var(--navy-900);
+  border-bottom: 1px solid #C9D7E4;
+}
+
+/* ---------- 5. Badge ---------- */
+.badge { border: 1px solid transparent; }
+.badge-blue  { border-color: rgba(46, 109, 164, .28); }
+.badge-green { border-color: rgba(31, 157, 99, .28); }
+.badge-amber { border-color: rgba(217, 126, 6, .30); }
+.badge-red   { border-color: rgba(217, 45, 32, .26); }
+.badge-gray  { border-color: var(--gray-200); }
+.badge-navy  { border-color: var(--navy-700); }
+
+
+/* ---------- Pratinjau surat warga ---------- */
+/* Template resmi desa dikirim sebagai teks utuh (kop, judul, nomor, isi,
+   tanda tangan). Huruf dibuat lebih kecil dan berjarak supaya tampak seperti
+   surat, dan baris berlabel tetap rata karena memakai font monospace. */
+.letter-warga {
+  font-size: .8125rem;
+  line-height: 1.75;
+  padding: 30px 32px;
+}
+.letter-warga #pratinjauIsi {
+  font-family: var(--font-mono, ui-monospace, "Cascadia Mono", "Courier New", monospace);
+  font-size: .75rem;
+  letter-spacing: .01em;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 640px) {
+  .letter-warga { padding: 18px 16px; }
+  .letter-warga #pratinjauIsi { font-size: .6875rem; }
+}

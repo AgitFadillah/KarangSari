@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ringkasan · Dashboard Admin Desa Sukamaju</title>
+  <meta name="description" content="Ringkasan dashboard admin Desa Sukamaju: jumlah pengajuan surat, sebaran status, dan agenda mendatang.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="admin-shell">
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="admin-brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M4 18h16M6 18v-8h3v8M11 18v-8h3v8M16 18v-8h3v8M12 3l9 5H3l9-5z"/></svg>
+        </div>
+        <div>
+          <div class="brand-name">Desa Sukamaju</div>
+          <div class="brand-sub">DASHBOARD ADMIN</div>
+        </div>
+      </div>
+      <nav class="admin-nav" aria-label="Menu admin">
+        <div class="admin-nav-label">OPERASIONAL</div>
+        <a href="ringkasan.html" class="active" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Ringkasan
+        </a>
+        <a href="pengajuan.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>
+          Pengajuan Surat
+          <span class="badge badge-gray">2</span>
+        </a>
+        <div class="admin-nav-label">PENGATURAN</div>
+        <a href="jenis-surat.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+          Jenis Surat
+        </a>
+        <a href="konten-website.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>
+          Konten Website
+        </a>
+        <a href="profil-kontak.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Profil &amp; Kontak
+        </a>
+        <a href="akun-admin.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Akun Admin
+        </a>
+        <a href="log-aktivitas.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          Log Aktivitas
+        </a>
+        <div class="admin-help">
+          <b>Butuh bantuan?</b>
+          Panduan singkat alur verifikasi dan pengelolaan surat.
+          <a href="../pelayanan.html#cara">Buka panduan →</a>
+        </div>
+      </nav>
+      <a href="akun-admin.html" class="admin-user">
+        <div class="avatar">SW</div>
+        <div>
+          <div class="admin-user-name">Sari Wulandari</div>
+          <div class="admin-user-role">Administrator</div>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="margin-left:auto;opacity:.5"><path d="M6 9l6 6 6-6"/></svg>
+      </a>
+    </aside>
+
+    <div class="admin-main">
+      <header class="admin-topbar">
+        <button class="admin-menu-btn" id="adminMenuBtn" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="adminSidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div>
+          <div class="breadcrumb"><span>Admin</span><span class="sep">/</span><span>Ringkasan</span></div>
+          <h1>Ringkasan</h1>
+        </div>
+        <form class="search" action="pengajuan.html" method="get" role="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="search" name="q" placeholder="Cari pengajuan..." aria-label="Cari pengajuan">
+        </form>
+        <a href="pengajuan.html" class="admin-bell" aria-label="2 pengajuan menunggu tindakan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <span class="admin-bell-dot"></span>
+        </a>
+        <a href="akun-admin.html" class="admin-user-chip">
+          <div class="avatar">SW</div>
+          <div>
+            <div class="name">Sari W.</div>
+            <div class="role">Admin</div>
+          </div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="color:var(--gray-500)"><path d="M6 9l6 6 6-6"/></svg>
+        </a>
+      </header>
+
+      <main class="admin-content">
+        <div class="admin-page-head greeting">
+          <div>
+            <div class="date">Sabtu, 31 Oktober 2026 · 08.15 WIB</div>
+            <h2>Selamat pagi, Sari.</h2>
+            <p class="sub">Ada <b>2</b> pengajuan yang menunggu tindakan Anda.</p>
+          </div>
+          <div class="flex gap-12 wrap">
+            <a href="pengajuan.html" class="btn btn-primary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>
+              Periksa pengajuan
+            </a>
+            <a href="konten-website.html" class="btn btn-outline">Kelola konten</a>
+          </div>
+        </div>
+
+        <div class="stat-cards">
+          <div class="stat-card">
+            <div class="stat-card-icon blue" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+            </div>
+            <div class="stat-card-label">Total pengajuan</div>
+            <div class="stat-card-value">8</div>
+            <div class="stat-card-note">Seluruh pengajuan tercatat</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon amber" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            </div>
+            <div class="stat-card-label">Menunggu tindakan</div>
+            <div class="stat-card-value amber">2</div>
+            <div class="stat-card-note">1 baru · 1 perlu perbaikan</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon blue" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+            </div>
+            <div class="stat-card-label">Dalam proses</div>
+            <div class="stat-card-value">3</div>
+            <div class="stat-card-note">Disetujui, dicetak, dan siap diambil</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon green" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+            <div class="stat-card-label">Selesai</div>
+            <div class="stat-card-value green">2</div>
+            <div class="stat-card-note">Surat telah diserahkan ke warga</div>
+          </div>
+        </div>
+
+        <div class="admin-grid-2">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Pengajuan terbaru</h2>
+                <p>Lima pengajuan terakhir yang masuk</p>
+              </div>
+              <a href="pengajuan.html" class="panel-link">Semua →</a>
+            </div>
+            <div class="table-wrap">
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>Pemohon</th>
+                    <th>Layanan</th>
+                    <th>Masuk</th>
+                    <th>Status</th>
+                    <th aria-label="Aksi"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="cell-avatar">
+                        <div class="avatar">BS</div>
+                        <div>
+                          <div class="cell-main">Budi Santoso</div>
+                          <div class="cell-sub">SBM-2026-0008</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>Surat Keterangan Domisili</td>
+                    <td><div>30 Okt 2026</div><div class="cell-sub">09.14</div></td>
+                    <td><span class="badge badge-amber">Menunggu Verifikasi</span></td>
+                    <td class="right">
+                      <a href="detail-pengajuan.html?id=SBM-2026-0008" class="row-arrow" aria-label="Lihat detail pengajuan SBM-2026-0008">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l6 6-6 6"/></svg>
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="cell-avatar">
+                        <div class="avatar">SA</div>
+                        <div>
+                          <div class="cell-main">Siti Aminah</div>
+                          <div class="cell-sub">SBM-2026-0007</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>Surat Keterangan Usaha</td>
+                    <td><div>29 Okt 2026</div><div class="cell-sub">14.02</div></td>
+                    <td><span class="badge badge-red">Perlu Perbaikan</span></td>
+                    <td class="right">
+                      <a href="detail-pengajuan.html?id=SBM-2026-0007" class="row-arrow" aria-label="Lihat detail pengajuan SBM-2026-0007">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l6 6-6 6"/></svg>
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="cell-avatar">
+                        <div class="avatar">AF</div>
+                        <div>
+                          <div class="cell-main">Ahmad Fauzi</div>
+                          <div class="cell-sub">SBM-2026-0006</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>Surat Keterangan Tidak Mampu</td>
+                    <td><div>28 Okt 2026</div><div class="cell-sub">10.35</div></td>
+                    <td><span class="badge badge-green">Disetujui</span></td>
+                    <td class="right">
+                      <a href="detail-pengajuan.html?id=SBM-2026-0006" class="row-arrow" aria-label="Lihat detail pengajuan SBM-2026-0006">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l6 6-6 6"/></svg>
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="cell-avatar">
+                        <div class="avatar">RM</div>
+                        <div>
+                          <div class="cell-main">Rina Marlina</div>
+                          <div class="cell-sub">SBM-2026-0005</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>Surat Keterangan Domisili</td>
+                    <td><div>27 Okt 2026</div><div class="cell-sub">11.08</div></td>
+                    <td><span class="badge badge-blue">Sedang Diproses</span></td>
+                    <td class="right">
+                      <a href="detail-pengajuan.html?id=SBM-2026-0005" class="row-arrow" aria-label="Lihat detail pengajuan SBM-2026-0005">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l6 6-6 6"/></svg>
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="cell-avatar">
+                        <div class="avatar">DK</div>
+                        <div>
+                          <div class="cell-main">Dedi Kurniawan</div>
+                          <div class="cell-sub">SBM-2026-0004</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>Surat Izin Keramaian</td>
+                    <td><div>24 Okt 2026</div><div class="cell-sub">08.52</div></td>
+                    <td><span class="badge badge-green">Siap Diambil</span></td>
+                    <td class="right">
+                      <a href="detail-pengajuan.html?id=SBM-2026-0004" class="row-arrow" aria-label="Lihat detail pengajuan SBM-2026-0004">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l6 6-6 6"/></svg>
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div>
+            <div class="panel">
+              <div class="panel-head">
+                <h2>Sebaran status</h2>
+                <span class="badge badge-gray">8 total</span>
+              </div>
+              <div class="horizontal-bars">
+                <div class="hbar-row">
+                  <div class="hbar-top"><b>Menunggu Verifikasi</b><span>1</span></div>
+                  <div class="hbar-track"><div class="hbar-fill amber" style="width:12%"></div></div>
+                </div>
+                <div class="hbar-row">
+                  <div class="hbar-top"><b>Perlu Perbaikan</b><span>1</span></div>
+                  <div class="hbar-track"><div class="hbar-fill red" style="width:12%"></div></div>
+                </div>
+                <div class="hbar-row">
+                  <div class="hbar-top"><b>Ditolak</b><span>1</span></div>
+                  <div class="hbar-track"><div class="hbar-fill red" style="width:12%"></div></div>
+                </div>
+                <div class="hbar-row">
+                  <div class="hbar-top"><b>Disetujui</b><span>1</span></div>
+                  <div class="hbar-track"><div class="hbar-fill green" style="width:12%"></div></div>
+                </div>
+                <div class="hbar-row">
+                  <div class="hbar-top"><b>Sedang Diproses</b><span>1</span></div>
+                  <div class="hbar-track"><div class="hbar-fill blue" style="width:12%"></div></div>
+                </div>
+                <div class="hbar-row">
+                  <div class="hbar-top"><b>Siap Diambil</b><span>1</span></div>
+                  <div class="hbar-track"><div class="hbar-fill green" style="width:12%"></div></div>
+                </div>
+                <div class="hbar-row">
+                  <div class="hbar-top"><b>Selesai</b><span>2</span></div>
+                  <div class="hbar-track"><div class="hbar-fill navy" style="width:25%"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                <h2>Agenda mendatang</h2>
+                <a href="konten-website.html" class="panel-link">Kelola</a>
+              </div>
+              <div class="agenda-item">
+                <div class="agenda-date"><b>08</b><span>Nov</span></div>
+                <div class="agenda-body">
+                  <h3>Musyawarah Perencanaan Pembangunan Desa</h3>
+                  <p>08.00–12.00 · Balai Desa Sukamaju</p>
+                </div>
+              </div>
+              <div class="agenda-item">
+                <div class="agenda-date"><b>12</b><span>Nov</span></div>
+                <div class="agenda-body">
+                  <h3>Posyandu Balita dan Lansia</h3>
+                  <p>08.00–11.00 · Balai RW 04</p>
+                </div>
+              </div>
+              <div class="agenda-item">
+                <div class="agenda-date"><b>16</b><span>Nov</span></div>
+                <div class="agenda-body">
+                  <h3>Kerja Bakti Bersih Sungai Cileunca</h3>
+                  <p>07.00–10.00 · Titik kumpul Jembatan Cileunca</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="quick-grid">
+          <a href="jenis-surat.html" class="quick-card">
+            <div class="icon-tile" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+            </div>
+            <div>
+              <b>Kelola jenis surat</b>
+              <span>6 aktif dari 6 layanan</span>
+            </div>
+            <span class="quick-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l6 6-6 6"/></svg></span>
+          </a>
+          <a href="konten-website.html" class="quick-card">
+            <div class="icon-tile blue" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>
+            </div>
+            <div>
+              <b>Konten website</b>
+              <span>5 berita terbit</span>
+            </div>
+            <span class="quick-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l6 6-6 6"/></svg></span>
+          </a>
+          <a href="../index.html" target="_blank" rel="noopener" class="quick-card">
+            <div class="icon-tile green" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>
+            </div>
+            <div>
+              <b>Lihat website publik</b>
+              <span>Buka di tab baru</span>
+            </div>
+            <span class="quick-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l6 6-6 6"/></svg></span>
+          </a>
+        </div>
+      </main>
+
+      <footer class="admin-foot">
+        <span>Sistem Informasi Desa Sukamaju · Versi prototipe 1.0</span>
+        <span>Data pada dashboard adalah contoh dan tidak memuat data warga sebenarnya.</span>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
