@@ -56,7 +56,22 @@ echo "[start] Menunggu basis data siap dan menjalankan migrasi..."
 # "migrate" di bawah bisa menyambung ke basis data yang salah. Karena itu
 # cache dibuang dulu, sehingga seluruh proses start memakai variabel runtime.
 # Cache dibangun ulang oleh "optimize" di akhir skrip ini.
-php artisan optimize:clear >/dev/null 2>&1 || echo "[start] Peringatan: optimize:clear gagal (lanjut dengan cache lama)."
+#
+# KENAPA TIDAK MEMAKAI "optimize:clear"?
+# Perintah itu menjalankan "cache:clear" juga, dan cache:clear menghapus isi
+# tabel "cache" di basis data. Pada deployment pertama tabel itu belum ada
+# (baru dibuat oleh migrate di bawah), sehingga hasilnya:
+#
+#     SQLSTATE[42P01]: Undefined table: relation "cache" does not exist
+#
+# Perintah itu gagal, cache config tidak pernah terhapus, dan seluruh proses
+# start memakai nilai hasil build — persis masalah yang ingin dicegah. Karena
+# itu dipakai perintah yang hanya menyentuh berkas di disk.
+php artisan config:clear  || echo "[start] Peringatan: config:clear gagal."
+php artisan route:clear   || echo "[start] Peringatan: route:clear gagal."
+php artisan view:clear    || echo "[start] Peringatan: view:clear gagal."
+php artisan event:clear   || echo "[start] Peringatan: event:clear gagal."
+php artisan clear-compiled || echo "[start] Peringatan: clear-compiled gagal."
 
 percobaan=0
 batas=10
@@ -105,7 +120,17 @@ mkdir -p \
 # di repositori dan hilang setiap container diganti, jadi dibuat ulang di sini.
 # Kegagalan symlink tidak boleh menghentikan aplikasi: dokumen warga tetap
 # dapat diakses karena tidak memakai symlink.
-php artisan storage:link --force || echo "[start] Peringatan: storage:link gagal (foto perangkat mungkin tidak tampil)."
+#
+# Pemeriksaan "-L" (symlink) dan "-e" (ada) dipakai agar log tidak penuh galat
+# palsu. Di Windows, Laravel membuat "junction", dan PHP menganggapnya bukan
+# symlink, sehingga "storage:link --force" mencetak "link already exists"
+# padahal tidak ada yang salah. Di Linux (Railway) pemeriksaan ini tetap
+# membuat ulang symlink setiap kali container start.
+if [ -L public/storage ] || [ ! -e public/storage ]; then
+    php artisan storage:link --force || echo "[start] Peringatan: storage:link gagal (foto perangkat mungkin tidak tampil)."
+else
+    echo "[start] public/storage sudah ada dan bukan symlink, lewati storage:link."
+fi
 
 # Cache konfigurasi, route, dan view.
 php artisan optimize || echo "[start] Peringatan: optimize gagal, aplikasi tetap dijalankan tanpa cache."
