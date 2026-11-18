@@ -279,4 +279,197 @@ class SkripDeployTest extends TestCase
             . 'membuat setiap halaman gagal dengan "Vite manifest not found".'
         );
     }
+
+    /**
+     * Skrip start harus BERHENTI CEPAT bila alamat basis data jelas salah.
+     *
+     * Di hosting container, aplikasi dan PostgreSQL adalah dua mesin terpisah.
+     * Alamat 127.0.0.1 di dalam container aplikasi menunjuk ke container itu
+     * sendiri, dan di sana tidak ada PostgreSQL. Jadi bila DB_URL kosong
+     * sementara DB_HOST tidak diisi, koneksi PASTI ditolak - bukan "belum siap".
+     *
+     * Tanpa pemeriksaan ini, skrip mengulang 10 kali x 5 detik dan membanjiri
+     * log dengan "Connection refused" yang tidak menjelaskan apa pun. Itu
+     * pernah terjadi: log penuh galat koneksi, tetapi penyebab sebenarnya satu
+     * hal sederhana - teks referensi ${{NamaService.DATABASE_URL}} tidak
+     * ter-resolve karena nama service basis data di dashboard tidak sama persis.
+     *
+     * Pemeriksaan harus berada SEBELUM perulangan migrate, supaya tidak ada
+     * satu pun percobaan koneksi yang sia-sia.
+     */
+    public function test_skrip_start_berhenti_cepat_bila_alamat_basis_data_salah(): void
+    {
+        $perintah = implode("\n", $this->barisPerintah($this->skrip('deploy-start.sh')));
+
+        $posisiJaga = strpos($perintah, 'DB_URL kosong dan DB_HOST tidak diisi');
+
+        $this->assertNotFalse(
+            $posisiJaga,
+            'deploy-start.sh harus menjelaskan dengan gamblang saat DB_URL kosong dan DB_HOST '
+            . 'tidak diisi: aplikasi mencoba menghubungi basis data di container itu sendiri. '
+            . 'Tanpa pesan itu, log hanya berisi "Connection refused" yang menyesatkan.'
+        );
+
+        $posisiMigrate = strpos($perintah, 'migrate --force');
+
+        $this->assertNotFalse($posisiMigrate, 'deploy-start.sh harus menjalankan "migrate --force".');
+
+        $this->assertLessThan(
+            $posisiMigrate,
+            $posisiJaga,
+            'Pemeriksaan alamat basis data harus dijalankan SEBELUM migrate. Kalau diletakkan '
+            . 'sesudahnya, skrip tetap mengulang 10 kali dan log tetap dipenuhi galat koneksi.'
+        );
+
+        $this->assertStringContainsString(
+            'Add Reference',
+            $perintah,
+            'Pesan galat harus menyebut cara memperbaikinya di dashboard Railway (ikon Reference '
+            . 'atau "Add Reference" pada variabel DB_URL).'
+        );
+    }
+
+    /**
+     * Uji perilaku sungguhan: skrip dijalankan dengan "php" tiruan.
+     *
+     * Pemeriksaan teks di atas bisa lolos walaupun logikanya salah. Uji ini
+     * membuktikan skrip benar-benar berhenti sebelum menyentuh basis data, dan
+     * tetap berjalan normal ketika alamat basis data memang diisi.
+     *
+     * @return array{0:int,1:string}
+     */
+    private function jalankanSkripStart(array $variabel): array
+    {
+        $sh = $this->cariShell();
+
+        if ($sh === null) {
+            $this->markTestSkipped('Shell "sh" tidak tersedia di sistem ini.');
+        }
+
+        $akar = dirname(__DIR__, 2);
+        $palsu = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'stub-php-' . bin2hex(random_bytes(4));
+
+        if (! is_dir($palsu)) {
+            mkdir($palsu, 0777, true);
+        }
+
+        // "php" tiruan: mencatat setiap perintah artisan yang dipanggil, tanpa
+        // benar-benar menjalankan Laravel. Dengan begitu uji ini tidak butuh
+        // basis data dan tetap membuktikan urutan pemanggilannya.
+        $stub = $palsu . DIRECTORY_SEPARATOR . 'php';
+        file_put_contents($stub, "#!/bin/sh\necho \"STUB-PHP \$*\"\nexit 0\n");
+        @chmod($stub, 0755);
+
+        $env = [];
+
+        foreach (getenv() as $kunci => $nilai) {
+            $env[$kunci] = $nilai;
+        }
+
+        // Windows menyimpan variabel PATH dengan nama "Path". Bila nama itu
+        // diteruskan apa adanya, shell tidak menemukan perintah dasar seperti
+        // "mkdir" dan skrip gagal karena alasan yang tidak ada hubungannya
+        // dengan yang sedang diuji. Kedua ejaan diisi agar sama di semua sistem.
+        $pathAsli = $env['PATH'] ?? ($env['Path'] ?? '');
+
+        unset($env['Path']);
+        $env['PATH'] = $palsu . PATH_SEPARATOR . $pathAsli;
+
+        foreach (['DB_URL', 'DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD'] as $kunci) {
+            unset($env[$kunci]);
+        }
+
+        $env['APP_KEY'] = 'base64:' . base64_encode(random_bytes(32));
+
+        foreach ($variabel as $kunci => $nilai) {
+            $env[$kunci] = $nilai;
+        }
+
+        $proses = proc_open(
+            '"' . $sh . '" deploy-start.sh',
+            [1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
+            $pipa,
+            $akar,
+            $env
+        );
+
+        $this->assertIsResource($proses, 'Skrip start tidak bisa dijalankan untuk diuji.');
+
+        $keluaran = (string) stream_get_contents($pipa[1]) . (string) stream_get_contents($pipa[2]);
+
+        fclose($pipa[1]);
+        fclose($pipa[2]);
+
+        $kode = proc_close($proses);
+
+        @unlink($stub);
+        @rmdir($palsu);
+
+        return [$kode, $keluaran];
+    }
+
+    private function cariShell(): ?string
+    {
+        foreach (['C:\\Users\\Git\\bin\\sh.exe', '/bin/sh', '/usr/bin/sh'] as $calon) {
+            if (is_file($calon)) {
+                return $calon;
+            }
+        }
+
+        return null;
+    }
+
+    public function test_skrip_start_berhenti_sebelum_migrate_bila_db_url_kosong(): void
+    {
+        [$kode, $keluaran] = $this->jalankanSkripStart([
+            'DB_CONNECTION' => 'pgsql',
+        ]);
+
+        $this->assertSame(
+            1,
+            $kode,
+            'Skrip harus keluar dengan kode 1 (gagal) ketika DB_URL kosong dan DB_HOST tidak '
+            . 'diisi. Keluaran: ' . $keluaran
+        );
+
+        $this->assertStringContainsString(
+            'DB_URL kosong',
+            $keluaran,
+            'Pesan galat harus menyebut DB_URL kosong sebagai penyebabnya.'
+        );
+
+        $this->assertStringNotContainsString(
+            'artisan migrate',
+            $keluaran,
+            'Skrip tidak boleh mencoba migrate sama sekali ketika alamat basis data sudah pasti '
+            . 'salah. Setiap percobaan hanya menambah galat "Connection refused" di log.'
+        );
+    }
+
+    public function test_skrip_start_tetap_mencoba_migrate_bila_db_url_terisi(): void
+    {
+        [$kode, $keluaran] = $this->jalankanSkripStart([
+            'DB_CONNECTION' => 'pgsql',
+            'DB_URL' => 'postgresql://pengguna:rahasia@postgres.railway.internal:5432/railway',
+        ]);
+
+        $this->assertStringContainsString(
+            'artisan migrate',
+            $keluaran,
+            'Pemeriksaan alamat basis data tidak boleh terlalu ketat: bila DB_URL terisi, skrip '
+            . 'harus tetap menjalankan migrate. Keluaran: ' . $keluaran
+        );
+
+        $this->assertStringNotContainsString(
+            'DB_URL kosong',
+            $keluaran,
+            'Skrip tidak boleh menuduh DB_URL kosong padahal variabelnya terisi.'
+        );
+
+        $this->assertNotSame(
+            1,
+            $kode,
+            'Dengan DB_URL terisi, skrip tidak boleh berhenti dengan kode gagal.'
+        );
+    }
 }

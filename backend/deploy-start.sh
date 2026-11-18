@@ -134,6 +134,51 @@ php artisan tinker --execute='
     }
 ' 2>&1 || echo "[start] Peringatan: uji koneksi basis data gagal dijalankan."
 
+# ---------------------------------------------------------------------------
+# Berhenti cepat bila alamat basis data jelas salah.
+# ---------------------------------------------------------------------------
+# Di hosting container, container aplikasi dan container basis data adalah dua
+# mesin terpisah. Alamat "127.0.0.1" di dalam container aplikasi menunjuk ke
+# container itu sendiri, dan di sana tidak ada PostgreSQL. Jadi bila DB_URL
+# kosong sementara DB_HOST juga tidak diisi (nilai bawaannya 127.0.0.1),
+# koneksi PASTI ditolak - bukan "belum siap".
+#
+# Tanpa pemeriksaan ini, skrip mengulang 10 kali x 5 detik dan membanjiri log
+# dengan pesan "Connection refused" yang tidak menjelaskan apa pun. Yang
+# sebenarnya terjadi hampir selalu satu hal: teks referensi
+# ${{NamaService.DATABASE_URL}} tidak ter-resolve karena nama service basis
+# data di dashboard tidak sama persis dengan yang ditulis.
+#
+# Perhatikan syaratnya: hanya berhenti bila DB_HOST memang kosong atau menunjuk
+# ke loopback. Bila pengguna sengaja mengisi DB_HOST, nilainya dihormati dan
+# skrip tetap mencoba seperti biasa.
+if [ "${DB_CONNECTION:-sqlite}" != "sqlite" ] && [ -z "${DB_URL:-}" ]; then
+    case "${DB_HOST:-}" in
+        ""|127.0.0.1|localhost|::1)
+            echo "[start] GAGAL: DB_URL kosong dan DB_HOST tidak diisi, sehingga"
+            echo "[start] aplikasi mencoba menghubungi basis data di alamat"
+            echo "[start] container itu sendiri (127.0.0.1:5432). Di sana tidak ada"
+            echo "[start] PostgreSQL, jadi koneksi pasti ditolak - bukan soal timing."
+            echo "[start]"
+            echo "[start] Penyebab paling umum: DB_URL berisi teks referensi"
+            echo "[start] seperti \${{NamaService.DATABASE_URL}} yang tidak ter-resolve"
+            echo "[start] karena nama service basis data di dashboard tidak sama"
+            echo "[start] persis dengan nama yang ditulis."
+            echo "[start]"
+            echo "[start] Cara memperbaiki (pilih salah satu):"
+            echo "[start]   1. Service aplikasi > Variables > DB_URL > klik ikon"
+            echo "[start]      Reference (panah) > Add Reference > pilih service"
+            echo "[start]      PostgreSQL > pilih DATABASE_URL. Pastikan nilainya"
+            echo "[start]      tampil sebagai chip referensi, bukan teks \${{...}} biasa."
+            echo "[start]   2. Atau isi manual dari tab Variables service PostgreSQL:"
+            echo "[start]      DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD."
+            echo "[start]"
+            echo "[start] Service ini tidak akan hidup sampai alamat basis data benar."
+            exit 1
+            ;;
+    esac
+fi
+
 percobaan=0
 batas=10
 
