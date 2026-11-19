@@ -9,8 +9,8 @@ use Illuminate\Database\Seeder;
 /**
  * Tujuh jenis surat resmi desa.
  *
- * Sumber kebenaran seluruh isinya adalah dokumen Word perangkat desa di
- * folder docs/ (lihat App\Support\TemplateSuratDesa). Seeder ini hanya
+ * Sumber kebenaran seluruh isinya adalah dokumen Word perangkat desa
+ * (lihat App\Support\TemplateSuratDesa). Seeder ini hanya
  * menuangkannya ke tabel jenis_surats:
  *
  *  - template_surat  : teks resmi dengan penanda {{...}}

@@ -15,10 +15,11 @@ use Tests\TestCase;
 /**
  * Template surat resmi desa.
  *
- * Perangkat desa menyerahkan dokumen Word surat (folder docs/) dan meminta
+ * Perangkat desa menyerahkan dokumen Word surat dan meminta
  * isinya dipakai apa adanya: kop surat, kalimat, dan blok tanda tangan tidak
  * boleh dikarang sistem. Yang berubah hanya bagian titik-titik, yang menjadi
  * penanda {{...}} agar terisi otomatis dari data pemohon dan isian warga.
+ * Dokumen aslinya tidak disertakan di repositori ini.
  */
 class TemplateSuratDesaTest extends TestCase
 {
@@ -70,7 +71,7 @@ class TemplateSuratDesaTest extends TestCase
 
         $this->assertNotNull($template);
 
-        // Kalimat kunci yang memang ada di docs/SURAT KET. DOMISILI.docx.
+        // Kalimat kunci yang memang ada di dokumen resmi surat domisili.
         $this->assertStringContainsString('SURAT KETERANGAN DOMISILI', $template);
         $this->assertStringContainsString(
             'menerangkan dengan sebenar-benarnya bahwa :',
@@ -261,7 +262,7 @@ class TemplateSuratDesaTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.jenis-surat.edit', $jenis))
             ->assertOk()
-            ->assertSee('docs/SURAT KET. DOMISILI.docx');
+            ->assertSee('SURAT KET. DOMISILI.docx');
 
         // Kategori lama yang tidak punya dokumen resmi (KTP): admin diberi tahu.
         $lain = JenisSurat::query()->create([

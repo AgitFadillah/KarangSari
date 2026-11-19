@@ -258,7 +258,7 @@ class SkripDeployTest extends TestCase
     }
 
     /**
-     * Skrip build tidak boleh memakai "npm ci" (lihat docs/SIAP-PRODUCTION.md).
+     * Skrip build tidak boleh memakai "npm ci".
      */
     public function test_skrip_build_tidak_memakai_npm_ci(): void
     {

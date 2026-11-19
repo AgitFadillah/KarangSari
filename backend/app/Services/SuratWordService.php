@@ -24,7 +24,7 @@ use ZipArchive;
  * KOP SURAT
  * ---------
  * Seluruh surat memakai satu kop resmi desa: berkas gambar
- * public/images/kop-surat.png (bersumber dari docs/kop surat.png). Gambar itu
+ * public/images/kop-surat.png (disalin dari kop dokumen resmi desa). Gambar itu
  * sudah memuat lambang, tiga baris nama pemerintah, alamat, dan garis ganda,
  * sehingga hasil cetaknya sama dengan kop pada dokumen Word desa.
  *

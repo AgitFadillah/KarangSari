@@ -98,3 +98,12 @@ desktop.ini
 .phpunit.result.cache
 .phpunit.cache/
 _ide_helper.php
+
+# -----------------------------------------------------------------------------
+# Dokumen internal desa
+# -----------------------------------------------------------------------------
+# Folder docs/ berisi dokumen Word asli dari perangkat desa (profil desa,
+# template surat resmi, kop surat). Isinya bukan bagian dari kode aplikasi dan
+# tidak dipublikasikan di repositori ini. Salin sendiri bila ingin menjalankan
+# migrasi/seed yang menyebut nama berkasnya (hanya sebagai label).
+/docs/

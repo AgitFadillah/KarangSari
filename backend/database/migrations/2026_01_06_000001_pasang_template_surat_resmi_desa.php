@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Memasang template surat resmi desa yang disalin dari dokumen Word yang
- * diberikan perangkat desa (folder docs/).
+ * diberikan perangkat desa.
  *
  * Hanya jenis surat yang dokumennya sudah diserahkan yang diubah; jenis surat
  * lain dibiarkan memakai template bawaannya sampai dokumennya masuk. Template

@@ -39,7 +39,7 @@ return [
     'disk_dokumen' => env('DOKUMEN_DISK', 'local'),
 
     // Identitas dasar. Seeder menyalin nilai ini ke tabel profil_desas.
-    // Nilainya dibaca dari kop dokumen resmi desa (docs/SURAT KET. DOMISILI.docx):
+    // Nilainya dibaca dari kop dokumen resmi desa:
     //   PEMERINTAH KABUPATEN LAMPUNG SELATAN
     //   KECAMATAN JATI AGUNG
     //   DESA KARANG SARI

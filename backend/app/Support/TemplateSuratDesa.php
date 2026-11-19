@@ -6,7 +6,8 @@ use App\Models\JenisSurat;
 
 /**
  * Template surat resmi desa, disalin dari dokumen Word yang diberikan
- * perangkat desa (folder docs/).
+ * perangkat desa. Dokumen aslinya TIDAK disertakan di repositori ini; kolom
+ * "sumber" di bawah hanya menyimpan nama berkasnya sebagai keterangan asal.
  *
  * Ada TUJUH dokumen resmi:
  *  - SURAT KET. DOMISILI.docx
@@ -38,7 +39,7 @@ class TemplateSuratDesa
     {
         return [
             'domisili' => [
-                'sumber' => 'docs/SURAT KET. DOMISILI.docx',
+                'sumber' => 'SURAT KET. DOMISILI.docx',
                 'template' => self::domisili(),
                 'kode' => 'SKD',
                 'kode_layanan' => '470',
@@ -57,7 +58,7 @@ class TemplateSuratDesa
             ],
 
             'usaha' => [
-                'sumber' => 'docs/SURAT KET. USAHA.docx',
+                'sumber' => 'SURAT KET. USAHA.docx',
                 'template' => self::usaha(),
                 'kode' => 'SKU',
                 'kode_layanan' => '471',
@@ -77,7 +78,7 @@ class TemplateSuratDesa
             ],
 
             'tidak-mampu' => [
-                'sumber' => 'docs/SURAT KET. TIDAK MAMPU.docx',
+                'sumber' => 'SURAT KET. TIDAK MAMPU.docx',
                 'template' => self::tidakMampu(),
                 'kode' => 'SKTM',
                 'kode_layanan' => '472',
@@ -96,7 +97,7 @@ class TemplateSuratDesa
             ],
 
             'kematian' => [
-                'sumber' => 'docs/SURAT KET. MENINGGAL.docx',
+                'sumber' => 'SURAT KET. MENINGGAL.docx',
                 'template' => self::meninggal(),
                 'kode' => 'SKK',
                 'kode_layanan' => '474',
@@ -117,7 +118,7 @@ class TemplateSuratDesa
             ],
 
             'belum-menikah' => [
-                'sumber' => 'docs/SURAT KET. BELUM MENIKAH.docx',
+                'sumber' => 'SURAT KET. BELUM MENIKAH.docx',
                 'template' => self::belumMenikah(),
                 'kode' => 'SKBM',
                 'kode_layanan' => '476',
@@ -134,7 +135,7 @@ class TemplateSuratDesa
             ],
 
             'orang-tua-asuh' => [
-                'sumber' => 'docs/SURAT KET. ORANG TUA ASUH WALI.docx',
+                'sumber' => 'SURAT KET. ORANG TUA ASUH WALI.docx',
                 'template' => self::orangTuaAsuh(),
                 'kode' => 'SKOTA',
                 'kode_layanan' => '477',
@@ -158,7 +159,7 @@ class TemplateSuratDesa
             ],
 
             'pekerjaan' => [
-                'sumber' => 'docs/SURAT KET. PEKERJAAN.docx',
+                'sumber' => 'SURAT KET. PEKERJAAN.docx',
                 'template' => self::pekerjaan(),
                 'kode' => 'SKP',
                 'kode_layanan' => '478',

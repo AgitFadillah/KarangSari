@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 /**
  * Peta "titik-titik dokumen desa" untuk SETIAP kategori surat.
  *
- * Dokumen Word asli dari perangkat desa (folder docs/) dipakai sebagai
+ * Dokumen Word asli dari perangkat desa dipakai sebagai
  * kerangka. Semua format — kop, Bookman Old Style, ukuran huruf, tab, tabel
  * tanda tangan — dibiarkan apa adanya. Yang diubah hanya titik-titik pada
  * paragraf yang memang disediakan dokumen.

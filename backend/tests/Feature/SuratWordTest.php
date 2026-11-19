@@ -243,8 +243,8 @@ class SuratWordTest extends TestCase
     public function test_kop_resmi_terpasang_paling_atas_sebagai_gambar(): void
     {
         // Kop bukan lagi teks yang dirakit, melainkan satu gambar resmi desa
-        // (docs/kop surat.png) yang sudah memuat lambang, tiga baris nama
-        // pemerintah, alamat, dan garis ganda.
+        // yang sudah memuat lambang, tiga baris nama pemerintah, alamat, dan
+        // garis ganda.
         $pengajuan = $this->pengajuan();
         $xml = app(SuratWordService::class)->documentXml($pengajuan->jenisSurat, $pengajuan);
 
