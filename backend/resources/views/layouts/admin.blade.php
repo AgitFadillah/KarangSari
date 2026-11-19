@@ -6,6 +6,7 @@
         ? \App\Models\Pengajuan::query()->where('status', \App\Enums\StatusPengajuan::MenungguVerifikasi->value)->count()
         : 0);
     $activeAdmin = $activeAdmin ?? '';
+    $logoAdmin = $profil->logoUrl();
 @endphp
 <!DOCTYPE html>
 <html lang="id">
@@ -15,6 +16,10 @@
   <title>@yield('title', 'Dashboard Admin '.$profil->nama_desa)</title>
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="robots" content="noindex, nofollow">
+  @if ($logoAdmin)
+    <link rel="icon" type="image/png" href="{{ url($logoAdmin) }}">
+    <link rel="apple-touch-icon" href="{{ url($logoAdmin) }}">
+  @endif
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   @vite('resources/css/site.css')

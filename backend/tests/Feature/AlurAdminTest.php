@@ -573,6 +573,30 @@ class AlurAdminTest extends TestCase
             ->assertSee('Riwayat kepala desa');
     }
 
+    public function test_dashboard_admin_memakai_logo_desa_sebagai_ikon_tab(): void
+    {
+        $gambar = imagecreatetruecolor(64, 64);
+        imagefill($gambar, 0, 0, imagecolorallocate($gambar, 20, 80, 140));
+        ob_start();
+        imagepng($gambar);
+        $biner = (string) ob_get_clean();
+        imagedestroy($gambar);
+
+        Storage::disk('public')->put('profil/logo-admin.png', $biner);
+        ProfilDesa::query()->firstOrFail()->update(['logo_path' => 'profil/logo-admin.png']);
+        SiteProfile::lupakan();
+
+        $html = $this->actingAs($this->administrator)
+            ->get(route('admin.ringkasan'))
+            ->assertOk()
+            ->getContent();
+
+        $this->assertStringContainsString(
+            '<link rel="icon" type="image/png" href="'.url('/storage/profil/logo-admin.png').'">',
+            $html,
+        );
+    }
+
     public function test_form_profil_menolak_email_tidak_sah(): void
     {
         $this->actingAs($this->administrator)
