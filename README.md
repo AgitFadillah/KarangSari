@@ -185,6 +185,10 @@ php artisan serve
 | Panduan warga | <http://127.0.0.1:8000/panduan> |
 | Panduan admin | <http://127.0.0.1:8000/admin/panduan> |
 
+Halaman panduan warga dan panduan admin tidak memerlukan login. Keduanya
+berguna sebagai rujukan cepat saat petugas desa mendampingi warga mengajukan
+surat, dan isinya dapat disunting lewat menu Kelola Konten Website.
+
 ### Akun hasil seeder
 
 Kata sandi mengikuti `ADMIN_SEED_PASSWORD`:
