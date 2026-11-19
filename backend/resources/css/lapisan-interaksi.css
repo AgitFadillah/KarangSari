@@ -287,6 +287,14 @@ body.publik .org-puncak .person-card.puncak {
   border-width: 1.5px;
 }
 
+/* Di ponsel kartu puncak berubah menjadi kartu navy bergradasi dengan cincin
+   dekoratif, jadi garis biru tema di tepinya justru mengganggu tampilan. */
+@media (max-width: 860px) {
+  body.publik .org-puncak .person-card.puncak {
+    border-color: transparent;
+  }
+}
+
 /* Baris berita ringan selalu berada di dalam kartu berbingkai. Garis aksen
    kiri yang dulu dipakai justru menempel pada kotak tanggal dan membuat baris
    terlihat miring, jadi batasnya kini cukup mengandalkan bingkai kartu. */

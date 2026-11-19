@@ -871,43 +871,90 @@ h3 { font-size: 1.25rem; font-weight: 700; line-height: 1.3; }
 }
 
 @media (max-width: 860px) {
-  /* Mode daftar: kartu puncak dan kartu perangkat ditumpuk rapi selebar
-     kontainer. Garis dan titik penghubung bagan desktop disembunyikan karena
-     di layar sempit posisinya mudah meleset dan membuat tampilan berantakan. */
+  /* Mode bagan bertingkat: pimpinan tampil pada kartu navy yang menonjol,
+     lalu perangkat tersusun sebagai daftar yang tersambung garis pohon
+     dengan siku membulat ke tengah tiap kartu. */
   .org-chart { align-items: stretch; }
   .org-puncak { justify-content: stretch; }
-  .org-puncak .person-card.puncak { max-width: none; }
   .org-puncak::after { display: none; }
 
+  .org-puncak .person-card.puncak {
+    max-width: none; width: 100%;
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; gap: 18px; text-align: left;
+    padding: 22px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, #0B1F3A 0%, #17395F 100%);
+    box-shadow: 0 18px 36px -20px rgba(11, 31, 58, .8);
+  }
+  /* Cincin dekoratif di sudut kartu pimpinan. */
+  .org-puncak .person-card.puncak::after {
+    content: ''; position: absolute; right: -54px; top: -64px;
+    width: 200px; height: 200px; border-radius: 50%;
+    border: 26px solid rgba(255, 255, 255, .06);
+  }
+  .org-puncak .person-card.puncak .avatar {
+    width: 84px; height: 84px; font-size: 1.3rem; margin: 0; flex: 0 0 auto;
+    border: 3px solid rgba(255, 255, 255, .85);
+    box-shadow: 0 10px 24px -12px rgba(0, 0, 0, .6);
+  }
+  .org-puncak .person-teks { position: relative; z-index: 1; flex: 1 1 auto; min-width: 0; }
+  .org-puncak .person-name { color: var(--white); font-size: 1.15rem; line-height: 1.3; }
+  .org-puncak .person-role { color: #9EC3E6; font-size: .875rem; margin-top: 3px; }
+  .org-puncak .person-nip { color: rgba(255, 255, 255, .62); }
+
   .org-cabang {
-    display: flex; flex-direction: column; gap: 10px;
-    padding: 14px 0 0; margin-top: 14px;
+    position: relative;
+    display: flex; flex-direction: column; gap: 12px;
+    padding: 18px 0 0 36px; margin-top: 0;
     border-left: 0;
   }
-  .org-cabang::before,
-  .org-simpul::before,
-  .org-simpul::after { display: none; }
-  .org-simpul { display: block; }
+  .org-cabang::before { display: none; }
+
+  .org-simpul { display: block; position: relative; }
+  /* Ruas garis tegak tiap kartu: dari atas (termasuk jarak antar kartu)
+     sampai titik tengah, tempat siku membulat menyambung ke kartu. */
+  .org-simpul::before {
+    content: ''; position: absolute; left: -22px; top: -12px; bottom: 0;
+    width: 2px; height: auto; transform: none;
+    background: var(--gray-300);
+  }
+  .org-simpul:first-child::before { top: -18px; }
+  .org-simpul:last-child::before { bottom: 50%; }
+
+  /* Siku membulat: garis tegak pendek lalu berbelok ke kanan. Ujungnya
+     dimasukkan sedikit ke bawah kartu agar tidak menyisakan tonjolan. */
+  .org-simpul::after,
+  .org-simpul:first-child::after,
+  .org-simpul:last-child::after {
+    content: ''; position: absolute; left: -22px; right: auto;
+    top: calc(50% - 12px); width: 27px; height: 12px;
+    background: none;
+    border-left: 2px solid var(--gray-300);
+    border-bottom: 2px solid var(--gray-300);
+    border-bottom-left-radius: 12px;
+  }
+
   .org-cabang .person-card {
+    position: relative; z-index: 1;
     display: flex; align-items: center; gap: 14px; text-align: left;
     padding: 14px 16px;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 20px -16px rgba(11, 31, 58, .6);
   }
-  .org-cabang .avatar { width: 48px; height: 48px; font-size: .85rem; margin: 0; flex: 0 0 auto; }
+  .org-cabang .avatar { width: 52px; height: 52px; font-size: .9rem; margin: 0; flex: 0 0 auto; }
   .org-cabang .person-teks { flex: 1 1 auto; min-width: 0; }
   .org-cabang .person-name { font-size: .9375rem; line-height: 1.35; }
   .org-cabang .person-role { margin-top: 1px; }
   .org-cabang .person-nip { margin-top: 3px; }
 }
 
-/* Kartu puncak di layar sempit juga dibuat mendatar agar hemat tinggi. */
+/* Kartu puncak di layar sempit tetap mendatar, hanya diringkaskan sedikit
+   agar foto, nama, dan jabatan muat tanpa membuat kartu terlalu tinggi. */
 @media (max-width: 480px) {
-  .org-puncak .person-card.puncak {
-    display: flex; align-items: center; gap: 14px; text-align: left;
-    padding: 16px;
-  }
-  .org-puncak .person-card.puncak .avatar { width: 56px; height: 56px; font-size: .95rem; margin: 0; flex: 0 0 auto; }
-  .org-puncak .person-teks { flex: 1 1 auto; min-width: 0; }
-  .org-puncak .person-name { font-size: 1rem; line-height: 1.35; }
+  .org-puncak .person-card.puncak { gap: 16px; padding: 18px; }
+  .org-puncak .person-card.puncak .avatar { width: 72px; height: 72px; font-size: 1.1rem; }
+  .org-puncak .person-name { font-size: 1.05rem; line-height: 1.32; }
 }
 
 /* ---------- Catalog cards ---------- */
