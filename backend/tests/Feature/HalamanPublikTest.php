@@ -15,6 +15,7 @@ use Database\Seeders\JenisSuratSeeder;
 use Database\Seeders\ProfilDesaSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 /**
@@ -86,6 +87,50 @@ class HalamanPublikTest extends TestCase
             ->assertOk()
             ->assertSee('Berita Sudah Terbit')
             ->assertDontSee('Berita Masih Draf');
+    }
+
+    public function test_potensi_tanpa_data_tidak_menampilkan_pil_filter_kosong(): void
+    {
+        $this->get('/potensi')
+            ->assertOk()
+            ->assertDontSee('class="potential-pills"', false)
+            ->assertSee('Belum ada potensi desa yang terdata.');
+    }
+
+    public function test_kepala_halaman_memuat_logo_desa_untuk_pratinjau_tautan(): void
+    {
+        Storage::fake('public');
+
+        $gambar = imagecreatetruecolor(120, 160);
+        imagefill($gambar, 0, 0, imagecolorallocate($gambar, 20, 80, 140));
+        ob_start();
+        imagepng($gambar);
+        $biner = (string) ob_get_clean();
+        imagedestroy($gambar);
+
+        Storage::disk('public')->put('profil/logo-uji.png', $biner);
+
+        $profil = ProfilDesa::query()->firstOrFail();
+        $profil->update(['logo_path' => 'profil/logo-uji.png']);
+        SiteProfile::lupakan();
+
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $logoAbsolut = url('/storage/profil/logo-uji.png');
+        $this->assertStringContainsString('<link rel="icon" type="image/png" href="'.$logoAbsolut.'">', $html);
+        $this->assertStringContainsString('property="og:image" content="'.url('gambar-sosial.png').'?v=', $html);
+        $this->assertStringContainsString('property="og:image:width" content="1200"', $html);
+        $this->assertStringContainsString('property="og:image:height" content="630"', $html);
+        $this->assertStringContainsString('name="twitter:card" content="summary_large_image"', $html);
+
+        $res = $this->get('/gambar-sosial.png')
+            ->assertOk()
+            ->assertHeader('Content-Type', 'image/png');
+
+        $ukuran = getimagesizefromstring($res->getContent());
+        $this->assertIsArray($ukuran);
+        $this->assertSame(1200, $ukuran[0]);
+        $this->assertSame(630, $ukuran[1]);
     }
 
     public function test_potensi_hanya_menampilkan_yang_aktif(): void

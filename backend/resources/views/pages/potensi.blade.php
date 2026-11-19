@@ -124,15 +124,20 @@
             ->unique()
             ->values();
       @endphp
-      <div class="potential-pills" id="potentialPills" role="tablist" aria-label="Filter kategori potensi">
-        <button class="potential-pill active" data-filter="semua">Semua</button>
-        @foreach ($pillKategori as $kategori)
-          <button class="potential-pill" data-filter="{{ \Illuminate\Support\Str::slug($kategori) }}">{{ $kategori }}</button>
-        @endforeach
-      </div>
+      {{-- Filter hanya berguna bila ada kartu yang bisa disaring. Saat data
+           potensi masih kosong, deretan pil tidak dirender agar tidak
+           meninggalkan pil kosong di bawah judul halaman. --}}
+      @if ($pillKategori->isNotEmpty())
+        <div class="potential-pills" id="potentialPills" role="tablist" aria-label="Filter kategori potensi">
+          <button class="potential-pill active" data-filter="semua">Semua</button>
+          @foreach ($pillKategori as $kategori)
+            <button class="potential-pill" data-filter="{{ \Illuminate\Support\Str::slug($kategori) }}">{{ $kategori }}</button>
+          @endforeach
+        </div>
+      @endif
 
       <div class="potential-grid" id="potentialGrid">
-        @forelse ($potensis as $potensi)
+        @foreach ($potensis as $potensi)
           @php
             $kategori = \Illuminate\Support\Str::slug((string) $potensi->kategori) ?: 'lainnya';
             $gaya = ['thumb-dark', 'thumb-light', 'thumb-mint'][$loop->index % 3];
@@ -151,14 +156,18 @@
               @endif
             </div>
           </article>
-        @empty
-          <p class="muted">Belum ada potensi desa yang terdata.</p>
-        @endforelse
+        @endforeach
       </div>
 
-      <div class="potential-empty" id="potentialEmpty">
-        Belum ada potensi pada kategori ini. Sampaikan usulan Anda ke kantor desa.
-      </div>
+      {{-- Dua keadaan kosong dibedakan: belum ada data sama sekali (langsung
+           tampil) versus penyaringan kategori yang tidak menemukan kartu. --}}
+      <p class="potential-empty @if ($potensis->isEmpty()) show @endif" id="potentialEmpty">
+        @if ($potensis->isEmpty())
+          Belum ada potensi desa yang terdata. Sampaikan usulan Anda ke kantor desa.
+        @else
+          Belum ada potensi pada kategori ini. Sampaikan usulan Anda ke kantor desa.
+        @endif
+      </p>
 
     </div>
   </section>

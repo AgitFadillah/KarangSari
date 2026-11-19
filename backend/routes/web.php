@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\ProfilController;
 use App\Http\Controllers\Admin\RingkasanController;
 use App\Http\Controllers\Admin\StatistikDesaController;
 use App\Http\Controllers\CekStatusController;
+use App\Http\Controllers\GambarSosialController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PengajuanController;
 use App\Http\Controllers\SitemapController;
@@ -101,6 +102,10 @@ Route::get('/pemberitahuan-data', [PageController::class, 'pemberitahuanData'])-
 
 // Panduan warga: alur pengajuan, cek status, dan revisi.
 Route::get('/panduan', [PageController::class, 'panduan'])->name('panduan');
+
+// Gambar pratinjau tautan (Open Graph) yang dipakai WhatsApp/media sosial.
+// Dibuat dinamis dari logo desa supaya ikut berubah saat admin mengganti logo.
+Route::get('/gambar-sosial.png', [GambarSosialController::class, 'logo'])->name('gambar-sosial');
 
 // Berkas bantu mesin pencari. Hanya halaman publik yang didaftarkan.
 Route::get('/sitemap.xml', [SitemapController::class, 'sitemap'])->name('sitemap');

@@ -330,8 +330,13 @@ body.publik .potential-pill {
 body.publik .potential-pill:hover {
   border-color: var(--navy-900);
 }
+/* Pil aktif harus tetap berlatar navy dengan teks putih. Sebelumnya aturan
+   body.publik .potential-pill (spesifisitas lebih tinggi) membuat latarnya
+   putih sementara teksnya tetap putih, sehingga pil tampak kosong. */
 body.publik .potential-pill.active {
-  border-color: var(--publik-garis);
+  background: var(--navy-900);
+  border-color: var(--navy-900);
+  color: var(--white);
 }
 body.publik .contact-wa-link,
 body.publik .map-open-btn,
