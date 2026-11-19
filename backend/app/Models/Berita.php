@@ -16,7 +16,7 @@ use Illuminate\Support\Str;
  */
 #[Fillable([
     'judul', 'slug', 'kategori', 'is_highlight', 'ringkasan', 'isi', 'penulis',
-    'terbit_at', 'dibuat_oleh',
+    'foto_path', 'terbit_at', 'dibuat_oleh',
 ])]
 class Berita extends Model
 {
@@ -78,6 +78,22 @@ class Berita extends Model
             'agenda' => 'Agenda',
             default => 'Berita',
         };
+    }
+
+    /**
+     * URL foto berita yang siap dipakai di halaman publik.
+     *
+     * Mengembalikan null bila foto belum diunggah atau berkasnya sudah tidak
+     * ada di disk — template lalu jatuh ke blok ilustrasi bawaan, bukan
+     * menampilkan gambar rusak.
+     */
+    public function fotoUrl(): ?string
+    {
+        if (! \App\Support\BerkasPublik::ada($this->foto_path)) {
+            return null;
+        }
+
+        return \App\Support\BerkasPublik::url($this->foto_path);
     }
 
     /** Membuat slug unik dari judul. */

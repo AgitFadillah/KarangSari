@@ -38,7 +38,7 @@
     <button type="submit" class="admin-user-chip" style="border:0;background:none;cursor:pointer;font:inherit" title="Keluar">
       <div class="avatar">{{ auth()->user()->initials }}</div>
       <div>
-        <div class="name">{{ Str::limit(auth()->user()->name, 12) }}</div>
+        <div class="name">{{ auth()->user()->name }}</div>
         <div class="role">{{ auth()->user()->role->shortLabel() }}</div>
       </div>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="color:var(--gray-500)"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>

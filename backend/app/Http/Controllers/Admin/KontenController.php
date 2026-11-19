@@ -40,17 +40,31 @@ class KontenController extends Controller
             'judul' => ['required', 'string', 'max:255'],
             'isi' => ['nullable', 'string', 'max:65535'],
             'status' => ['required', Rule::in([KontenWebsite::DRAF, KontenWebsite::TERBIT])],
+            'terbitkan' => ['nullable', 'in:1'],
+            'drafkan' => ['nullable', 'in:1'],
         ]);
+
+        // Tombol "Terbitkan sekarang" / "Simpan sebagai draf" mengalahkan
+        // pilihan pada dropdown. Ini jalur yang dipakai perangkat desa yang
+        // mengeluh tidak bisa menerbitkan konten: satu klik langsung
+        // menerbitkan, tanpa bergantung pada dropdown kustom.
+        $status = $data['status'];
+
+        if (($data['terbitkan'] ?? null) === '1') {
+            $status = KontenWebsite::TERBIT;
+        } elseif (($data['drafkan'] ?? null) === '1') {
+            $status = KontenWebsite::DRAF;
+        }
 
         $konten->update([
             'judul' => $data['judul'],
             'isi' => $data['isi'] ?? null,
-            'status' => $data['status'],
+            'status' => $status,
             'diperbarui_oleh' => $request->user()->id,
         ]);
 
         LogAktivitas::catat(
-            tindakan: $data['status'] === KontenWebsite::TERBIT
+            tindakan: $status === KontenWebsite::TERBIT
                 ? 'Menerbitkan konten website'
                 : 'Menyimpan konten sebagai draf',
             subjek: $konten->judul,
@@ -59,6 +73,8 @@ class KontenController extends Controller
 
         return redirect()
             ->route('admin.konten.edit', $konten)
-            ->with('status', 'Konten tersimpan.');
+            ->with('status', $status === KontenWebsite::TERBIT
+                ? 'Konten diterbitkan dan langsung tampil di halaman publik.'
+                : 'Konten disimpan sebagai draf (belum tampil di halaman publik).');
     }
 }

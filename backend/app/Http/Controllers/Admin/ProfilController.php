@@ -55,9 +55,24 @@ class ProfilController extends Controller
             'jam_kunjungan' => ['nullable', 'string', 'max:255'],
             'tahun_berdiri' => ['nullable', 'string', 'max:20'],
             'kueri_peta' => ['nullable', 'string', 'max:255'],
+            // Koordinat peta: angka desimal, titik atau koma sebagai pemisah.
+            // Batasnya mengikuti jangkauan lintang (-90..90) dan bujur (-180..180)
+            // supaya salah ketik tidak menghasilkan pin di tempat yang mustahil.
+            'peta_lat' => ['nullable', 'string', 'max:30', $this->aturanKoordinat(90)],
+            'peta_lng' => ['nullable', 'string', 'max:30', $this->aturanKoordinat(180)],
             'sejarah' => ['nullable', 'string', 'max:5000'],
             'visi' => ['nullable', 'string', 'max:2000'],
             'misi' => ['nullable', 'string', 'max:5000'],
+
+            // Batas wilayah & penggunaan lahan dikirim sebagai baris
+            // terpisah (tambah/hapus baris di dashboard). Format teks lama
+            // tetap diterima agar tautan/bookmark formulir lama tidak rusak.
+            'batas' => ['nullable', 'array'],
+            'batas.*.arah' => ['nullable', 'string', 'max:60'],
+            'batas.*.tetangga' => ['nullable', 'string', 'max:160'],
+            'lahan' => ['nullable', 'array'],
+            'lahan.*.label' => ['nullable', 'string', 'max:60'],
+            'lahan.*.persen' => ['nullable', 'string', 'max:10'],
             'batas_wilayah' => ['nullable', 'string', 'max:2000'],
             'penggunaan_lahan' => ['nullable', 'string', 'max:2000'],
 
@@ -126,6 +141,46 @@ class ProfilController extends Controller
         }
 
         $barisData = $data['data'] ?? [];
+
+        // Baris "batas wilayah" dan "penggunaan lahan" dirangkai kembali
+        // menjadi teks "Arah: nama" / "Label: persen" per baris — bentuk
+        // yang sudah dibaca oleh model dan halaman publik. Baris yang
+        // dikosongkan admin otomatis hilang dari hasil.
+        //
+        // Penting: hanya disentuh bila formulir benar-benar mengirim baris
+        // (atau teks lamanya). Kalau tidak, kolom dibiarkan apa adanya —
+        // permintaan lain yang tidak memuat field ini tidak boleh menghapus
+        // data wilayah yang sudah tersimpan.
+        if (array_key_exists('batas', $data) || array_key_exists('batas_wilayah', $data)) {
+            $data['batas_wilayah'] = $this->rangkaiBaris(
+                $data['batas'] ?? null,
+                'arah',
+                'tetangga',
+                $data['batas_wilayah'] ?? null,
+            );
+        }
+
+        if (array_key_exists('lahan', $data) || array_key_exists('penggunaan_lahan', $data)) {
+            $data['penggunaan_lahan'] = $this->rangkaiBaris(
+                $data['lahan'] ?? null,
+                'label',
+                'persen',
+                $data['penggunaan_lahan'] ?? null,
+            );
+        }
+
+        unset($data['batas'], $data['lahan']);
+
+        // Koordinat disimpan dalam bentuk baku ("-5.358421") walau admin
+        // mengetik dengan koma desimal, supaya sematan Google Maps valid.
+        foreach (['peta_lat', 'peta_lng'] as $kolom) {
+            if (! array_key_exists($kolom, $data)) {
+                continue;
+            }
+
+            $nilai = trim(str_replace(',', '.', (string) $data[$kolom]));
+            $data[$kolom] = $nilai === '' ? null : $nilai;
+        }
 
         unset(
             $data['logo'], $data['foto_beranda'],
@@ -203,5 +258,67 @@ class ProfilController extends Controller
         return redirect()
             ->route('admin.profil.edit')
             ->with('status', 'Profil desa tersimpan.');
+    }
+
+    /**
+     * Aturan validasi untuk satu nilai koordinat peta.
+     *
+     * Menerima titik maupun koma sebagai pemisah desimal (kebiasaan mengetik
+     * di Indonesia) dan menolak nilai di luar jangkauan bumi.
+     */
+    protected function aturanKoordinat(float $batas): \Closure
+    {
+        return function (string $atribut, mixed $nilai, \Closure $gagal) use ($batas) {
+            $teks = trim(str_replace(',', '.', (string) $nilai));
+
+            if ($teks === '') {
+                return;
+            }
+
+            if (! is_numeric($teks) || abs((float) $teks) > $batas) {
+                $gagal("Koordinat peta tidak valid. Isi angka antara -{$batas} dan {$batas}.");
+            }
+        };
+    }
+
+    /**
+     * Rangkai baris isian menjadi teks "kunci: nilai" per baris.
+     *
+     * Bila formulir tidak mengirim baris sama sekali (mis. permintaan lama
+     * atau tes yang masih memakai field teks), nilai teks aslinya dipakai
+     * apa adanya supaya data tidak terhapus tanpa sengaja.
+     *
+     * @param  mixed  $baris  Array baris dari formulir.
+     */
+    protected function rangkaiBaris(mixed $baris, string $kunciField, string $nilaiField, ?string $teksLama): ?string
+    {
+        if (! is_array($baris)) {
+            return $teksLama;
+        }
+
+        $hasil = [];
+
+        foreach ($baris as $satu) {
+            if (! is_array($satu)) {
+                continue;
+            }
+
+            $kunci = trim((string) ($satu[$kunciField] ?? ''));
+            $nilai = trim((string) ($satu[$nilaiField] ?? ''));
+
+            // Baris yang salah satu kolomnya kosong diabaikan: itulah cara
+            // admin "menghapus" baris tanpa menghapus field-nya.
+            if ($kunci === '' || $nilai === '') {
+                continue;
+            }
+
+            // Titik dua pada kunci akan memecah pembacaan "kunci: nilai",
+            // jadi diganti tanda hubung.
+            $kunci = str_replace(':', ' -', $kunci);
+
+            $hasil[] = $kunci.': '.$nilai;
+        }
+
+        return $hasil === [] ? null : implode("\n", $hasil);
     }
 }

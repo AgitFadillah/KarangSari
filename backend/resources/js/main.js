@@ -60,12 +60,34 @@ document.addEventListener('DOMContentLoaded', () => {
   const adminMenuBtn = document.getElementById('adminMenuBtn');
   const adminSidebar = document.getElementById('adminSidebar');
   if (adminMenuBtn && adminSidebar) {
-    adminMenuBtn.addEventListener('click', () => {
-      adminSidebar.classList.toggle('open');
+    const setSidebarOpen = (open) => {
+      adminSidebar.classList.toggle('open', open);
+      adminMenuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
+
+    adminMenuBtn.addEventListener('click', (e) => {
+      // Tombol ini berada DI DALAM .admin-main, jadi tanpa stopPropagation
+      // kliknya akan ikut memicu listener "klik konten menutup sidebar" di
+      // bawah dan menu langsung tertutup lagi — gejalanya sidebar seolah
+      // tidak bisa dibuka sama sekali.
+      e.stopPropagation();
+      setSidebarOpen(!adminSidebar.classList.contains('open'));
     });
-    // Close when clicking content on mobile
-    document.querySelector('.admin-main')?.addEventListener('click', () => {
-      if (window.innerWidth <= 1024) adminSidebar.classList.remove('open');
+
+    // Tutup saat area konten diketuk (di ponsel), tetapi jangan menutup
+    // ketika yang diketuk justru tombol pembukanya.
+    document.querySelector('.admin-main')?.addEventListener('click', (e) => {
+      if (window.innerWidth <= 1024 && !adminMenuBtn.contains(e.target)) {
+        setSidebarOpen(false);
+      }
+    });
+
+    // Tutup dengan Escape agar bisa dipakai tanpa mouse.
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && adminSidebar.classList.contains('open')) {
+        setSidebarOpen(false);
+        adminMenuBtn.focus();
+      }
     });
   }
 
@@ -94,6 +116,36 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.key === 'Escape' && !userPanel.hidden) {
         setOpen(false);
         userBtn.focus();
+      }
+    });
+  }
+
+  // Menu pengguna di sidebar admin: buka/tutup panel.
+  // Baris ini dulu hanya tampilan statis (ikon panah tidak melakukan apa
+  // pun), sehingga perangkat desa mengira menunya rusak.
+  const sideUserBtn = document.getElementById('adminSidebarUserBtn');
+  const sideUserPanel = document.getElementById('adminSidebarUserPanel');
+  if (sideUserBtn && sideUserPanel) {
+    const setSideOpen = (open) => {
+      sideUserPanel.hidden = !open;
+      sideUserBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
+
+    sideUserBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setSideOpen(sideUserPanel.hidden);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!sideUserPanel.hidden && !sideUserPanel.contains(e.target) && !sideUserBtn.contains(e.target)) {
+        setSideOpen(false);
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !sideUserPanel.hidden) {
+        setSideOpen(false);
+        sideUserBtn.focus();
       }
     });
   }

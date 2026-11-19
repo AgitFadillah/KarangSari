@@ -75,28 +75,63 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
           Log Aktivitas
         </a>
-        <div class="admin-help">
-          <b>Butuh bantuan?</b>
-          Panduan lengkap alur verifikasi, dokumen, status, dan pengelolaan konten.
-          <a href="{{ route('admin.panduan') }}">Buka panduan →</a>
-        </div>
       </nav>
-      @if (auth()->user()->role->bolehKelolaAkun())
-        <a href="{{ route('admin.akun.index') }}" class="admin-user">
+
+      {{-- Kartu bantuan diletakkan di LUAR <nav> yang bisa digulir.
+           Sebelumnya kartu ini berada di dalam daftar menu, sehingga saat
+           menunya panjang ia ikut tergulir dan menimpa baris pengguna di
+           bawah — itulah sebabnya baris pengguna tampak "terpotong". --}}
+      <div class="admin-help">
+        <b>Butuh bantuan?</b>
+        Panduan lengkap alur verifikasi, dokumen, status, dan pengelolaan konten.
+        <a href="{{ route('admin.panduan') }}">Buka panduan →</a>
+      </div>
+
+      {{-- Baris pengguna: kini benar-benar bisa dibuka (dulu hanya tampilan
+           statis dengan ikon panah yang menyesatkan). Panelnya terbuka ke
+           ATAS karena baris ini menempel di dasar sidebar. --}}
+      <div class="admin-user-wrap">
+        <button type="button" class="admin-user" id="adminSidebarUserBtn"
+                aria-expanded="false" aria-controls="adminSidebarUserPanel" aria-haspopup="true">
           <div class="avatar">{{ auth()->user()->initials }}</div>
-          <div>
+          <div class="admin-user-teks">
             <div class="admin-user-name">{{ auth()->user()->name }}</div>
             <div class="admin-user-role">{{ auth()->user()->role->label() }}</div>
           </div>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="margin-left:auto;opacity:.5"><path d="M6 9l6 6 6-6"/></svg>
-        </a>
-      @else
-        <div class="admin-user">
-          <div class="avatar">{{ auth()->user()->initials }}</div>
-          <div>
-            <div class="admin-user-name">{{ auth()->user()->name }}</div>
-            <div class="admin-user-role">{{ auth()->user()->role->label() }}</div>
+          <svg class="admin-user-panah" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>
+        </button>
+
+        <div class="admin-user-panel admin-user-panel-atas" id="adminSidebarUserPanel" hidden>
+          <div class="admin-user-panel-head">
+            <div class="avatar">{{ auth()->user()->initials }}</div>
+            <div>
+              <div class="nama">{{ auth()->user()->name }}</div>
+              <div class="peran">{{ auth()->user()->role->label() }}</div>
+            </div>
+          </div>
+          <div class="admin-user-panel-meta">
+            <span class="label">Nama pengguna</span>
+            <span class="nilai">{{ auth()->user()->username }}</span>
+          </div>
+          <div class="admin-user-panel-actions">
+            @if (auth()->user()->role->bolehKelolaAkun())
+              <a href="{{ route('admin.akun.index') }}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Akun Admin
+              </a>
+            @endif
+            <a href="{{ route('admin.panduan') }}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              Panduan admin
+            </a>
+            <form method="POST" action="{{ route('admin.logout') }}">
+              @csrf
+              <button type="submit" class="danger">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+                Keluar
+              </button>
+            </form>
           </div>
         </div>
-      @endif
+      </div>
     </aside>

@@ -153,6 +153,15 @@ function ubahSelect(select) {
     menu.hidden ? buka() : tutup();
   });
 
+  // PENTING: cegah mousedown pada menu mencabut fokus dari tombol.
+  //
+  // Tanpa ini, menekan sebuah opsi (yang berupa <li>, bukan elemen yang bisa
+  // difokus) membuat browser memindahkan fokus ke <body>. Akibatnya handler
+  // "focusout" di bawah langsung menutup menu SEBELUM event "click" pada opsi
+  // sempat diproses — inilah sebab dropdown terlihat "tidak bisa dipilih":
+  // menu sempat terbuka, tetapi pilihan tidak pernah tersimpan.
+  menu.addEventListener('mousedown', (e) => e.preventDefault());
+
   menu.addEventListener('click', (e) => {
     const li = e.target.closest('.pilih-opsi');
     if (li) pilih(li);

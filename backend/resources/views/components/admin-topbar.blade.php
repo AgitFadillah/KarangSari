@@ -48,7 +48,7 @@
             aria-expanded="false" aria-haspopup="true" aria-controls="adminUserPanel">
       <div class="avatar">{{ $pengguna->initials }}</div>
       <div>
-        <div class="name">{{ Str::limit($pengguna->name, 12) }}</div>
+        <div class="name">{{ $pengguna->name }}</div>
         <div class="role">{{ $pengguna->role->shortLabel() }}</div>
       </div>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="color:var(--gray-500)" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>

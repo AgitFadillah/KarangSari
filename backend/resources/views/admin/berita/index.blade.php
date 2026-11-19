@@ -6,6 +6,12 @@
 <style>
 .berita-table { min-width: 820px; }
 
+/* Gambar kecil di kolom judul: penanda cepat bahwa entri sudah punya foto. */
+.cell-foto {
+  width: 44px; height: 34px; object-fit: cover; border-radius: 5px;
+  vertical-align: middle; margin-right: 9px; background: var(--gray-100);
+}
+
     /* Ringkasan jumlah per kategori di atas tabel. */
     .sum-kartu {
       display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -109,7 +115,12 @@
                 @forelse ($beritas as $berita)
                   <tr>
                     <td class="cell-preview">
-                      <div class="cell-main">{{ $berita->judul }}
+                      @php $fotoAdmin = $berita->fotoUrl(); @endphp
+                      <div class="cell-main">
+                        @if ($fotoAdmin)
+                          <img class="cell-foto" src="{{ $fotoAdmin }}" alt="" width="44" height="34" loading="lazy">
+                        @endif
+                        {{ $berita->judul }}
                         @if ($berita->is_highlight)
                           <span class="badge badge-amber" title="Tampil sebagai banner di halaman Informasi">Sorotan</span>
                         @endif

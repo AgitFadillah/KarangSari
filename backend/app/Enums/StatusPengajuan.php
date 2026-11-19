@@ -50,6 +50,29 @@ enum StatusPengajuan: string
         };
     }
 
+    /**
+     * Warna titik pada garis waktu riwayat pengajuan.
+     *
+     * Aturan ini diminta langsung oleh perangkat desa agar warga dapat
+     * membaca progres suratnya sekali lihat:
+     *
+     *   kuning = proses sedang berlangsung (menunggu verifikasi / perlu perbaikan)
+     *   hijau  = disetujui (termasuk tahap setelahnya: diproses, siap diambil, selesai)
+     *   merah  = ditolak
+     *
+     * Sebelumnya semua titik berwarna hijau karena view hanya membedakan
+     * "selesai" dan "tidak selesai", sehingga pengajuan yang masih menunggu
+     * verifikasi tampak sudah disetujui.
+     */
+    public function warnaTitik(): string
+    {
+        return match ($this) {
+            self::Ditolak => 'red',
+            self::Disetujui, self::SedangDiproses, self::SiapDiambil, self::Selesai => 'green',
+            self::MenungguVerifikasi, self::PerluPerbaikan => 'amber',
+        };
+    }
+
     /** Status yang dihitung sebagai "menunggu tindakan admin". */
     public static function perluTindakan(): array
     {

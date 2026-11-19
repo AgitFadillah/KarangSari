@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 #[Fillable([
     'nama_desa', 'kecamatan', 'kabupaten', 'provinsi', 'kode_pos',
     'alamat_kantor', 'telepon', 'whatsapp', 'email',
-    'jam_layanan', 'jam_kunjungan', 'kueri_peta', 'sejarah', 'visi', 'misi',
+    'jam_layanan', 'jam_kunjungan', 'kueri_peta', 'peta_lat', 'peta_lng',
+    'sejarah', 'visi', 'misi',
     'logo_path', 'foto_beranda_path', 'batas_wilayah', 'penggunaan_lahan',
     'tahun_berdiri',
     // Bagian "Gambaran Umum Kondisi Desa" pada dokumen PROFIL desa.docx.
@@ -30,6 +31,49 @@ class ProfilDesa extends Model
     public function getAlamatLengkapAttribute(): string
     {
         return (string) $this->alamat_kantor;
+    }
+
+    /**
+     * Koordinat peta dalam bentuk "lat,lng" bila admin sudah mengisinya.
+     *
+     * Nilai yang tidak sah (bukan angka, di luar jangkauan) diabaikan, supaya
+     * salah ketik tidak menghasilkan sematan peta yang menunjuk ke laut.
+     */
+    public function koordinatPeta(): ?string
+    {
+        $lat = $this->koordinatSah($this->peta_lat, 90.0);
+        $lng = $this->koordinatSah($this->peta_lng, 180.0);
+
+        if ($lat === null || $lng === null) {
+            return null;
+        }
+
+        // Titik 0,0 ("Null Island") hampir pasti berarti kolom terisi asal;
+        // lebih baik jatuh ke kueri teks daripada menunjuk laut Atlantik.
+        if (abs($lat) < 0.000001 && abs($lng) < 0.000001) {
+            return null;
+        }
+
+        return $lat.','.$lng;
+    }
+
+    /** Ubah satu nilai koordinat menjadi angka siap pakai, atau null. */
+    protected function koordinatSah(mixed $nilai, float $batas): ?string
+    {
+        $teks = trim(str_replace(',', '.', (string) $nilai));
+
+        if ($teks === '' || ! is_numeric($teks)) {
+            return null;
+        }
+
+        $angka = (float) $teks;
+
+        if (abs($angka) > $batas) {
+            return null;
+        }
+
+        // Tampilkan tanpa nol berlebih, mis. "-5.358421" tetap "-5.358421".
+        return rtrim(rtrim(number_format($angka, 7, '.', ''), '0'), '.');
     }
 
     /**
@@ -77,14 +121,25 @@ class ProfilDesa extends Model
     /** Tautan "Buka di Google Maps" untuk lokasi kantor. */
     public function tautanPeta(): string
     {
-        return 'https://www.google.com/maps/search/?api=1&query='.rawurlencode($this->kueriPeta());
+        // Koordinat (bila ada) lebih tepat daripada teks: Google Maps
+        // menampilkan pin pada titik yang sama dengan sematan di halaman.
+        return 'https://www.google.com/maps/search/?api=1&query='
+            .rawurlencode($this->koordinatPeta() ?? $this->kueriPeta());
     }
 
     /** URL sematan peta (tanpa API key, memakai mode "output=embed"). */
     public function embedPeta(): string
     {
-        return 'https://www.google.com/maps?q='.rawurlencode($this->kueriPeta())
-            .'&z=16&hl=id&output=embed';
+        // Bila koordinat kantor sudah diisi admin, sematan memakai titik itu
+        // (q=<lat>,<lng>) sehingga peta benar-benar menunjuk lokasi kantor,
+        // bukan hasil tebakan Google atas kueri teks.
+        $titik = $this->koordinatPeta();
+
+        $kueri = $titik !== null ? $titik : $this->kueriPeta();
+
+        return 'https://www.google.com/maps?q='.rawurlencode($kueri)
+            .'&z='.($titik !== null ? '17' : '16')
+            .'&hl=id&output=embed';
     }
 
     /**

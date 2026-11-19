@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Berita;
 use App\Models\LogAktivitas;
+use App\Support\UnggahGambar;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,6 +19,9 @@ use Illuminate\Validation\Rule;
  */
 class BeritaController extends Controller
 {
+    /** Folder foto berita pada disk public. */
+    protected const FOLDER_FOTO = 'berita';
+
     public function index(): View
     {
         abort_unless(request()->user()->role->bolehKelolaKonten(), 403);
@@ -64,6 +68,12 @@ class BeritaController extends Controller
 
         $data = $this->validasi($request);
 
+        // Foto disimpan pada disk public karena tampil di halaman publik.
+        // Nama berkas dan ekstensinya ditentukan UnggahGambar (bukan dari
+        // nama kiriman pengguna) supaya berkas berbahaya tidak bisa ikut
+        // tersimpan sebagai halaman HTML di domain desa.
+        $foto = UnggahGambar::simpan($request, 'foto', self::FOLDER_FOTO);
+
         $berita = Berita::create([
             'judul' => $data['judul'],
             'slug' => Berita::slugUnik($data['judul']),
@@ -72,6 +82,7 @@ class BeritaController extends Controller
             'ringkasan' => $data['ringkasan'] ?? null,
             'isi' => $data['isi'] ?? null,
             'penulis' => $data['penulis'] ?? null,
+            'foto_path' => $foto,
             'terbit_at' => $data['terbit_at'] ?? null,
             'dibuat_oleh' => $request->user()->id,
         ]);
@@ -106,7 +117,7 @@ class BeritaController extends Controller
 
         $data = $this->validasi($request);
 
-        $berita->update([
+        $atribut = [
             'judul' => $data['judul'],
             'slug' => $data['judul'] === $berita->judul
                 ? $berita->slug
@@ -117,7 +128,36 @@ class BeritaController extends Controller
             'isi' => $data['isi'] ?? null,
             'penulis' => $data['penulis'] ?? null,
             'terbit_at' => $data['terbit_at'] ?? null,
-        ]);
+        ];
+
+        // Foto baru menggantikan yang lama. Berkas lama baru dihapus SETELAH
+        // baris database tersimpan, supaya kegagalan penyimpanan tidak
+        // membuat foto berita hilang tanpa pengganti.
+        $fotoLama = null;
+        $fotoBaru = UnggahGambar::simpan($request, 'foto', self::FOLDER_FOTO);
+
+        if ($fotoBaru !== null) {
+            $fotoLama = $berita->foto_path;
+            $atribut['foto_path'] = $fotoBaru;
+        } elseif ($request->input('foto_hapus') === '1') {
+            $fotoLama = $berita->foto_path;
+            $atribut['foto_path'] = null;
+        }
+
+        try {
+            $berita->update($atribut);
+        } catch (\Throwable $e) {
+            // Baris gagal disimpan: buang foto pengganti agar tidak menumpuk.
+            if ($fotoBaru !== null && $fotoBaru !== $fotoLama) {
+                UnggahGambar::hapus($fotoBaru);
+            }
+
+            throw $e;
+        }
+
+        if (filled($fotoLama) && $fotoLama !== $fotoBaru) {
+            UnggahGambar::hapus($fotoLama);
+        }
 
         $this->jagaSatuSorotan($berita);
 
@@ -137,7 +177,11 @@ class BeritaController extends Controller
         abort_unless($request->user()->role->bolehKelolaKonten(), 403);
 
         $judul = $berita->judul;
+        $foto = $berita->foto_path;
         $berita->delete();
+
+        // Foto ikut dibuang agar tidak menjadi sampah di volume penyimpanan.
+        UnggahGambar::hapus($foto);
 
         LogAktivitas::catat(
             tindakan: 'Menghapus berita',
@@ -179,11 +223,18 @@ class BeritaController extends Controller
             'isi' => ['nullable', 'string', 'max:65000'],
             'penulis' => ['nullable', 'string', 'max:120'],
             'terbit_at' => ['nullable', 'date'],
+
+            // Foto dokumentasi kegiatan (opsional).
+            'foto' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:5120'],
+            'foto_hapus' => ['nullable', 'in:0,1'],
         ], [
             'judul.required' => 'Judul berita wajib diisi.',
             'kategori.required' => 'Kategori wajib dipilih.',
             'kategori.in' => 'Kategori tidak dikenal.',
             'terbit_at.date' => 'Tanggal terbit tidak valid.',
+            'foto.image' => 'Foto harus berupa berkas gambar.',
+            'foto.mimes' => 'Foto harus berformat PNG, JPG, atau WEBP.',
+            'foto.max' => 'Ukuran foto maksimal 5 MB.',
         ]);
     }
 }

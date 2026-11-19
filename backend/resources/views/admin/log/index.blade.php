@@ -26,6 +26,38 @@
     .log-table .cell-avatar { gap: 10px; }
     .log-table .cell-avatar .avatar { flex: none; width: 34px; height: 34px; }
     .log-table .cell-avatar .cell-main { min-width: 0; }
+
+    /* Ringkasan aktivitas per hari: kartu kecil yang bisa diklik.
+       Dibuat bisa digulir mendatar di layar sempit, bukan mengecil sampai
+       tanggalnya tidak terbaca. */
+    .hari-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+    }
+    .hari-kartu {
+      display: grid; gap: 2px; padding: 12px 14px;
+      border: 1px solid #D8E2EC; border-radius: var(--radius-sm);
+      background: var(--white); text-decoration: none; color: inherit;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .hari-kartu:hover {
+      border-color: var(--blue-500); text-decoration: none;
+      box-shadow: 0 6px 18px -12px rgba(46,109,164,.5);
+    }
+    .hari-kartu.aktif { border-color: var(--navy-900); border-width: 1.5px; background: var(--blue-100); }
+    .hari-tanggal { font-size: .875rem; font-weight: 700; color: var(--navy-900); }
+    .hari-hari { font-size: .75rem; color: var(--gray-500); }
+    .hari-jumlah { font-size: .75rem; font-weight: 600; color: var(--blue-600); margin-top: 4px; }
+
+    /* Petunjuk gulir hanya muncul di layar sempit, saat tabel memang
+       terpotong dan perlu digeser. */
+    .geser-hint { display: none; }
+    @media (max-width: 860px) {
+      .geser-hint {
+        display: block; margin: 0 0 8px;
+        font-size: .75rem; color: var(--gray-500);
+      }
+    }
 </style>
 @endpush
 
@@ -43,11 +75,56 @@
           </div>
         </div>
 
+        {{-- Ringkasan per hari: klik satu tanggal untuk menyaring tabel. --}}
+        @if ($perHari->isNotEmpty())
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Aktivitas per hari</h2>
+                <p>Pilih tanggal untuk menampilkan log hari itu saja.</p>
+              </div>
+              @if ($tanggal)
+                <a href="{{ route('admin.log', array_filter(['q' => $q])) }}" class="btn btn-outline btn-sm">
+                  Tampilkan semua hari
+                </a>
+              @endif
+            </div>
+            <div class="hari-grid">
+              @foreach ($perHari as $hari)
+                @php $nilaiHari = (string) $hari->hari; @endphp
+                <a href="{{ route('admin.log', array_filter(['tanggal' => $nilaiHari, 'q' => $q])) }}"
+                   @class(['hari-kartu', 'aktif' => $tanggal === $nilaiHari])>
+                  <span class="hari-tanggal">{{ \Illuminate\Support\Carbon::parse($nilaiHari)->locale('id')->translatedFormat('d M Y') }}</span>
+                  <span class="hari-hari">{{ \Illuminate\Support\Carbon::parse($nilaiHari)->locale('id')->translatedFormat('l') }}</span>
+                  <span class="hari-jumlah">{{ $hari->jumlah }} aktivitas</span>
+                </a>
+              @endforeach
+            </div>
+          </div>
+        @endif
+
         <div class="panel">
           <form method="get" action="{{ route('admin.log') }}" class="search-box log-search" role="search">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
             <input type="search" name="q" value="{{ $q }}" placeholder="Cari pelaku, tindakan, atau subjek..." aria-label="Cari aktivitas">
+            {{-- Filter tanggal ikut terbawa saat mencari, supaya hasil
+                 pencarian tidak diam-diam berpindah ke semua hari. --}}
+            @if ($tanggal)
+              <input type="hidden" name="tanggal" value="{{ $tanggal }}">
+            @endif
           </form>
+
+          @if ($tanggal)
+            <div class="notice notice-blue" role="note" style="margin-bottom:18px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+              <div>
+                Menampilkan log tanggal
+                <b>{{ \Illuminate\Support\Carbon::parse($tanggal)->locale('id')->translatedFormat('l, j F Y') }}</b>.
+                <a href="{{ route('admin.log', array_filter(['q' => $q])) }}">Tampilkan semua hari</a>
+              </div>
+            </div>
+          @endif
+          <p class="geser-hint">Geser tabel ke samping untuk melihat kolom lainnya →</p>
           <div class="table-wrap">
             <table class="data log-table">
               <thead>

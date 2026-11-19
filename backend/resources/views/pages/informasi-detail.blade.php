@@ -36,6 +36,13 @@
 .baca-isi img { border-radius: var(--radius-md); width: 100%; height: auto; }
 .baca-isi hr { border: none; border-top: 1px solid var(--gray-200); margin: 2em 0; }
 
+/* Foto utama berita pada halaman baca. */
+.baca-foto { margin: 0 0 28px; }
+.baca-foto img {
+  display: block; width: 100%; height: auto; max-height: 460px; object-fit: cover;
+  border-radius: var(--radius-lg); background: var(--gray-100);
+}
+
 /* Sorotan pembuka */
 .baca-lead {
   font-size: 1.125rem; line-height: 1.7; color: var(--navy-900); font-weight: 600;
@@ -99,6 +106,15 @@
   <section class="section" style="padding-top:56px">
     <div class="container">
       <div class="baca-wrap">
+        @php $fotoDetail = $berita->fotoUrl(); @endphp
+        @if ($fotoDetail)
+          {{-- Foto dokumentasi kegiatan; ditampilkan sebelum ringkasan agar
+               pembaca langsung melihat konteks berita. --}}
+          <figure class="baca-foto">
+            <img src="{{ $fotoDetail }}" alt="Foto {{ $berita->judul }}" loading="lazy">
+          </figure>
+        @endif
+
         @if (filled($berita->ringkasan))
           <p class="baca-lead" style="margin-bottom:32px">{{ $berita->ringkasan }}</p>
         @endif

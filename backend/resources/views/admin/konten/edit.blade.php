@@ -61,10 +61,28 @@
                 <option value="{{ \App\Models\KontenWebsite::TERBIT }}" @selected(old('status', $konten->status) === \App\Models\KontenWebsite::TERBIT)>Terbit</option>
                 <option value="{{ \App\Models\KontenWebsite::DRAF }}" @selected(old('status', $konten->status) === \App\Models\KontenWebsite::DRAF)>Draf</option>
               </select>
+              <p class="field-help">
+                Status saat ini:
+                <b>{{ $konten->labelStatus() }}</b>.
+                @if ($konten->isTerbit())
+                  Konten ini sedang tampil di halaman publik.
+                @else
+                  Konten draf tidak tampil di halaman publik.
+                @endif
+              </p>
             </div>
             <div class="panel-foot">
-              <span>Konten berstatus draf tidak tampil pada halaman publik.</span>
-              <button type="submit" class="btn btn-primary">Simpan perubahan</button>
+              <span>Pilih salah satu tombol di kanan untuk menyimpan sekaligus menentukan status.</span>
+              <div class="flex gap-8" style="flex-wrap:wrap">
+                {{-- Tombol eksplisit: perangkat desa tidak perlu menyentuh
+                     dropdown sama sekali untuk menerbitkan konten. --}}
+                <button type="submit" name="drafkan" value="1" class="btn btn-outline">
+                  Simpan sebagai draf
+                </button>
+                <button type="submit" name="terbitkan" value="1" class="btn btn-primary">
+                  Terbitkan sekarang
+                </button>
+              </div>
             </div>
           </form>
         </div>

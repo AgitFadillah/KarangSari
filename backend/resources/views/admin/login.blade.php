@@ -70,7 +70,7 @@
               <div class="pw-wrap">
                 <input type="password" id="password" name="password" placeholder="Masukkan kata sandi" autocomplete="current-password" required>
                 <button type="button" class="pw-toggle" data-pw-toggle aria-label="Tampilkan kata sandi">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 117 11 7 4-7 11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
                 </button>
               </div>
             </div>

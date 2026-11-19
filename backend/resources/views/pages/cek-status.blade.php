@@ -173,7 +173,7 @@
               <div class="timeline">
                 @foreach ($pengajuan->riwayat as $riwayat)
                   <div class="timeline-item">
-                    <span class="timeline-dot {{ $riwayat->status->isSelesai() ? '' : 'green' }}" aria-hidden="true"></span>
+                    <span class="timeline-dot {{ $riwayat->status->warnaTitik() }}" aria-hidden="true"></span>
                     <div class="between">
                       <b>{{ $riwayat->status->label() }}</b>
                       <span class="badge {{ $riwayat->badgeAktor() }}">{{ ucfirst($riwayat->aktor) }}</span>

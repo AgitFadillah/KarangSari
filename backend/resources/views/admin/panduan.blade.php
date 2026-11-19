@@ -42,7 +42,7 @@
     <div class="timeline">
       @foreach ($alur as $status)
         <div class="timeline-item">
-          <span class="timeline-dot {{ $status->isSelesai() ? '' : 'green' }}" aria-hidden="true"></span>
+          <span class="timeline-dot {{ $status->warnaTitik() }}" aria-hidden="true"></span>
           <div class="between">
             <b>{{ $status->label() }}</b>
             <span class="badge {{ $status->badge() }}">{{ $status->value }}</span>

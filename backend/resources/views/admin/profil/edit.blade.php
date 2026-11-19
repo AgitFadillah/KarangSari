@@ -110,6 +110,36 @@
     }
     .narasi-grid > div > .field + .field { margin-top: 20px; }
     @media (max-width: 1100px) { .narasi-grid { grid-template-columns: 1fr; } }
+
+    /* Editor baris (batas wilayah, penggunaan lahan): tiap baris punya
+       tombol hapus sendiri, dan tombol "+ Tambah" menambah baris baru.
+       Dulu keduanya hanya satu kotak teks besar berformat "Arah: nama",
+       sehingga perangkat desa harus menghafal tanda titik dua. */
+    .baris-editor { display: grid; gap: 8px; }
+    .baris-item { display: flex; gap: 8px; align-items: center; }
+    .baris-item input { flex: 1 1 0; min-width: 0; }
+    .baris-item input[type="number"] { flex: 0 0 88px; text-align: right; }
+    .baris-hapus {
+      flex: 0 0 auto; display: grid; place-items: center;
+      width: 38px; height: 38px; border-radius: var(--radius-sm);
+      border: 1.5px solid #E4C9C6; background: var(--white); color: #a3413b;
+      cursor: pointer; transition: background .15s, border-color .15s;
+    }
+    .baris-hapus:hover { background: var(--red-100); border-color: #a3413b; }
+    .baris-hapus svg { width: 16px; height: 16px; }
+    .tautan-tambah {
+      border: 0; background: none; padding: 0; cursor: pointer;
+      font: inherit; font-size: .8125rem; font-weight: 700; color: var(--blue-600);
+    }
+    .tautan-tambah:hover { text-decoration: underline; }
+    /* Di layar sempit, kolom "arah" dan "nama desa" ditumpuk agar isiannya
+       tidak menjadi sangat sempit. */
+    @media (max-width: 560px) {
+      .baris-item { flex-wrap: wrap; }
+      .baris-item input { flex: 1 1 100%; }
+      .baris-item input[type="number"] { flex: 1 1 100%; text-align: left; }
+      .baris-hapus { width: 100%; }
+    }
   </style>
 @endpush
 
@@ -238,6 +268,44 @@
                       Tulis nama tempat atau alamat yang mudah ditemukan di Google Maps.
                       Bila dikosongkan, peta memakai <b>Alamat kantor</b> dan wilayah desa di atas.
                     </p>
+                  </div>
+
+                  {{-- Koordinat: cara paling pasti agar peta menunjuk tepat ke
+                       kantor desa. Tanpa koordinat, Google Maps menebak lokasi
+                       dari teks sehingga pin bisa jatuh di jalan atau desa lain. --}}
+                  <div class="field">
+                    <label for="peta_lat">Koordinat peta — lintang</label>
+                    <input type="text" id="peta_lat" name="peta_lat"
+                           value="{{ old('peta_lat', $profil->peta_lat) }}"
+                           maxlength="30" inputmode="decimal" placeholder="mis. -5.358421">
+                    <p class="field-help">Angka pertama dari koordinat Google Maps.</p>
+                  </div>
+                  <div class="field">
+                    <label for="peta_lng">Koordinat peta — bujur</label>
+                    <input type="text" id="peta_lng" name="peta_lng"
+                           value="{{ old('peta_lng', $profil->peta_lng) }}"
+                           maxlength="30" inputmode="decimal" placeholder="mis. 105.294715">
+                    <p class="field-help">Angka kedua dari koordinat Google Maps.</p>
+                  </div>
+                  <div class="field span-2">
+                    <div class="notice notice-blue" role="note">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+                      <div>
+                        <b>Cara mengambil koordinat:</b>
+                        buka <b>Google Maps</b>, cari kantor desa, lalu klik kanan tepat di titik kantor.
+                        Salin angka pertama (lintang) dan angka kedua (bujur) yang muncul paling atas.
+                        <br>
+                        Bila kedua kolom ini diisi, peta di beranda dan halaman kontak memakai titik
+                        tersebut (skala 17) sehingga pin tepat di lokasi kantor. Bila dikosongkan,
+                        peta kembali memakai <b>Kueri lokasi peta</b> di atas.
+                      </div>
+                    </div>
+                    @if ($profil->koordinatPeta())
+                      <p class="field-help">
+                        Koordinat tersimpan: <b>{{ $profil->koordinatPeta() }}</b> ·
+                        <a href="{{ $profil->tautanPeta() }}" target="_blank" rel="noopener">cek di Google Maps</a>
+                      </p>
+                    @endif
                   </div>
                   <div class="field span-2">
                     <label for="tahun_berdiri">Tahun berdiri desa</label>
@@ -633,16 +701,82 @@
                 </div>
 
                 <div>
+                  {{-- Batas wilayah & penggunaan lahan disunting sebagai baris
+                       yang bisa DITAMBAH dan DIHAPUS, bukan satu kotak teks
+                       besar. Perangkat desa cukup mengisi arah dan nama desa
+                       tetangga pada baris terpisah. --}}
                   <div class="field">
-                    <label for="batas_wilayah">Batas wilayah (satu per baris)</label>
-                    <textarea id="batas_wilayah" name="batas_wilayah" rows="5" maxlength="2000" placeholder="Utara: Desa Cibeureum&#10;Timur: Desa Tugu Selatan">{{ old('batas_wilayah', $profil->batas_wilayah) }}</textarea>
-                    <p class="field-help">Format: <code>Arah: Nama desa/kecamatan</code>.</p>
+                    <div class="field-label-row">
+                      <label for="batas-0-arah">Batas wilayah</label>
+                      <button type="button" class="tautan-tambah" data-tambah-baris="batas">
+                        + Tambah arah
+                      </button>
+                    </div>
+                    @php
+                      $barisBatas = old('batas');
+                      if (! is_array($barisBatas)) {
+                          $barisBatas = [];
+                          foreach ($profil->batas_wilayah_tersusun as $arah => $tetangga) {
+                              $barisBatas[] = ['arah' => $arah, 'tetangga' => $tetangga];
+                          }
+                      }
+                      if ($barisBatas === []) {
+                          $barisBatas = [['arah' => '', 'tetangga' => '']];
+                      }
+                    @endphp
+                    <div class="baris-editor" data-baris-editor="batas">
+                      @foreach ($barisBatas as $i => $baris)
+                        <div class="baris-item">
+                          <input type="text" name="batas[{{ $i }}][arah]"
+                                 value="{{ is_array($baris) ? ($baris['arah'] ?? '') : '' }}"
+                                 maxlength="60" placeholder="Arah, mis. Utara" aria-label="Arah batas wilayah">
+                          <input type="text" name="batas[{{ $i }}][tetangga]"
+                                 value="{{ is_array($baris) ? ($baris['tetangga'] ?? '') : '' }}"
+                                 maxlength="160" placeholder="Desa/kecamatan tetangga" aria-label="Nama desa tetangga">
+                          <button type="button" class="baris-hapus" data-hapus-baris aria-label="Hapus baris ini">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+                          </button>
+                        </div>
+                      @endforeach
+                    </div>
+                    <p class="field-help">Kosongkan kedua kolom pada baris yang tidak dipakai. Baris kosong otomatis diabaikan.</p>
                   </div>
 
                   <div class="field">
-                    <label for="penggunaan_lahan">Penggunaan lahan (satu per baris)</label>
-                    <textarea id="penggunaan_lahan" name="penggunaan_lahan" rows="5" maxlength="2000" placeholder="Kebun dan pertanian: 58&#10;Hutan lindung: 27">{{ old('penggunaan_lahan', $profil->penggunaan_lahan) }}</textarea>
-                    <p class="field-help">Format: <code>Label: persen</code>. Total disarankan 100%.</p>
+                    <div class="field-label-row">
+                      <label for="lahan-0-label">Penggunaan lahan</label>
+                      <button type="button" class="tautan-tambah" data-tambah-baris="lahan">
+                        + Tambah lahan
+                      </button>
+                    </div>
+                    @php
+                      $barisLahan = old('lahan');
+                      if (! is_array($barisLahan)) {
+                          $barisLahan = [];
+                          foreach ($profil->penggunaan_lahan_tersusun as $lahan) {
+                              $barisLahan[] = ['label' => $lahan['label'], 'persen' => $lahan['persen']];
+                          }
+                      }
+                      if ($barisLahan === []) {
+                          $barisLahan = [['label' => '', 'persen' => '']];
+                      }
+                    @endphp
+                    <div class="baris-editor" data-baris-editor="lahan">
+                      @foreach ($barisLahan as $i => $baris)
+                        <div class="baris-item">
+                          <input type="text" name="lahan[{{ $i }}][label]"
+                                 value="{{ is_array($baris) ? ($baris['label'] ?? '') : '' }}"
+                                 maxlength="60" placeholder="Jenis lahan, mis. Sawah" aria-label="Jenis penggunaan lahan">
+                          <input type="number" name="lahan[{{ $i }}][persen]"
+                                 value="{{ is_array($baris) ? ($baris['persen'] ?? '') : '' }}"
+                                 min="0" max="100" inputmode="numeric" placeholder="%" aria-label="Persentase">
+                          <button type="button" class="baris-hapus" data-hapus-baris aria-label="Hapus baris ini">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+                          </button>
+                        </div>
+                      @endforeach
+                    </div>
+                    <p class="field-help">Persen 0–100. Total disarankan 100%.</p>
                   </div>
                 </div>
               </div>
@@ -660,3 +794,70 @@
         </form>
       </main>
 @endsection
+
+@push('scripts')
+<script>
+  // Editor baris untuk "Batas wilayah" dan "Penggunaan lahan":
+  // tombol "+ Tambah" menyalin baris terakhir (kosong), tombol tong sampah
+  // menghapus barisnya. Indeks nama field sengaja tidak dirapikan ulang —
+  // Laravel menerima kunci array apa pun, dan indeks yang bolong tidak
+  // menjadi masalah karena controller menyaring baris kosong.
+  (function () {
+    function barisBaru(jenis) {
+      var contoh = document.querySelector('[data-baris-editor="' + jenis + '"] .baris-item');
+      if (! contoh) return null;
+
+      var salinan = contoh.cloneNode(true);
+      salinan.querySelectorAll('input').forEach(function (input) {
+        input.value = '';
+      });
+      return salinan;
+    }
+
+    document.querySelectorAll('[data-tambah-baris]').forEach(function (tombol) {
+      tombol.addEventListener('click', function () {
+        var jenis = tombol.dataset.tambahBaris;
+        var wadah = document.querySelector('[data-baris-editor="' + jenis + '"]');
+        if (! wadah) return;
+
+        var baru = barisBaru(jenis);
+        if (! baru) return;
+
+        // Indeks harus unik: ambil nomor terbesar yang sudah ada lalu +1.
+        var nomor = 0;
+        wadah.querySelectorAll('input[name]').forEach(function (input) {
+          var cocok = /\[(\d+)\]/.exec(input.name);
+          if (cocok) nomor = Math.max(nomor, parseInt(cocok[1], 10) + 1);
+        });
+
+        baru.querySelectorAll('input[name]').forEach(function (input) {
+          input.name = input.name.replace(/\[\d+\]/, '[' + nomor + ']');
+        });
+
+        wadah.appendChild(baru);
+        baru.querySelector('input')?.focus();
+      });
+    });
+
+    // Satu pendengar di dokumen: tetap bekerja untuk baris yang baru dibuat.
+    document.addEventListener('click', function (e) {
+      var hapus = e.target.closest('[data-hapus-baris]');
+      if (! hapus) return;
+
+      var wadah = hapus.closest('[data-baris-editor]');
+      var baris = hapus.closest('.baris-item');
+      if (! wadah || ! baris) return;
+
+      // Sisakan minimal satu baris supaya formulir tidak menjadi kosong
+      // tanpa jalan untuk menambah lagi.
+      if (wadah.querySelectorAll('.baris-item').length > 1) {
+        baris.remove();
+      } else {
+        baris.querySelectorAll('input').forEach(function (input) {
+          input.value = '';
+        });
+      }
+    });
+  })();
+</script>
+@endpush

@@ -245,30 +245,75 @@
       <div class="eyebrow">Struktur Pemerintahan</div>
       <h2>Orang-orang yang melayani di kantor desa.</h2>
       <p class="lead" style="margin:16px 0 48px">Susunan nama dan jabatan berikut dikelola oleh perangkat desa melalui dashboard admin.</p>
-      <div class="people-grid">
-        @forelse ($perangkats as $orang)
+
+      @php
+        // Puncak bagan adalah Kepala Desa. Bila jabatannya belum ditulis
+        // dengan kata "kepala desa", entri pertama (urutan terkecil) dipakai
+        // supaya bagan tetap punya satu pemimpin di atas.
+        $puncak = $perangkats->first(fn ($orang) => \Illuminate\Support\Str::contains(
+            \Illuminate\Support\Str::lower((string) $orang->jabatan),
+            'kepala desa'
+        )) ?? $perangkats->first();
+        $anggota = $perangkats->reject(fn ($orang) => $puncak && $orang->is($puncak))->values();
+      @endphp
+
+      @if ($perangkats->isEmpty())
+        <p class="muted">Data perangkat desa belum diisi.</p>
+      @else
+        {{-- Bagan organisasi: pemimpin di puncak, garis penghubung turun ke
+             deretan perangkat. Di layar sempit bagan berubah menjadi daftar
+             bertingkat bergaya direktori (garis di kiri, kartu bertumpuk)
+             agar tetap terbaca tanpa menggeser layar ke samping. --}}
+        <div class="org-chart">
           @php
-            $fotoPerangkat = \App\Support\BerkasPublik::ada($orang->foto_path)
-                ? \App\Support\BerkasPublik::url($orang->foto_path)
+            $fotoPuncak = \App\Support\BerkasPublik::ada($puncak->foto_path)
+                ? \App\Support\BerkasPublik::url($puncak->foto_path)
                 : null;
           @endphp
-          <div class="person-card">
-            @if ($fotoPerangkat)
-              <img class="avatar avatar-foto" src="{{ $fotoPerangkat }}"
-                   alt="Foto {{ $orang->nama }}" loading="lazy" width="88" height="88">
-            @else
-              <div @class(['avatar', 'navy' => $loop->first])>{{ \App\Enums\RoleAdmin::initials($orang->nama) }}</div>
-            @endif
-            <div class="person-name">{{ $orang->nama }}</div>
-            <div class="person-role">{{ $orang->jabatan }}</div>
-            @if (filled($orang->nip))
-              <div class="person-nip">NIP {{ $orang->nip }}</div>
-            @endif
+          <div class="org-puncak">
+            <div class="person-card puncak">
+              @if ($fotoPuncak)
+                <img class="avatar avatar-foto" src="{{ $fotoPuncak }}"
+                     alt="Foto {{ $puncak->nama }}" loading="lazy" width="88" height="88">
+              @else
+                <div class="avatar navy">{{ \App\Enums\RoleAdmin::initials($puncak->nama) }}</div>
+              @endif
+              <div class="person-name">{{ $puncak->nama }}</div>
+              <div class="person-role">{{ $puncak->jabatan }}</div>
+              @if (filled($puncak->nip))
+                <div class="person-nip">NIP {{ $puncak->nip }}</div>
+              @endif
+            </div>
           </div>
-        @empty
-          <p class="muted">Data perangkat desa belum diisi.</p>
-        @endforelse
-      </div>
+
+          @if ($anggota->isNotEmpty())
+            <div class="org-cabang">
+              @foreach ($anggota as $orang)
+                @php
+                  $fotoAnggota = \App\Support\BerkasPublik::ada($orang->foto_path)
+                      ? \App\Support\BerkasPublik::url($orang->foto_path)
+                      : null;
+                @endphp
+                <div class="org-simpul">
+                  <div class="person-card">
+                    @if ($fotoAnggota)
+                      <img class="avatar avatar-foto" src="{{ $fotoAnggota }}"
+                           alt="Foto {{ $orang->nama }}" loading="lazy" width="72" height="72">
+                    @else
+                      <div class="avatar">{{ \App\Enums\RoleAdmin::initials($orang->nama) }}</div>
+                    @endif
+                    <div class="person-name">{{ $orang->nama }}</div>
+                    <div class="person-role">{{ $orang->jabatan }}</div>
+                    @if (filled($orang->nip))
+                      <div class="person-nip">NIP {{ $orang->nip }}</div>
+                    @endif
+                  </div>
+                </div>
+              @endforeach
+            </div>
+          @endif
+        </div>
+      @endif
     </div>
   </section>
 

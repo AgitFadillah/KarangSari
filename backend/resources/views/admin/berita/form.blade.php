@@ -6,6 +6,47 @@
 
 @section('title', ($baru ? 'Tulis Berita' : 'Ubah Berita').' · Dashboard Admin '.$profil->nama_desa)
 
+@push('styles')
+<style>
+/* Kolom foto berita: pratinjau di kiri, pemilih berkas di kanan.
+   Aturan dasar .foto-* sengaja disalin dari form perangkat karena berkas
+   itu hanya memuat gayanya di dalam halaman form perangkat sendiri. */
+.foto-row { display: flex; gap: 18px; align-items: flex-start; flex-wrap: wrap; }
+.foto-preview {
+  flex: 0 0 auto; background: var(--gray-100); border: 1px solid var(--gray-200);
+  display: grid; place-items: center; overflow: hidden;
+  font-weight: 600; color: var(--gray-500); letter-spacing: .01em;
+}
+.foto-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Atribut [hidden] kalah oleh display:grid, jadi ditegaskan di sini. */
+.foto-preview img[hidden], .foto-preview span[hidden] { display: none !important; }
+.foto-aksi { flex: 1 1 260px; min-width: 220px; max-width: 420px; }
+.foto-aksi input[type="file"] {
+  display: block; width: 100%; max-width: 100%; padding: 10px 12px; cursor: pointer;
+  border: 1px dashed var(--gray-200); border-radius: var(--radius-sm);
+  background: var(--gray-100); font: inherit; font-size: .875rem; color: var(--gray-600);
+}
+.foto-aksi input[type="file"]::file-selector-button {
+  margin-right: 12px; padding: 7px 14px; cursor: pointer; font: inherit;
+  font-size: .8125rem; font-weight: 600; color: var(--navy-900);
+  background: var(--white); border: 1px solid var(--gray-200);
+  border-radius: var(--radius-full);
+}
+.foto-aksi input[type="file"]::file-selector-button:hover { border-color: var(--blue-500); color: var(--blue-600); }
+.foto-hapus { display: flex; gap: 8px; align-items: center; margin-top: 10px; font-size: .8125rem; color: var(--gray-600); }
+
+/* Kotak pratinjau foto berita: bentuknya persegi lebar (bukan bulat seperti
+   foto perangkat) karena kartu berita memang memakai gambar mendatar. */
+.foto-preview-lebar {
+  width: 208px; height: 130px; border-radius: var(--radius-md);
+  font-size: .8125rem; text-align: center; padding: 0 12px;
+}
+@media (max-width: 480px) {
+  .foto-preview-lebar { width: 100%; height: 160px; }
+}
+</style>
+@endpush
+
 @section('topbar')
 @php $adminTrail = [
     ['label' => 'Admin', 'route' => 'admin.ringkasan'],
@@ -37,6 +78,7 @@
 
         <div class="panel">
           <form method="POST"
+                enctype="multipart/form-data"
                 action="{{ $baru ? route('admin.berita.store') : route('admin.berita.update', $berita) }}">
             @csrf
             @if (! $baru)
@@ -79,6 +121,36 @@
               <input type="text" id="penulis" name="penulis" value="{{ old('penulis', $berita->penulis) }}" maxlength="120" placeholder="mis. Pemerintah Desa">
             </div>
 
+            {{-- Foto dokumentasi: tampil pada kartu berita di beranda, arsip
+                 Informasi, dan halaman detail berita. --}}
+            <div class="field mb-16">
+              <label for="foto">Foto berita / pengumuman / agenda</label>
+              @php $fotoSekarang = $berita->fotoUrl(); @endphp
+              <div class="foto-row">
+                <div class="foto-preview foto-preview-lebar" id="foto-preview">
+                  <img id="foto-gambar"
+                       src="{{ $fotoSekarang ?? '' }}"
+                       alt="Foto {{ $berita->judul ?: 'berita' }}"
+                       @if (! $fotoSekarang) hidden @endif>
+                  <span id="foto-kosong" @if ($fotoSekarang) hidden @endif>Belum ada foto</span>
+                </div>
+                <div class="foto-aksi">
+                  <input type="file" id="foto" name="foto"
+                         accept="image/png,image/jpeg,image/webp">
+                  <p class="field-help">
+                    Format JPG, PNG, atau WEBP. Maksimal 5 MB. Foto mendatar (lanskap)
+                    paling pas untuk kartu berita.
+                  </p>
+                  @if ($fotoSekarang)
+                    <label class="foto-hapus">
+                      <input type="checkbox" name="foto_hapus" value="1" @checked(old('foto_hapus'))>
+                      Hapus foto saat ini
+                    </label>
+                  @endif
+                </div>
+              </div>
+            </div>
+
             {{-- Sorotan: banner besar paling atas pada halaman Informasi. --}}
             <div class="field mb-16">
               <div class="checkbox-row">
@@ -108,6 +180,30 @@
 @endsection
 
 @push('scripts')
+<script>
+  // Pratinjau foto sebelum disimpan, tanpa perlu mengunggah lebih dulu.
+  (function () {
+    var input = document.getElementById('foto');
+    var gambar = document.getElementById('foto-gambar');
+    var kosong = document.getElementById('foto-kosong');
+    if (! input || ! gambar) return;
+
+    input.addEventListener('change', function () {
+      var berkas = input.files && input.files[0];
+      if (! berkas) return;
+
+      if (berkas.size > 5 * 1024 * 1024) {
+        input.value = '';
+        window.alert('Ukuran foto melebihi 5 MB. Pilih berkas yang lebih kecil.');
+        return;
+      }
+
+      gambar.src = URL.createObjectURL(berkas);
+      gambar.hidden = false;
+      if (kosong) kosong.hidden = true;
+    });
+  })();
+</script>
 <script>
   // Keterangan tanggal mengikuti kategori yang dipilih. Dropdown kustom
   // milik kita tetap memicu event "change" pada <select> aslinya, jadi

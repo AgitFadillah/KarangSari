@@ -28,6 +28,14 @@
   /* Bila hanya ada satu pengumuman, kartunya melebar penuh supaya tidak
      menyisakan separuh halaman kosong di sebelahnya. */
   .info-satu { grid-template-columns: 1fr; }
+
+  /* Banner sorotan: beri bayangan lembut saat memakai foto agar tepi kartu
+     tetap terlihat menyatu dengan latar. */
+  .sorotan-banner { box-shadow: var(--shadow-md); }
+  .sorotan-banner:hover { text-decoration: none; }
+  @media (max-width: 640px) {
+    .sorotan-banner { padding: 28px 22px !important; }
+  }
 </style>
 @endpush
 
@@ -114,9 +122,18 @@
 
   <!-- Sorotan (banner besar) -->
   @if ($sorotan && $tampil($sorotan->kategori))
+    @php
+      // Foto sorotan dipakai sebagai latar banner, dengan lapisan gradasi
+      // biru di atasnya agar teks putih tetap terbaca. Tanpa foto, banner
+      // kembali memakai gradasi biru seperti sebelumnya.
+      $fotoSorotan = $sorotan->fotoUrl();
+      $latarSorotan = $fotoSorotan
+          ? 'linear-gradient(135deg, rgba(11,31,58,.86), rgba(46,109,164,.62)), url("'.$fotoSorotan.'") center/cover no-repeat'
+          : 'linear-gradient(135deg,var(--blue-600),var(--blue-500))';
+    @endphp
     <section class="section" style="padding-top:0" data-bagian="sorotan">
       <div class="container">
-        <a href="{{ route('informasi.detail', $sorotan->slug) }}" class="card" style="display:block;text-decoration:none;margin-top:40px;padding:44px 40px;background:linear-gradient(135deg,var(--blue-600),var(--blue-500));color:#fff;border:none">
+        <a href="{{ route('informasi.detail', $sorotan->slug) }}" class="card sorotan-banner" style="display:block;text-decoration:none;margin-top:40px;padding:44px 40px;background:{{ $latarSorotan }};color:#fff;border:none">
           <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px">
             <span class="badge badge-amber">Sorotan</span>
             <span class="badge badge-navy" style="background:rgba(255,255,255,.18)">{{ $sorotan->labelKategori() }}</span>
@@ -138,8 +155,13 @@
       <div class="container">
         <div @class(['news-grid', 'news-grid-tunggal' => $beritaSamping->isEmpty()])>
           <a href="{{ route('informasi.detail', $beritaUtama->slug) }}" class="news-feature" style="text-decoration:none" data-cat="berita">
-            <div class="news-feature-img">
-              <svg class="art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M3 21h18M4 18h16M6 18v-8h3v8M11 18v-8h3v8M16 18v-8h3v8M12 3l9 5H3l9-5z"/></svg>
+            @php $fotoUtama = $beritaUtama->fotoUrl(); @endphp
+            <div @class(['news-feature-img', 'foto' => $fotoUtama !== null])>
+              @if ($fotoUtama)
+                <img src="{{ $fotoUtama }}" alt="Foto {{ $beritaUtama->judul }}" loading="lazy">
+              @else
+                <svg class="art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M3 21h18M4 18h16M6 18v-8h3v8M11 18v-8h3v8M16 18v-8h3v8M12 3l9 5H3l9-5z"/></svg>
+              @endif
               <span class="badge badge-navy" style="background:var(--blue-500)">Berita Utama</span>
             </div>
             <div class="news-feature-body">
@@ -152,7 +174,11 @@
           </a>
           <div class="news-side">
             @forelse ($beritaSamping as $berita)
+              @php $fotoSamping = $berita->fotoUrl(); @endphp
               <a href="{{ route('informasi.detail', $berita->slug) }}" class="news-item news-item-light" data-cat="{{ $berita->kategori }}">
+                @if ($fotoSamping)
+                  <div class="news-thumb"><img src="{{ $fotoSamping }}" alt="Foto {{ $berita->judul }}" loading="lazy"></div>
+                @endif
                 <div>
                   <div class="news-meta">{{ $berita->labelKategori() }}</div>
                   <h3>{{ $berita->judul }}</h3>

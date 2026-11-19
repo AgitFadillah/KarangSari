@@ -22,6 +22,7 @@
   --gray-900: #0F1E33;
   --gray-600: #5B6B7F;
   --gray-500: #8A97A8;
+  --gray-300: #D3DBE4;
   --gray-200: #E5EAF0;
   --gray-100: #F5F7FA;
   --white: #FFFFFF;
@@ -496,7 +497,15 @@ h3 { font-size: 1.25rem; font-weight: 700; line-height: 1.3; }
   display: grid; place-items: center; font-weight: 800; font-size: 1.05rem;
   color: var(--gray-600); margin-bottom: 18px;
 }
-.step:first-child .step-num { background: var(--navy-900); border-color: var(--navy-900); color: var(--white); }
+/* Semua nomor langkah memakai satu warna biru yang sama.
+   Sebelumnya hanya langkah pertama yang berwarna (navy) sehingga rangkaian
+   alur terlihat seperti "hanya langkah 1 yang aktif" — padahal keempatnya
+   adalah tahapan yang setara. */
+.step .step-num {
+  background: var(--blue-600);
+  border-color: var(--blue-600);
+  color: var(--white);
+}
 .step h3 { font-size: 1.05rem; margin-bottom: 8px; }
 .step p { font-size: .875rem; color: var(--gray-600); }
 @media (max-width: 1024px) { .steps { grid-template-columns: 1fr 1fr; } .steps::before { display: none; } }
@@ -526,6 +535,25 @@ h3 { font-size: 1.25rem; font-weight: 700; line-height: 1.3; }
   display: flex; align-items: flex-end; padding: 20px; position: relative;
 }
 .news-feature-img svg.art { position: absolute; inset: 0; margin: auto; width: 120px; height: 120px; opacity: .14; color: var(--white); }
+/* Foto berita sungguhan mengisi penuh kotak gambar. Lapisan gradasi gelap
+   tipis di bagian bawah menjaga badge "Berita Utama" tetap terbaca di atas
+   foto yang terang. */
+.news-feature-img.foto { padding: 20px; }
+.news-feature-img.foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.news-feature-img.foto::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgba(11,31,58,.72), rgba(11,31,58,0) 58%);
+}
+.news-feature-img.foto .badge { position: relative; z-index: 1; }
+/* Gambar kecil pada daftar berita/arsip. */
+.news-thumb {
+  width: 78px; height: 62px; flex: none; overflow: hidden;
+  border-radius: var(--radius-sm); background: var(--gray-100);
+}
+.news-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Kolom teks pada baris berita harus boleh menyusut agar judul panjang
+   membungkus, bukan mendorong gambar keluar layar di ponsel. */
+.news-item > div:last-child { min-width: 0; }
 .news-feature-body { padding: 26px 28px 30px; }
 .news-feature-body h3 { color: var(--white); font-size: 1.35rem; margin: 12px 0 10px; }
 .news-feature-body h3 a { color: inherit; text-decoration: none; }
@@ -762,6 +790,107 @@ h3 { font-size: 1.25rem; font-weight: 700; line-height: 1.3; }
 .person-role { color: var(--blue-600); font-size: .875rem; margin-top: 2px; }
 .person-nip { color: var(--gray-500); font-size: .75rem; margin-top: 6px; letter-spacing: .01em; }
 
+/* ---------- Bagan struktur pemerintahan ----------
+   Desktop: pemimpin di puncak, garis turun ke batang mendatar, lalu garis
+   pendek ke setiap kartu perangkat. Mobile: berubah menjadi daftar
+   bertingkat bergaya direktori (garis penghubung di kiri, kartu bertumpuk
+   dengan titik cabang), supaya tidak perlu menggeser layar ke samping. */
+.org-chart { display: flex; flex-direction: column; align-items: center; }
+.org-puncak { display: flex; justify-content: center; width: 100%; }
+.org-puncak .person-card.puncak {
+  max-width: 300px; width: 100%;
+  border-color: var(--navy-900); border-width: 1.5px;
+  box-shadow: 0 10px 30px -18px rgba(11,31,58,.55);
+}
+.org-puncak .person-card.puncak .avatar { width: 88px; height: 88px; font-size: 1.35rem; }
+
+/* Garis vertikal dari kartu puncak ke batang mendatar. */
+.org-puncak::after {
+  content: ''; width: 2px; height: 34px; background: var(--gray-300);
+}
+/* Deretan perangkat pada satu baris; setiap kartu sama lebar dan boleh
+   menyusut, sehingga bagan tidak pernah melebar melewati layar. */
+.org-cabang {
+  position: relative; display: flex; width: 100%;
+  gap: 22px; padding-top: 34px; align-items: stretch;
+}
+.org-simpul { position: relative; flex: 1 1 0; min-width: 0; }
+/* Garis turun dari batang mendatar ke kartu. */
+.org-simpul::before {
+  content: ''; position: absolute; top: -34px; left: 50%; transform: translateX(-50%);
+  width: 2px; height: 34px; background: var(--gray-300);
+}
+/* Batang mendatar: tiap kartu menggambar separuh batang di kiri dan
+   kanannya, diperpanjang setengah jarak antar kartu agar bersambung.
+   Kartu pertama/terakhir berhenti tepat di titik tengahnya. */
+.org-simpul::after {
+  content: ''; position: absolute; top: -34px; left: -11px; right: -11px;
+  height: 2px; background: var(--gray-300);
+}
+.org-simpul:first-child::after { left: 50%; }
+.org-simpul:last-child::after { right: 50%; }
+.org-cabang .person-card { height: 100%; padding: 22px 14px; }
+.org-cabang .avatar { width: 64px; height: 64px; font-size: 1rem; margin-bottom: 14px; }
+/* Nama & jabatan panjang dipotong rapi, bukan merusak lebar kolom. */
+.org-cabang .person-name { font-size: .9375rem; overflow-wrap: anywhere; }
+.org-cabang .person-role { overflow-wrap: anywhere; }
+
+/* Bila perangkat cukup banyak, kartu mengecil bertahap agar tetap satu
+   baris (bentuk bagan yang benar) tanpa memaksa layar bergeser. */
+@media (max-width: 1180px) {
+  .org-cabang { gap: 14px; }
+  .org-cabang .person-card { padding: 18px 10px; }
+  .org-cabang .avatar { width: 54px; height: 54px; font-size: .9rem; }
+  .org-cabang .person-name { font-size: .875rem; }
+  .org-cabang .person-role { font-size: .8125rem; }
+  .org-simpul::after { left: -7px; right: -7px; }
+}
+
+@media (max-width: 860px) {
+  /* Mode direktori: garis tegak di kiri, setiap kartu bercabang dari garis
+     itu seperti pohon berkas. */
+  .org-chart { align-items: stretch; }
+  .org-puncak { justify-content: stretch; }
+  .org-puncak .person-card.puncak { max-width: none; }
+  .org-puncak::after { display: none; }
+
+  .org-cabang {
+    display: flex; flex-direction: column; gap: 10px;
+    padding: 14px 0 0 22px; margin-top: 14px;
+    border-left: 2px solid var(--gray-300);
+  }
+  .org-cabang::before { display: none; }
+  .org-simpul { display: block; }
+  .org-simpul::before {
+    top: 50%; left: -22px; transform: none; width: 20px; height: 2px;
+    background: var(--gray-300);
+  }
+  /* Titik cabang pada garis induk. */
+  .org-simpul::after {
+    content: ''; position: absolute; top: calc(50% - 3px); left: -27px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--blue-500); border: 2px solid var(--white);
+    box-sizing: content-box;
+  }
+  .org-cabang .person-card {
+    display: flex; align-items: center; gap: 14px; text-align: left;
+    padding: 14px 16px;
+  }
+  .org-cabang .avatar { width: 48px; height: 48px; font-size: .85rem; margin: 0; flex: 0 0 auto; }
+  .org-cabang .person-name { font-size: .9375rem; }
+  .org-cabang .person-role { margin-top: 1px; }
+  .org-cabang .person-nip { margin-top: 3px; }
+}
+
+/* Kartu puncak di layar sempit juga dibuat mendatar agar hemat tinggi. */
+@media (max-width: 480px) {
+  .org-puncak .person-card.puncak {
+    display: flex; align-items: center; gap: 14px; text-align: left;
+    padding: 16px;
+  }
+  .org-puncak .person-card.puncak .avatar { width: 56px; height: 56px; font-size: .95rem; margin: 0; flex: 0 0 auto; }
+}
+
 /* ---------- Catalog cards ---------- */
 .catalog-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 @media (max-width: 860px) { .catalog-grid { grid-template-columns: 1fr; } }
@@ -786,6 +915,10 @@ h3 { font-size: 1.25rem; font-weight: 700; line-height: 1.3; }
 .search-box { position: relative; }
 .search-box svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 17px; height: 17px; color: var(--gray-500); }
 .search-box input { padding-left: 42px; }
+/* Aturan input umum di media query ponsel mengecilkan padding menjadi
+   12px, sehingga teks menimpa ikon kaca pembesar. Selektor ini lebih
+   spesifik agar ruang ikon selalu tersedia. */
+.search-box input[type="search"] { padding-left: 42px; }
 
 /* ---------- Requirement list ---------- */
 .req-list { display: flex; flex-direction: column; }
@@ -967,19 +1100,40 @@ table.data .badge { white-space: nowrap; }
 .admin-nav a:hover { background: rgba(255,255,255,.06); color: var(--white); }
 .admin-nav a.active { background: rgba(255,255,255,.1); color: var(--white); }
 .admin-nav .badge { margin-left: auto; }
+
+/* Kartu bantuan: kini di luar <nav>, jadi jaraknya diatur sendiri dan
+   tidak lagi ikut tergulir bersama daftar menu. */
 .admin-help {
-  margin: 14px; padding: 18px; border-radius: var(--radius-md);
-  background: rgba(255,255,255,.06); font-size: .8125rem;
+  margin: 0 14px 12px; padding: 16px; border-radius: var(--radius-md);
+  background: rgba(255,255,255,.06); font-size: .8125rem; line-height: 1.55;
+  flex: none;
 }
 .admin-help b { color: var(--white); display: block; margin-bottom: 4px; }
 .admin-help a { color: var(--blue-500); }
+
+/* Baris pengguna di dasar sidebar. Dulu ini <a>/<div> statis dengan ikon
+   panah yang tidak melakukan apa pun; sekarang tombol yang membuka menu. */
+.admin-user-wrap { position: relative; flex: none; }
 .admin-user {
-  display: flex; gap: 12px; align-items: center; padding: 16px 20px;
-  border-top: 1px solid rgba(255,255,255,.08);
+  display: flex; gap: 12px; align-items: center; width: 100%;
+  padding: 14px 20px; border: 0; border-top: 1px solid rgba(255,255,255,.08);
+  background: none; color: inherit; font: inherit; text-align: left; cursor: pointer;
 }
-.admin-user .avatar { width: 40px; height: 40px; font-size: .8rem; margin: 0; background: rgba(255,255,255,.12); color: var(--white); }
-.admin-user-name { font-weight: 600; color: var(--white); font-size: .875rem; }
+.admin-user:hover, .admin-user[aria-expanded="true"] { background: rgba(255,255,255,.07); }
+.admin-user .avatar { width: 40px; height: 40px; font-size: .8rem; margin: 0; background: rgba(255,255,255,.12); color: var(--white); flex: 0 0 auto; }
+.admin-user-teks { min-width: 0; flex: 1 1 auto; }
+.admin-user-name { font-weight: 600; color: var(--white); font-size: .875rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .admin-user-role { font-size: .75rem; color: rgba(255,255,255,.45); }
+.admin-user-panah { margin-left: auto; flex: 0 0 auto; opacity: .5; transition: transform .15s ease; }
+.admin-user[aria-expanded="true"] .admin-user-panah { transform: rotate(180deg); opacity: .85; }
+
+/* Panel menu pengguna pada sidebar terbuka ke ATAS, karena barisnya
+   menempel di dasar layar. Selektor digandakan agar menang atas aturan
+   .admin-user-panel umum yang muncul belakangan di berkas ini. */
+.admin-user-panel.admin-user-panel-atas {
+  top: auto; bottom: calc(100% + 8px); left: 14px; right: 14px; width: auto;
+  max-height: calc(100vh - 120px); overflow-y: auto;
+}
 
 .admin-main { background: var(--gray-100); min-width: 0; }
 .admin-topbar {
@@ -999,6 +1153,11 @@ table.data .badge { white-space: nowrap; }
 .admin-user-chip .avatar { width: 38px; height: 38px; font-size: .78rem; margin: 0; }
 .admin-user-chip .name { font-weight: 600; font-size: .875rem; }
 .admin-user-chip .role { font-size: .75rem; color: var(--gray-500); }
+/* Blok nama harus boleh menyusut agar nama panjang dipotong dengan elipsis,
+   bukan mendorong chip keluar topbar. */
+.admin-user-chip > div:not(.avatar) { min-width: 0; max-width: 200px; }
+.admin-user-chip .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.admin-user-chip .role { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* ---------- Menu pengguna di topbar (dropdown) ---------- */
 .admin-user-menu { position: relative; flex: 0 0 auto; }
@@ -1045,6 +1204,13 @@ table.data .badge { white-space: nowrap; }
   .admin-shell { grid-template-columns: 1fr; }
   .admin-sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 264px; z-index: 60; transform: translateX(-100%); transition: transform .2s; height: 100vh; }
   .admin-sidebar.open { transform: none; }
+  /* Menu di dalam sidebar bisa lebih panjang dari tinggi layar. Fade tipis
+     di ujung bawah menandakan masih ada item yang bisa digulir, sehingga
+     baris yang terpotong tidak terlihat seperti menu yang rusak. */
+  .admin-nav {
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent);
+  }
   .admin-content { padding: 24px 20px 48px; }
   .admin-topbar { padding: 12px 20px; }
   .admin-topbar .search { display: none; }
@@ -1146,7 +1312,11 @@ table.data .badge { white-space: nowrap; }
   border-radius: 50%; background: var(--amber-600); border: 3px solid var(--white);
   box-shadow: 0 0 0 2px var(--gray-200);
 }
+/* Warna titik riwayat: kuning = sedang berlangsung, hijau = disetujui,
+   merah = ditolak. Lihat StatusPengajuan::warnaTitik(). */
 .timeline-dot.green { background: var(--green-600); }
+.timeline-dot.amber { background: var(--amber-600); }
+.timeline-dot.red { background: var(--red-600); }
 .timeline-meta { font-size: .8125rem; color: var(--gray-500); }
 
 /* ---------- Doc file rows (admin detail) ---------- */

@@ -616,8 +616,13 @@
            utama melebar penuh agar tidak menyisakan setengah halaman kosong. --}}
       <div @class(['news-grid', 'news-grid-tunggal' => $beritaSamping->isEmpty()])>
         <a href="{{ route('informasi.detail', $beritaUtama->slug) }}" class="news-feature">
-          <div class="news-feature-img">
-            <svg class="art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M3 21h18M4 18h16M6 18v-8h3v8M11 18v-8h3v8M16 18v-8h3v8M12 3l9 5H3l9-5z"/></svg>
+          @php $fotoBeranda = $beritaUtama->fotoUrl(); @endphp
+          <div @class(['news-feature-img', 'foto' => $fotoBeranda !== null])>
+            @if ($fotoBeranda)
+              <img src="{{ $fotoBeranda }}" alt="Foto {{ $beritaUtama->judul }}" loading="lazy">
+            @else
+              <svg class="art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M3 21h18M4 18h16M6 18v-8h3v8M11 18v-8h3v8M16 18v-8h3v8M12 3l9 5H3l9-5z"/></svg>
+            @endif
             <span class="badge badge-navy" style="background:var(--blue-500)">Berita Utama</span>
           </div>
           <div class="news-feature-body">
@@ -631,7 +636,11 @@
         @if ($beritaSamping->isNotEmpty())
           <div class="news-side">
             @foreach ($beritaSamping as $berita)
+              @php $fotoSampingBeranda = $berita->fotoUrl(); @endphp
               <a href="{{ route('informasi.detail', $berita->slug) }}" class="news-item">
+                @if ($fotoSampingBeranda)
+                  <div class="news-thumb"><img src="{{ $fotoSampingBeranda }}" alt="Foto {{ $berita->judul }}" loading="lazy"></div>
+                @endif
                 <div>
                   <div class="news-meta">{{ $berita->labelKategori() }}</div>
                   <h3>{{ $berita->judul }}</h3>
