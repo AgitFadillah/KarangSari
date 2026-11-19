@@ -287,15 +287,9 @@ body.publik .org-puncak .person-card.puncak {
   border-width: 1.5px;
 }
 
-/* Baris berita tidak punya bingkai penuh (menempel pada daftar), jadi
-   dipakai garis biru di sisi kiri sebagai penanda batas yang tetap jelas. */
-body.publik .news-item-light {
-  box-shadow: inset 3px 0 0 var(--publik-garis);
-  padding-left: 16px;
-}
-body.publik .news-item-light:hover {
-  box-shadow: inset 3px 0 0 var(--navy-900), 0 8px 26px -8px rgba(46, 109, 164, .38);
-}
+/* Baris berita ringan selalu berada di dalam kartu berbingkai. Garis aksen
+   kiri yang dulu dipakai justru menempel pada kotak tanggal dan membuat baris
+   terlihat miring, jadi batasnya kini cukup mengandalkan bingkai kartu. */
 
 body.publik .panel-flat {
   border: 1.5px solid var(--publik-garis);
