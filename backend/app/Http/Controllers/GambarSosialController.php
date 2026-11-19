@@ -23,25 +23,67 @@ class GambarSosialController extends Controller
 
     public function logo(): Response
     {
+        // Bila ekstensi GD belum tersedia, jangan sampai pratinjau tautan
+        // gagal dan WhatsApp menampilkan ikon kosong: pakai gambar cadangan.
+        if (! function_exists('imagecreatetruecolor') || ! function_exists('imagepng')) {
+            return $this->gambarCadangan();
+        }
+
         $profil = SiteProfile::current();
         $path = BerkasPublik::path($profil->logo_path);
 
-        // Versi ikut berubah saat berkas logo diganti, sehingga gambar lama
-        // tidak terus tersaji dari cache.
-        $versi = $path !== null
-            ? (string) @filemtime($path)
-            : 'tanpa-logo';
+        try {
+            $png = $this->pngDariCache($path);
+        } catch (\Throwable $e) {
+            report($e);
 
-        $png = Cache::remember(
-            'gambar-sosial:'.md5($versi.'|'.(string) $path),
-            now()->addDay(),
-            fn (): string => $this->render($path),
-        );
+            return $this->gambarCadangan();
+        }
 
-        return response($png, 200, [
+        return response($png, 200, $this->headerGambar());
+    }
+
+    /**
+     * Susun gambar dari cache (versi ikut berubah saat logo diganti). Bila
+     * penyimpanan cache sedang bermasalah, gambar tetap disusun langsung.
+     */
+    private function pngDariCache(?string $path): string
+    {
+        $versi = $path !== null ? (string) @filemtime($path) : 'tanpa-logo';
+        $kunci = 'gambar-sosial:'.md5($versi.'|'.(string) $path);
+
+        try {
+            return Cache::remember($kunci, now()->addDay(), fn (): string => $this->render($path));
+        } catch (\Throwable $e) {
+            return $this->render($path);
+        }
+    }
+
+    /**
+     * Gambar cadangan yang ikut disimpan di repositori. Dipakai saat GD tidak
+     * tersedia atau penyusunan gambar gagal, supaya tautan tetap punya gambar
+     * pratinjau.
+     */
+    private function gambarCadangan(): Response
+    {
+        $berkas = public_path('images/gambar-sosial-default.png');
+
+        if (! is_file($berkas)) {
+            abort(404);
+        }
+
+        return response((string) file_get_contents($berkas), 200, $this->headerGambar());
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function headerGambar(): array
+    {
+        return [
             'Content-Type' => 'image/png',
             'Cache-Control' => 'public, max-age=86400',
-        ]);
+        ];
     }
 
     /**

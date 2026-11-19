@@ -9,6 +9,29 @@
     // pratinjau lama tidak terus dipakai.
     $gambarSosial = url(route('gambar-sosial'))
         .($logoUrl ? '?v='.substr(md5($logoUrl), 0, 8) : '');
+
+    // Data terstruktur (schema.org) supaya mesin pencari mengenal situs ini
+    // sebagai kantor pemerintah desa, lengkap dengan logo dan alamatnya.
+    $dataOrganisasi = array_filter([
+        '@context' => 'https://schema.org',
+        '@type' => 'GovernmentOrganization',
+        'name' => 'Pemerintah '.$profil->nama_desa,
+        'url' => url('/'),
+        'logo' => $logoUrl ? url($logoUrl) : null,
+        'image' => $gambarSosial,
+        'description' => $deskripsiHalaman,
+        'telephone' => filled($profil->telepon) ? $profil->telepon : null,
+        'email' => filled($profil->email) ? $profil->email : null,
+        'address' => array_filter([
+            '@type' => 'PostalAddress',
+            'streetAddress' => $profil->alamat_kantor,
+            'addressLocality' => $profil->kecamatan,
+            'addressRegion' => $profil->provinsi,
+            'postalCode' => $profil->kode_pos,
+            'addressCountry' => 'ID',
+        ]),
+        'areaServed' => $profil->kabupaten,
+    ]);
 @endphp
 <!DOCTYPE html>
 <html lang="id">
@@ -18,9 +41,13 @@
   <title>{{ $judulHalaman }}</title>
   <meta name="description" content="{{ $deskripsiHalaman }}">
   <meta name="csrf-token" content="{{ csrf_token() }}">
+  <meta name="theme-color" content="#0B1F3A">
+  <link rel="canonical" href="{{ url()->current() }}">
+  <link rel="sitemap" type="application/xml" href="{{ url('/sitemap.xml') }}">
 
   {{-- Pratinjau tautan di WhatsApp/media sosial: logo desa, bukan ikon abu-abu. --}}
   <meta property="og:type" content="website">
+  <meta property="og:locale" content="id_ID">
   <meta property="og:site_name" content="{{ $profil->nama_desa }}">
   <meta property="og:title" content="{{ $judulHalaman }}">
   <meta property="og:description" content="{{ $deskripsiHalaman }}">
@@ -40,6 +67,10 @@
     <link rel="icon" type="image/png" href="{{ url($logoUrl) }}">
     <link rel="apple-touch-icon" href="{{ url($logoUrl) }}">
   @endif
+
+  {{-- Data terstruktur untuk mesin pencari. Ditulis dengan flag HEX_TAG agar
+       isi dari dashboard tidak bisa menutup tag <script>. --}}
+  <script type="application/ld+json">{!! json_encode($dataOrganisasi, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}</script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">

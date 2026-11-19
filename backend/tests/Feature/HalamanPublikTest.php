@@ -97,6 +97,27 @@ class HalamanPublikTest extends TestCase
             ->assertSee('Belum ada potensi desa yang terdata.');
     }
 
+    public function test_kepala_halaman_memuat_meta_seo_dan_data_terstruktur(): void
+    {
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $this->assertStringContainsString('<link rel="canonical" href="'.url('/').'">', $html);
+        $this->assertStringContainsString('<link rel="sitemap" type="application/xml" href="'.url('/sitemap.xml').'">', $html);
+        $this->assertStringContainsString('name="theme-color" content="#0B1F3A"', $html);
+        $this->assertStringContainsString('property="og:locale" content="id_ID"', $html);
+        $this->assertStringContainsString('application/ld+json', $html);
+        $this->assertStringContainsString('"@type":"GovernmentOrganization"', $html);
+    }
+
+    public function test_gambar_pratinjau_tetap_tersedia_tanpa_logo(): void
+    {
+        // Tanpa logo unggahan, rute gambar sosial memakai gambar cadangan yang
+        // ikut disimpan di repositori supaya tautan tidak kehilangan gambar.
+        $this->get('/gambar-sosial.png')
+            ->assertOk()
+            ->assertHeader('Content-Type', 'image/png');
+    }
+
     public function test_kepala_halaman_memuat_logo_desa_untuk_pratinjau_tautan(): void
     {
         Storage::fake('public');
