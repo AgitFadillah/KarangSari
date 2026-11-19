@@ -25,6 +25,27 @@ class PetaLokasiTest extends TestCase
         $this->assertSame('Balai Desa Karang Sari', $profil->kueriPeta());
     }
 
+    /**
+     * Nama "Balai Desa Karang Sari" cukup umum. Bila admin mengisinya, wilayah
+     * kecamatan/kabupaten tetap ditambahkan agar Google Maps tidak memilih
+     * desa bernama sama di kabupaten lain.
+     */
+    public function test_kueri_peta_yang_diisi_diperjelas_dengan_wilayah(): void
+    {
+        $profil = new ProfilDesa([
+            'kueri_peta' => 'Balai Desa Karang Sari',
+            'nama_desa' => 'Desa Karang Sari',
+            'kecamatan' => 'Jati Agung',
+            'kabupaten' => 'Lampung Selatan',
+            'provinsi' => 'Lampung',
+        ]);
+
+        $this->assertSame(
+            'Balai Desa Karang Sari, Kecamatan Jati Agung, Lampung Selatan',
+            $profil->kueriPeta(),
+        );
+    }
+
     public function test_kueri_peta_kosong_jatuh_ke_alamat_dan_wilayah(): void
     {
         $profil = new ProfilDesa([
@@ -76,6 +97,9 @@ class PetaLokasiTest extends TestCase
         $this->assertStringStartsWith('https://www.google.com/maps?q=', $url);
         $this->assertStringContainsString('output=embed', $url);
         $this->assertStringContainsString(rawurlencode('Kantor Desa Karang Sari'), $url);
+        // Tampilan satelit dengan zoom dekat seperti referensi pengelola desa.
+        $this->assertStringContainsString('t=k', $url);
+        $this->assertStringContainsString('z=17', $url);
     }
 
     public function test_tautan_peta_memakai_pencarian_maps(): void

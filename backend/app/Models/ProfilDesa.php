@@ -87,25 +87,61 @@ class ProfilDesa extends Model
     {
         $kueri = trim((string) $this->kueri_peta);
 
+        // Bagian kecamatan/kabupaten/provinsi dipakai untuk memperjelas nama
+        // tempat yang generik ("Balai Desa Karang Sari"). Tanpa konteks ini,
+        // Google Maps bisa memilih desa bernama sama di kabupaten lain dan
+        // sematan jatuh ke area kosong.
+        $wilayah = $this->bagianWilayahPeta();
+
         if ($kueri !== '') {
-            return $kueri;
+            return $this->gabungBagianPeta([$kueri], $wilayah);
         }
 
         $kandidat = array_filter([
             trim((string) $this->alamat_kantor),
             trim((string) $this->nama_desa),
-            filled($this->kecamatan) ? 'Kecamatan '.trim((string) $this->kecamatan) : '',
-            trim((string) $this->kabupaten),
-            trim((string) $this->provinsi),
+            ...$wilayah,
         ], fn (string $baris): bool => $baris !== '');
 
-        // Alamat kantor umumnya sudah memuat nama desa, kecamatan, dan
-        // kabupaten. Bagian yang sudah terkandung di bagian sebelumnya
-        // dilewati supaya kueri peta tidak berulang, misalnya
-        // "… Karang Sari, Desa Karang Sari, Kecamatan Jati Agung …".
-        $bagian = [];
+        return $this->gabungBagianPeta([], $kandidat) ?: 'Kantor '.$this->nama_desa;
+    }
 
-        foreach ($kandidat as $baris) {
+    /**
+     * Bagian wilayah administratif untuk kueri peta.
+     *
+     * Kecamatan diberi awalan "Kecamatan" bila admin belum menuliskannya,
+     * supaya hasil pencarian tidak tertukar dengan nama orang/tempat lain.
+     *
+     * @return array<int, string>
+     */
+    protected function bagianWilayahPeta(): array
+    {
+        $kecamatan = trim((string) $this->kecamatan);
+
+        if ($kecamatan !== '' && ! str_starts_with(mb_strtolower($kecamatan), 'kecamatan ')) {
+            $kecamatan = 'Kecamatan '.$kecamatan;
+        }
+
+        return array_values(array_filter([
+            $kecamatan,
+            trim((string) $this->kabupaten),
+            trim((string) $this->provinsi),
+        ], fn (string $baris): bool => $baris !== ''));
+    }
+
+    /**
+     * Gabungkan bagian kueri tanpa mengulang wilayah yang sudah terkandung
+     * pada bagian sebelumnya, mis. "Lampung" tidak ditambahkan lagi setelah
+     * "Lampung Selatan".
+     *
+     * @param  array<int, string>  $awal
+     * @param  array<int, string>  $tambahan
+     */
+    protected function gabungBagianPeta(array $awal, array $tambahan): string
+    {
+        $bagian = $awal;
+
+        foreach ($tambahan as $baris) {
             foreach ($bagian as $sudah) {
                 if (mb_stripos($sudah, $baris) !== false) {
                     continue 2;
@@ -115,7 +151,7 @@ class ProfilDesa extends Model
             $bagian[] = $baris;
         }
 
-        return implode(', ', $bagian) ?: 'Kantor '.$this->nama_desa;
+        return implode(', ', $bagian);
     }
 
     /** Tautan "Buka di Google Maps" untuk lokasi kantor. */
@@ -137,9 +173,11 @@ class ProfilDesa extends Model
 
         $kueri = $titik !== null ? $titik : $this->kueriPeta();
 
+        // t=k memaksa tampilan satelit seperti referensi pengelola desa;
+        // z=17 cukup dekat untuk memperlihatkan bangunan balai desa tanpa
+        // kehilangan konteks jalan di sekitarnya.
         return 'https://www.google.com/maps?q='.rawurlencode($kueri)
-            .'&z='.($titik !== null ? '17' : '16')
-            .'&hl=id&output=embed';
+            .'&t=k&z=17&hl=id&output=embed';
     }
 
     /**

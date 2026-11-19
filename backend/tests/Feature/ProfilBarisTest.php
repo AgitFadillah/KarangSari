@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\RoleAdmin;
+use App\Models\DataDesa;
 use App\Models\ProfilDesa;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -174,6 +175,7 @@ class ProfilBarisTest extends TestCase
 
         $this->assertStringContainsString('-5.358421%2C105.294715', $profil->embedPeta());
         $this->assertStringContainsString('z=17', $profil->embedPeta());
+        $this->assertStringContainsString('t=k', $profil->embedPeta());
     }
 
     public function test_koordinat_di_luar_jangkauan_ditolak(): void
@@ -207,7 +209,8 @@ class ProfilBarisTest extends TestCase
         $profil = ProfilDesa::query()->firstOrFail();
 
         $this->assertNull($profil->koordinatPeta());
-        $this->assertStringContainsString('z=16', $profil->embedPeta());
+        $this->assertStringContainsString('z=17', $profil->embedPeta());
+        $this->assertStringContainsString('t=k', $profil->embedPeta());
         $this->assertStringContainsString('Kantor%20Desa%20Karang%20Sari', $profil->embedPeta());
     }
 
@@ -232,5 +235,126 @@ class ProfilBarisTest extends TestCase
         $this->assertStringContainsString('value="Desa Sukamaju"', $html);
         $this->assertStringContainsString('value="Desa Cibeureum"', $html);
         $this->assertStringContainsString('value="-5.358421"', $html);
+    }
+
+    /**
+     * Riwayat kepala desa boleh diubah, ditambah, dan dihapus dari satu
+     * formulir. Baris lama memakai id sebagai kunci; baris baru memakai
+     * kunci "baru_*" dan dihapus lewat riwayat_hapus[].
+     */
+    public function test_riwayat_kepala_desa_dapat_ditambah_diedit_dan_dihapus(): void
+    {
+        $pertama = DataDesa::query()->create([
+            'kelompok' => DataDesa::RIWAYAT_KADES,
+            'label' => 'Cuhli',
+            'nilai' => '1998 - 2004',
+            'keterangan' => 'Kepala Desa Pertama',
+            'urutan' => 1,
+        ]);
+
+        $kedua = DataDesa::query()->create([
+            'kelompok' => DataDesa::RIWAYAT_KADES,
+            'label' => 'Nama Lama',
+            'nilai' => '2004 - 2010',
+            'keterangan' => 'Kepala Desa',
+            'urutan' => 2,
+        ]);
+
+        $this->actingAs($this->admin)
+            ->put(route('admin.profil.update'), $this->dataDasar([
+                'riwayat' => [
+                    $pertama->id => [
+                        'label' => 'Cuhli',
+                        'nilai' => '1998 - 2004',
+                        'keterangan' => 'Kepala Desa Pertama',
+                    ],
+                    'baru_0' => [
+                        'label' => 'R O M S I, SH',
+                        'nilai' => '2022 - sekarang',
+                        'keterangan' => 'Kepala Desa',
+                    ],
+                ],
+                'riwayat_hapus' => [$kedua->id],
+            ]))
+            ->assertRedirect(route('admin.profil.edit'))
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('data_desas', [
+            'id' => $pertama->id,
+            'label' => 'Cuhli',
+            'nilai' => '1998 - 2004',
+        ]);
+        $this->assertDatabaseMissing('data_desas', ['id' => $kedua->id]);
+
+        $baru = DataDesa::query()
+            ->kelompok(DataDesa::RIWAYAT_KADES)
+            ->where('label', 'R O M S I, SH')
+            ->firstOrFail();
+
+        $this->assertSame('2022 - sekarang', $baru->nilai);
+        $this->assertSame('Kepala Desa', $baru->keterangan);
+        $this->assertGreaterThan($pertama->urutan, $baru->urutan);
+
+        // Baris baru langsung tampil di halaman profil publik.
+        $this->get(route('profil'))
+            ->assertOk()
+            ->assertSee('Cuhli')
+            ->assertSee('R O M S I, SH')
+            ->assertDontSee('Nama Lama');
+    }
+
+    public function test_riwayat_tanpa_nama_ditolak_saat_kolom_lain_diisi(): void
+    {
+        DataDesa::query()->create([
+            'kelompok' => DataDesa::RIWAYAT_KADES,
+            'label' => 'Cuhli',
+            'nilai' => '1998 - 2004',
+            'urutan' => 1,
+        ]);
+
+        $this->actingAs($this->admin)
+            ->put(route('admin.profil.update'), $this->dataDasar([
+                'riwayat' => [
+                    'baru_0' => [
+                        'label' => '',
+                        'nilai' => '2022 - sekarang',
+                        'keterangan' => 'Kepala Desa',
+                    ],
+                ],
+            ]))
+            ->assertSessionHasErrors('riwayat');
+
+        // Baris yang tidak valid tidak boleh menambah data tanpa nama.
+        $this->assertSame(
+            1,
+            DataDesa::query()->kelompok(DataDesa::RIWAYAT_KADES)->count()
+        );
+    }
+
+    public function test_form_riwayat_menampilkan_tombol_tambah_dan_hapus(): void
+    {
+        $baris = DataDesa::query()->create([
+            'kelompok' => DataDesa::RIWAYAT_KADES,
+            'label' => 'Cuhli',
+            'nilai' => '1998 - 2004',
+            'keterangan' => 'Kepala Desa Pertama',
+            'urutan' => 1,
+        ]);
+
+        $html = $this->actingAs($this->admin)
+            ->get(route('admin.profil.edit'))
+            ->assertOk()
+            ->assertSee('data-tambah-riwayat', false)
+            ->assertSee('data-riwayat-editor', false)
+            ->assertSee('data-hapus-riwayat', false)
+            ->assertSee('id="riwayat-template"', false)
+            ->getContent();
+
+        $this->assertStringContainsString(
+            'name="riwayat['.$baris->id.'][label]"',
+            $html
+        );
+        $this->assertStringContainsString('value="Cuhli"', $html);
+        $this->assertStringContainsString('riwayat_hapus[]', $html);
     }
 }

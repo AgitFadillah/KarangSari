@@ -12,6 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Profil & Kontak desa.
@@ -32,6 +33,12 @@ class ProfilController extends Controller
             'profil' => SiteProfile::current(),
             'dataDesa' => DataDesa::query()->terurut()->get()->groupBy('kelompok'),
             'kelompokData' => DataDesa::KELOMPOK,
+            // Riwayat kepala desa disunting dengan editor baris tersendiri
+            // (tambah/hapus), bukan sebagai tabel angka seperti kelompok lain.
+            'riwayatKades' => DataDesa::query()
+                ->kelompok(DataDesa::RIWAYAT_KADES)
+                ->terurut()
+                ->get(),
         ]);
     }
 
@@ -101,6 +108,16 @@ class ProfilController extends Controller
             'data.*.nilai_l' => ['nullable', 'string', 'max:20'],
             'data.*.nilai_p' => ['nullable', 'string', 'max:20'],
             'data.*.keterangan' => ['nullable', 'string', 'max:120'],
+
+            // Riwayat kepala desa dikirim sebagai baris tersendiri: kunci
+            // angka = baris lama yang diedit, kunci "baru_*" = baris baru.
+            // Baris yang dihapus dikirim terpisah lewat riwayat_hapus[].
+            'riwayat' => ['nullable', 'array'],
+            'riwayat.*.label' => ['nullable', 'string', 'max:120'],
+            'riwayat.*.nilai' => ['nullable', 'string', 'max:40'],
+            'riwayat.*.keterangan' => ['nullable', 'string', 'max:120'],
+            'riwayat_hapus' => ['nullable', 'array'],
+            'riwayat_hapus.*' => ['integer'],
         ], [
             'email.email' => 'Format email desa belum benar.',
             'logo.image' => 'Logo harus berupa gambar.',
@@ -141,6 +158,44 @@ class ProfilController extends Controller
         }
 
         $barisData = $data['data'] ?? [];
+
+        // Riwayat kepala desa: nama, masa jabatan, dan keterangan. Baris
+        // baru boleh dikirim tanpa id; baris lama memakai id sebagai kunci.
+        $riwayat = $data['riwayat'] ?? null;
+        $riwayatHapus = [];
+
+        if (isset($data['riwayat_hapus']) && is_array($data['riwayat_hapus'])) {
+            foreach ($data['riwayat_hapus'] as $id) {
+                $id = filter_var($id, FILTER_VALIDATE_INT);
+
+                if ($id !== false && $id !== null && $id > 0) {
+                    $riwayatHapus[] = $id;
+                }
+            }
+        }
+
+        // Baris baru yang sudah diisi masa jabatan/keterangan tetapi belum
+        // diberi nama akan tampak "hilang" setelah disimpan. Tolak dengan
+        // pesan yang jelas alih-alih membuang isian admin diam-diam.
+        if (is_array($riwayat)) {
+            foreach ($riwayat as $baris) {
+                if (! is_array($baris)) {
+                    continue;
+                }
+
+                $label = trim((string) ($baris['label'] ?? ''));
+                $nilai = trim((string) ($baris['nilai'] ?? ''));
+                $keterangan = trim((string) ($baris['keterangan'] ?? ''));
+
+                if ($label === '' && ($nilai !== '' || $keterangan !== '')) {
+                    throw ValidationException::withMessages([
+                        'riwayat' => 'Nama kepala desa wajib diisi pada setiap baris riwayat.',
+                    ]);
+                }
+            }
+        }
+
+        unset($data['riwayat'], $data['riwayat_hapus']);
 
         // Baris "batas wilayah" dan "penggunaan lahan" dirangkai kembali
         // menjadi teks "Arah: nama" / "Label: persen" per baris — bentuk
@@ -189,8 +244,67 @@ class ProfilController extends Controller
         );
 
         try {
-            DB::transaction(function () use ($profil, $data, $barisData) {
+            DB::transaction(function () use ($profil, $data, $barisData, $riwayat, $riwayatHapus) {
                 $profil->fill($data)->save();
+
+                // Hapus lebih dulu, lalu simpan baris yang masih ada. Dengan
+                // begitu baris yang tombol hapusnya ditekan tidak ikut
+                // diperbarui bila id-nya kebetulan masih terkirim.
+                if ($riwayatHapus !== []) {
+                    DataDesa::query()
+                        ->kelompok(DataDesa::RIWAYAT_KADES)
+                        ->whereKey($riwayatHapus)
+                        ->delete();
+                }
+
+                if (is_array($riwayat)) {
+                    $urutan = (int) DataDesa::query()
+                        ->kelompok(DataDesa::RIWAYAT_KADES)
+                        ->max('urutan');
+
+                    foreach ($riwayat as $kunci => $barisRiwayat) {
+                        if (! is_array($barisRiwayat)) {
+                            continue;
+                        }
+
+                        $label = trim((string) ($barisRiwayat['label'] ?? ''));
+                        $masaJabatan = trim((string) ($barisRiwayat['nilai'] ?? ''));
+                        $keterangan = trim((string) ($barisRiwayat['keterangan'] ?? ''));
+
+                        // Baris kosong (mis. baris baru yang tidak jadi
+                        // diisi) diabaikan, bukan disimpan sebagai data
+                        // tanpa nama.
+                        if ($label === '') {
+                            continue;
+                        }
+
+                        $id = filter_var($kunci, FILTER_VALIDATE_INT);
+
+                        if ($id !== false && $id !== null) {
+                            $baris = DataDesa::query()
+                                ->kelompok(DataDesa::RIWAYAT_KADES)
+                                ->find($id);
+
+                            if ($baris) {
+                                $baris->update([
+                                    'label' => $label,
+                                    'nilai' => $masaJabatan !== '' ? $masaJabatan : null,
+                                    'keterangan' => $keterangan !== '' ? $keterangan : null,
+                                ]);
+                            }
+
+                            continue;
+                        }
+
+                        DataDesa::query()->create([
+                            'kelompok' => DataDesa::RIWAYAT_KADES,
+                            'label' => $label,
+                            'nilai' => $masaJabatan !== '' ? $masaJabatan : null,
+                            'keterangan' => $keterangan !== '' ? $keterangan : null,
+                            'urutan' => ++$urutan,
+                        ]);
+                    }
+                }
 
                 foreach ($barisData as $id => $nilai) {
                     // Nilai dari formulir bisa saja bukan array (permintaan

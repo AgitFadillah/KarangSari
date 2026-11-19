@@ -183,3 +183,222 @@ table thead th {
   .letter-warga { padding: 18px 16px; }
   .letter-warga #pratinjauIsi { font-size: .6875rem; }
 }
+
+/* ============================================================
+   Border biru kontras untuk halaman publik
+   ------------------------------------------------------------
+   Sebelumnya kartu dan kolom isian memakai garis abu-abu tipis
+   yang di layar ponsel nyaris tidak terlihat. Warga yang tidak
+   menyentuh layar jadi tidak tahu batas kartu/tombol. Di semua
+   halaman publik, garis tepi kini biru tua dan langsung terlihat
+   tanpa hover; hover hanya menguatkan warna dan menambah bayangan.
+   Admin tidak terpengaruh karena semuanya di-scope body.publik.
+   ============================================================ */
+
+body.publik {
+  --publik-garis: #2E6DA4;
+  --publik-garis-muda: #A9C7E3;
+}
+
+/* ---------- Kolom isian ---------- */
+body.publik input[type=text],
+body.publik input[type=password],
+body.publik input[type=email],
+body.publik input[type=tel],
+body.publik input[type=date],
+body.publik input[type=search],
+body.publik input[type=number],
+body.publik input[type=url],
+body.publik input[type=time],
+body.publik textarea,
+body.publik .input,
+body.publik .pilih-tombol {
+  border: 1.5px solid var(--publik-garis);
+  background: #FBFCFE;
+}
+
+body.publik input[type=text]:hover,
+body.publik input[type=password]:hover,
+body.publik input[type=email]:hover,
+body.publik input[type=tel]:hover,
+body.publik input[type=date]:hover,
+body.publik input[type=search]:hover,
+body.publik input[type=number]:hover,
+body.publik input[type=url]:hover,
+body.publik input[type=time]:hover,
+body.publik textarea:hover,
+body.publik .pilih-tombol:hover {
+  border-color: var(--navy-900);
+}
+
+body.publik input:focus,
+body.publik textarea:focus,
+body.publik .input:focus,
+body.publik .pilih-tombol:focus-visible,
+body.publik .pilih-tombol[aria-expanded="true"] {
+  border-color: var(--navy-900);
+  box-shadow: 0 0 0 4px rgba(46, 109, 164, .18);
+}
+
+body.publik input:disabled,
+body.publik textarea:disabled,
+body.publik input[readonly],
+body.publik .pilih[data-nonaktif] .pilih-tombol {
+  border-color: var(--publik-garis-muda);
+  background: var(--gray-100);
+}
+
+/* ---------- Kartu, panel, dan baris berbingkai ---------- */
+body.publik .card,
+body.publik .panel,
+body.publik .contact-card,
+body.publik .contact-info-card,
+body.publik .catalog-card,
+body.publik .step-card,
+body.publik .form-card,
+body.publik .faq-item,
+body.publik .map-card,
+body.publik .hc-card,
+body.publik .person-card,
+body.publik .potential-card,
+body.publik .potensi-card,
+body.publik .doc-card,
+body.publik .stat-mini,
+body.publik .letter,
+body.publik .news-feature,
+body.publik .service-row,
+body.publik .terkait-kartu,
+body.publik .cta-card,
+body.publik .cta-strip-card,
+body.publik .cta-band,
+body.publik .side-card,
+body.publik .after-panel,
+body.publik .next-card,
+body.publik .privacy-details,
+body.publik .summary,
+body.publik .ringkasan {
+  border: 1.5px solid var(--publik-garis);
+}
+
+/* Kartu puncak bagan memakai border navy agar menonjol; di halaman publik
+   tetap diberi garis biru tema supaya seragam dengan kartu lain. */
+body.publik .org-puncak .person-card.puncak {
+  border-color: var(--publik-garis);
+  border-width: 1.5px;
+}
+
+/* Baris berita tidak punya bingkai penuh (menempel pada daftar), jadi
+   dipakai garis biru di sisi kiri sebagai penanda batas yang tetap jelas. */
+body.publik .news-item-light {
+  box-shadow: inset 3px 0 0 var(--publik-garis);
+  padding-left: 16px;
+}
+body.publik .news-item-light:hover {
+  box-shadow: inset 3px 0 0 var(--navy-900), 0 8px 26px -8px rgba(46, 109, 164, .38);
+}
+
+body.publik .panel-flat {
+  border: 1.5px solid var(--publik-garis);
+}
+
+/* Kartu yang bisa diklik: garis tepi menguat saat disorot. */
+body.publik a.card:hover,
+body.publik a.catalog-card:hover,
+body.publik .potential-card:hover,
+body.publik .potensi-card:hover,
+body.publik .person-card:hover,
+body.publik .service-row:hover,
+body.publik a.terkait-kartu:hover {
+  border-color: var(--navy-900);
+  box-shadow: 0 8px 26px -8px rgba(46, 109, 164, .42);
+}
+
+/* ---------- Tombol bergaris ---------- */
+body.publik .btn-outline {
+  border: 1.5px solid var(--publik-garis);
+  background: var(--white);
+  color: var(--navy-900);
+}
+body.publik .btn-outline:hover {
+  border-color: var(--navy-900);
+  background: var(--blue-100);
+}
+body.publik .potential-pill {
+  border: 1.5px solid var(--publik-garis);
+  background: var(--white);
+}
+body.publik .potential-pill:hover {
+  border-color: var(--navy-900);
+}
+body.publik .potential-pill.active {
+  border-color: var(--publik-garis);
+}
+body.publik .contact-wa-link,
+body.publik .map-open-btn,
+body.publik .hc-maps {
+  border: 1.5px solid var(--publik-garis);
+  background: var(--white);
+}
+body.publik .contact-wa-link:hover,
+body.publik .map-open-btn:hover,
+body.publik .hc-maps:hover {
+  border-color: var(--navy-900);
+}
+
+/* ---------- Bar tab ---------- */
+body.publik .tabs {
+  border: 1.5px solid var(--publik-garis);
+  background: var(--blue-50);
+}
+body.publik .profile-tabs {
+  border-top: 1.5px solid var(--publik-garis);
+  border-bottom: 1.5px solid var(--publik-garis);
+}
+body.publik .profile-tabs a.active {
+  border-bottom-color: var(--publik-garis);
+}
+
+/* ---------- Pintasan beranda ---------- */
+body.publik .quicklinks-grid {
+  border: 1.5px solid var(--publik-garis);
+}
+body.publik .quicklink {
+  border: 0;
+  border-right: 1px solid var(--publik-garis-muda);
+}
+body.publik .quicklink:hover {
+  border-right-color: var(--publik-garis);
+  background: var(--blue-50);
+}
+body.publik .quicklink:last-child {
+  border-right: 0;
+}
+@media (max-width: 1024px) {
+  body.publik .quicklink {
+    border-right: 1px solid var(--publik-garis-muda);
+    border-bottom: 1px solid var(--publik-garis-muda);
+  }
+  body.publik .quicklink:nth-child(2n) { border-right: 0; }
+  body.publik .quicklink:nth-last-child(-n+2) { border-bottom: 0; }
+}
+
+/* ---------- Tabel ---------- */
+body.publik .table-wrap > table,
+body.publik table.data,
+body.publik table.tabel-data {
+  border: 1.5px solid var(--publik-garis);
+}
+body.publik .table-wrap > table thead th,
+body.publik table.data thead th,
+body.publik table.tabel-data thead th {
+  border-bottom: 1.5px solid var(--publik-garis);
+}
+
+@media (max-width: 560px) {
+  body.publik .quicklinks-grid { border-radius: var(--radius-md); }
+  body.publik .quicklink {
+    border-right: 0;
+    border-bottom: 1px solid var(--publik-garis-muda);
+  }
+  body.publik .quicklink:last-child { border-bottom: 0; }
+}

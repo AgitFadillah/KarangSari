@@ -417,8 +417,14 @@ class HalamanPublikTest extends TestCase
         $this->assertStringContainsString('<iframe', $html);
         $this->assertStringContainsString('output=embed', $html);
         $this->assertStringContainsString('maps?q=', $html);
+        // Tampilan satelit dan zoom dekat supaya bangunan balai desa terlihat.
+        $this->assertStringContainsString('t=k', $html);
+        $this->assertStringContainsString('z=17', $html);
         // Kueri memuat alamat kantor sehingga peta menunjuk lokasi yang benar.
         $this->assertStringContainsString(rawurlencode($this->profil()->alamat_kantor), $html);
+        // Label lokasi ditulis di atas peta agar warga tahu titik yang ditunjuk.
+        $this->assertStringContainsString('peta-label', $html);
+        $this->assertStringContainsString('Balai '.$this->profil()->nama_desa, $html);
         $this->assertStringContainsString('Buka di Google Maps', $html);
     }
 
@@ -427,7 +433,8 @@ class HalamanPublikTest extends TestCase
         $this->get('/kontak')
             ->assertOk()
             ->assertSee('output=embed', false)
-            ->assertSee('Kantor '.$this->profil()->nama_desa, false);
+            ->assertSee('Kantor '.$this->profil()->nama_desa, false)
+            ->assertSee('Balai '.$this->profil()->nama_desa, false);
     }
 
     /**

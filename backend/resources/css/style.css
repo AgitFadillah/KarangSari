@@ -662,6 +662,24 @@ h3 { font-size: 1.25rem; font-weight: 700; line-height: 1.3; }
 .two-col > .card + .card,
 .two-col-wide > .card + .card { margin-top: 0; }
 
+/* Label lokasi di atas sematan peta satelit. Google Maps hanya menampilkan
+   pin pada koordinat, jadi label nama balai desa ditulis sendiri agar warga
+   langsung tahu titik yang ditunjuk. pointer-events:none membuat label tidak
+   menghalangi kontrol peta di bawahnya. */
+.peta-label {
+  position: absolute; z-index: 2; top: 14px; left: 14px;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, .96); border: 1px solid var(--blue-200);
+  box-shadow: var(--shadow-md);
+  font-size: .8125rem; font-weight: 700; color: var(--navy-900);
+  pointer-events: none;
+}
+.peta-label svg { width: 16px; height: 16px; color: #D92D20; flex: none; }
+@media (max-width: 480px) {
+  .peta-label { top: 10px; left: 10px; padding: 7px 12px; font-size: .75rem; }
+}
+
 /* ---------- Contact block ---------- */
 .contact-grid { display: grid; grid-template-columns: 5fr 6fr; gap: 24px; align-items: stretch; }
 @media (max-width: 1024px) { .contact-grid { grid-template-columns: 1fr; } }
@@ -790,6 +808,12 @@ h3 { font-size: 1.25rem; font-weight: 700; line-height: 1.3; }
 .person-role { color: var(--blue-600); font-size: .875rem; margin-top: 2px; }
 .person-nip { color: var(--gray-500); font-size: .75rem; margin-top: 6px; letter-spacing: .01em; }
 
+/* Teks identitas perangkat dibungkus satu blok agar di mode direktori
+   (mobile) nama, jabatan, dan NIP bertumpuk vertikal di samping avatar —
+   bukan menjadi tiga kolom flex yang saling mendesak. */
+.person-teks { min-width: 0; }
+.person-name, .person-role, .person-nip { overflow-wrap: anywhere; }
+
 /* ---------- Bagan struktur pemerintahan ----------
    Desktop: pemimpin di puncak, garis turun ke batang mendatar, lalu garis
    pendek ke setiap kartu perangkat. Mobile: berubah menjadi daftar
@@ -877,7 +901,8 @@ h3 { font-size: 1.25rem; font-weight: 700; line-height: 1.3; }
     padding: 14px 16px;
   }
   .org-cabang .avatar { width: 48px; height: 48px; font-size: .85rem; margin: 0; flex: 0 0 auto; }
-  .org-cabang .person-name { font-size: .9375rem; }
+  .org-cabang .person-teks { flex: 1 1 auto; min-width: 0; }
+  .org-cabang .person-name { font-size: .9375rem; line-height: 1.35; }
   .org-cabang .person-role { margin-top: 1px; }
   .org-cabang .person-nip { margin-top: 3px; }
 }
@@ -889,6 +914,8 @@ h3 { font-size: 1.25rem; font-weight: 700; line-height: 1.3; }
     padding: 16px;
   }
   .org-puncak .person-card.puncak .avatar { width: 56px; height: 56px; font-size: .95rem; margin: 0; flex: 0 0 auto; }
+  .org-puncak .person-teks { flex: 1 1 auto; min-width: 0; }
+  .org-puncak .person-name { font-size: 1rem; line-height: 1.35; }
 }
 
 /* ---------- Catalog cards ---------- */
@@ -1079,6 +1106,32 @@ table.data .badge { white-space: nowrap; }
 .cell-avatar .cell-sub { white-space: nowrap; }
 .cell-avatar { display: flex; gap: 12px; align-items: center; }
 .cell-avatar .avatar { width: 40px; height: 40px; font-size: .8rem; margin: 0; }
+
+/* Riwayat kepala desa: tiga kolom terlalu sempit di ponsel sehingga
+   keterangan terpotong. Tiap baris ditumpuk seperti kartu dengan label
+   kecil di atas nilainya. */
+@media (max-width: 560px) {
+  .tabel-riwayat thead { display: none; }
+  .tabel-riwayat,
+  .tabel-riwayat tbody,
+  .tabel-riwayat tr,
+  .tabel-riwayat td { display: block; width: 100%; }
+  .tabel-riwayat tr {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .tabel-riwayat tr:last-child { border-bottom: 0; }
+  .tabel-riwayat td { padding: 2px 0; border: 0; }
+  .tabel-riwayat td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: .625rem; font-weight: 800; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--gray-500);
+    margin-bottom: 1px;
+  }
+  .tabel-riwayat td:first-child { margin-bottom: 6px; }
+  .tabel-riwayat td:first-child::before { display: none; }
+}
 
 /* ---------- Admin shell ---------- */
 .admin-shell { display: grid; grid-template-columns: 264px 1fr; min-height: 100vh; }

@@ -14,7 +14,7 @@
   @vite('resources/css/site.css')
   @stack('styles')
 </head>
-<body>
+<body class="publik">
 
   @include('layouts.partials.topbar')
 

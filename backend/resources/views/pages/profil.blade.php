@@ -120,7 +120,8 @@
     $pendidikan = ($dataDesa[\App\Models\DataDesa::PENDIDIKAN] ?? collect())->filter->adaIsi();
     $pencaharian = ($dataDesa[\App\Models\DataDesa::PENCAHARIAN] ?? collect())->filter->adaIsi();
     $kesejahteraan = ($dataDesa[\App\Models\DataDesa::KESEJAHTERAAN] ?? collect())->filter->adaIsi();
-    $riwayatKades = ($dataDesa[\App\Models\DataDesa::RIWAYAT_KADES] ?? collect())->filter->adaIsi();
+    $riwayatKades = ($dataDesa[\App\Models\DataDesa::RIWAYAT_KADES] ?? collect())
+      ->filter(fn ($baris) => filled($baris->label) || filled($baris->nilai));
     $dusun = $profil->dusun_tersusun;
 
     $adaDemografi = filled($profil->jumlah_penduduk) || filled($profil->jumlah_kk)
@@ -278,11 +279,13 @@
               @else
                 <div class="avatar navy">{{ \App\Enums\RoleAdmin::initials($puncak->nama) }}</div>
               @endif
-              <div class="person-name">{{ $puncak->nama }}</div>
-              <div class="person-role">{{ $puncak->jabatan }}</div>
-              @if (filled($puncak->nip))
-                <div class="person-nip">NIP {{ $puncak->nip }}</div>
-              @endif
+              <div class="person-teks">
+                <div class="person-name">{{ $puncak->nama }}</div>
+                <div class="person-role">{{ $puncak->jabatan }}</div>
+                @if (filled($puncak->nip))
+                  <div class="person-nip">NIP {{ $puncak->nip }}</div>
+                @endif
+              </div>
             </div>
           </div>
 
@@ -302,11 +305,13 @@
                     @else
                       <div class="avatar">{{ \App\Enums\RoleAdmin::initials($orang->nama) }}</div>
                     @endif
-                    <div class="person-name">{{ $orang->nama }}</div>
-                    <div class="person-role">{{ $orang->jabatan }}</div>
-                    @if (filled($orang->nip))
-                      <div class="person-nip">NIP {{ $orang->nip }}</div>
-                    @endif
+                    <div class="person-teks">
+                      <div class="person-name">{{ $orang->nama }}</div>
+                      <div class="person-role">{{ $orang->jabatan }}</div>
+                      @if (filled($orang->nip))
+                        <div class="person-nip">NIP {{ $orang->nip }}</div>
+                      @endif
+                    </div>
                   </div>
                 </div>
               @endforeach
@@ -571,14 +576,14 @@
               <div class="card">
                 <h3 style="margin-bottom:20px">Riwayat kepala desa</h3>
                 <div class="table-wrap">
-                  <table class="data tabel-data">
+                  <table class="data tabel-data tabel-riwayat">
                     <thead><tr><th>Nama</th><th>Masa jabatan</th><th>Keterangan</th></tr></thead>
                     <tbody>
                       @foreach ($riwayatKades as $baris)
                         <tr>
-                          <td><div class="cell-main">{{ $baris->label }}</div></td>
-                          <td>{{ $baris->nilai ?: '—' }}</td>
-                          <td>{{ $baris->keterangan ?: '—' }}</td>
+                          <td data-label="Nama"><div class="cell-main">{{ $baris->label }}</div></td>
+                          <td data-label="Masa jabatan">{{ $baris->nilai ?: '—' }}</td>
+                          <td data-label="Keterangan">{{ $baris->keterangan ?: '—' }}</td>
                         </tr>
                       @endforeach
                     </tbody>

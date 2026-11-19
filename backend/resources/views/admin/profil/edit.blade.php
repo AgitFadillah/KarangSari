@@ -132,6 +132,36 @@
       font: inherit; font-size: .8125rem; font-weight: 700; color: var(--blue-600);
     }
     .tautan-tambah:hover { text-decoration: underline; }
+
+    /* Riwayat kepala desa: baris nama/masa jabatan/keterangan dengan tombol
+       hapus per baris. Di layar sempit kolomnya ditumpuk dan masing-masing
+       field diberi label kecil agar tetap jelas tanpa header tabel. */
+    .riwayat-editor { display: grid; gap: 8px; }
+    .riwayat-head, .riwayat-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, .8fr) minmax(0, 1.1fr) 38px;
+      gap: 8px; align-items: center;
+    }
+    .riwayat-head {
+      padding: 0 2px 6px;
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--gray-500);
+    }
+    .riwayat-field { display: block; min-width: 0; }
+    .riwayat-label { display: none; }
+    @media (max-width: 760px) {
+      .riwayat-head { display: none; }
+      .riwayat-item {
+        grid-template-columns: 1fr; gap: 6px;
+        padding: 12px; border: 1px solid var(--gray-200);
+        border-radius: var(--radius-md);
+      }
+      .riwayat-label {
+        display: block; margin-bottom: 4px;
+        font-size: .75rem; font-weight: 600; color: var(--gray-600);
+      }
+      .riwayat-item .baris-hapus { width: 100%; }
+    }
     /* Di layar sempit, kolom "arah" dan "nama desa" ditumpuk agar isiannya
        tidak menjadi sangat sempit. */
     @media (max-width: 560px) {
@@ -546,10 +576,10 @@
             @foreach ($kelompokData as $kelompok => $judul)
               @php $barisKelompok = $dataDesa[$kelompok] ?? collect(); @endphp
               @continue($barisKelompok->isEmpty())
-              {{-- Tabel riwayat kepala desa punya tiga kolom isian sehingga
-                   diberi lebar penuh; kalau dipaksa setengah lebar, teks
-                   "Kepala Desa Pertama" dan "Empat bulan" terpotong. --}}
-              <div @class(['panel', 'lebar' => $kelompok === \App\Models\DataDesa::RIWAYAT_KADES])>
+              {{-- Riwayat kepala desa punya editor baris sendiri di bawah
+                   tabel data, karena barisnya bisa ditambah/dihapus. --}}
+              @continue($kelompok === \App\Models\DataDesa::RIWAYAT_KADES)
+              <div class="panel">
                 <div class="panel-head">
                   <div>
                     <h2>{{ $judul }}</h2>
@@ -593,39 +623,6 @@
                     </table>
                   </div>
                   <p class="field-help mt-16">Kolom jumlah dihitung otomatis dari L + P saat halaman publik dibuka.</p>
-                @elseif ($kelompok === \App\Models\DataDesa::RIWAYAT_KADES)
-                  <div class="table-wrap">
-                    <table class="data data-desa">
-                      <thead>
-                        <tr>
-                          <th>Nama kepala desa</th>
-                          <th>Masa jabatan</th>
-                          <th>Keterangan</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @foreach ($barisKelompok as $baris)
-                          <tr>
-                            <td><div class="cell-main">{{ $baris->label }}</div></td>
-                            <td>
-                              <input type="text" maxlength="40"
-                                     aria-label="Masa jabatan {{ $baris->label }}"
-                                     name="data[{{ $baris->id }}][nilai]"
-                                     value="{{ old('data.'.$baris->id.'.nilai', $baris->nilai) }}"
-                                     placeholder="mis. 2002 - 2008">
-                            </td>
-                            <td>
-                              <input type="text" maxlength="120"
-                                     aria-label="Keterangan {{ $baris->label }}"
-                                     name="data[{{ $baris->id }}][keterangan]"
-                                     value="{{ old('data.'.$baris->id.'.keterangan', $baris->keterangan) }}"
-                                     placeholder="mis. Kepala Desa">
-                            </td>
-                          </tr>
-                        @endforeach
-                      </tbody>
-                    </table>
-                  </div>
                 @else
                   <div class="table-wrap">
                     <table class="data data-desa">
@@ -661,6 +658,129 @@
                 @endif
               </div>
             @endforeach
+            </div>
+
+            {{-- Riwayat kepala desa: baris bisa ditambah dan dihapus. Baris
+                 lama memakai id sebagai kunci; baris baru memakai kunci
+                 "baru_<nomor>". Penghapusan baru berlaku setelah Simpan. --}}
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>Riwayat kepala desa</h2>
+                  <p>Nama, masa jabatan, dan keterangan tiap kepala desa. Baris bisa ditambah atau dihapus.</p>
+                </div>
+                <button type="button" class="btn btn-outline btn-sm" data-tambah-riwayat>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                  Tambah kepala desa
+                </button>
+              </div>
+
+              @php
+                // Saat validasi gagal, tampilkan lagi isian yang baru
+                // dikirim (termasuk baris baru) alih-alih data lama.
+                $riwayatLama = old('riwayat');
+                $nomorRiwayatBaru = 0;
+
+                if (is_array($riwayatLama)) {
+                    $barisRiwayat = $riwayatLama;
+                } else {
+                    $barisRiwayat = [];
+                    foreach ($riwayatKades as $baris) {
+                        $barisRiwayat[$baris->id] = [
+                            'label' => $baris->label,
+                            'nilai' => $baris->nilai,
+                            'keterangan' => $baris->keterangan,
+                        ];
+                    }
+                    if ($barisRiwayat === []) {
+                        $barisRiwayat['baru_0'] = ['label' => '', 'nilai' => '', 'keterangan' => ''];
+                        $nomorRiwayatBaru = 1;
+                    }
+                }
+
+                foreach (array_keys($barisRiwayat) as $kunciBaris) {
+                    if (str_starts_with((string) $kunciBaris, 'baru_')) {
+                        $nomorRiwayatBaru = max(
+                            $nomorRiwayatBaru,
+                            ((int) substr((string) $kunciBaris, 5)) + 1,
+                        );
+                    }
+                }
+              @endphp
+
+              <div class="riwayat-head" aria-hidden="true">
+                <span>Nama kepala desa</span>
+                <span>Masa jabatan</span>
+                <span>Keterangan</span>
+                <span></span>
+              </div>
+
+              <div class="riwayat-editor" data-riwayat-editor>
+                @foreach ($barisRiwayat as $kunci => $baris)
+                  @php
+                    $kunci = (string) $kunci;
+                    $baris = is_array($baris) ? $baris : [];
+                    $idTersimpan = ctype_digit($kunci) ? (int) $kunci : null;
+                  @endphp
+                  <div class="riwayat-item" data-riwayat-item @if ($idTersimpan) data-id="{{ $idTersimpan }}" @endif>
+                    <label class="riwayat-field">
+                      <span class="riwayat-label">Nama kepala desa</span>
+                      <input type="text" name="riwayat[{{ $kunci }}][label]"
+                             value="{{ $baris['label'] ?? '' }}" maxlength="120"
+                             placeholder="Nama lengkap" aria-label="Nama kepala desa">
+                    </label>
+                    <label class="riwayat-field">
+                      <span class="riwayat-label">Masa jabatan</span>
+                      <input type="text" name="riwayat[{{ $kunci }}][nilai]"
+                             value="{{ $baris['nilai'] ?? '' }}" maxlength="40"
+                             placeholder="mis. 2002 - 2008" aria-label="Masa jabatan">
+                    </label>
+                    <label class="riwayat-field">
+                      <span class="riwayat-label">Keterangan</span>
+                      <input type="text" name="riwayat[{{ $kunci }}][keterangan]"
+                             value="{{ $baris['keterangan'] ?? '' }}" maxlength="120"
+                             placeholder="mis. Kepala Desa" aria-label="Keterangan">
+                    </label>
+                    <button type="button" class="baris-hapus" data-hapus-riwayat aria-label="Hapus baris riwayat ini">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+                    </button>
+                  </div>
+                @endforeach
+              </div>
+
+              {{-- Baris yang dihapus dari daftar dikirim lewat field ini.
+                   Disimpan juga saat validasi gagal agar niat hapus tidak
+                   hilang ketika formulir dikirim ulang. --}}
+              <div data-riwayat-hapus>
+                @foreach ((array) old('riwayat_hapus', []) as $idHapus)
+                  <input type="hidden" name="riwayat_hapus[]" value="{{ $idHapus }}">
+                @endforeach
+              </div>
+
+              <p class="field-help">Baris yang dihapus baru benar-benar hilang setelah tombol <b>Simpan perubahan</b> ditekan.</p>
+
+              <template id="riwayat-template">
+                <div class="riwayat-item" data-riwayat-item>
+                  <label class="riwayat-field">
+                    <span class="riwayat-label">Nama kepala desa</span>
+                    <input type="text" name="riwayat[__BARU__][label]" maxlength="120"
+                           placeholder="Nama lengkap" aria-label="Nama kepala desa">
+                  </label>
+                  <label class="riwayat-field">
+                    <span class="riwayat-label">Masa jabatan</span>
+                    <input type="text" name="riwayat[__BARU__][nilai]" maxlength="40"
+                           placeholder="mis. 2002 - 2008" aria-label="Masa jabatan">
+                  </label>
+                  <label class="riwayat-field">
+                    <span class="riwayat-label">Keterangan</span>
+                    <input type="text" name="riwayat[__BARU__][keterangan]" maxlength="120"
+                           placeholder="mis. Kepala Desa" aria-label="Keterangan">
+                  </label>
+                  <button type="button" class="baris-hapus" data-hapus-riwayat aria-label="Hapus baris riwayat ini">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+                  </button>
+                </div>
+              </template>
             </div>
 
             <div class="panel">
@@ -858,6 +978,55 @@
         });
       }
     });
+
+    // Riwayat kepala desa: tombol "+ Tambah kepala desa" menyalin template,
+    // tombol tong sampah menghapus baris. Baris lama yang dihapus dicatat
+    // di riwayat_hapus[] agar controller tahu record mana yang harus dibuang
+    // setelah tombol Simpan ditekan.
+    var wadahRiwayat = document.querySelector('[data-riwayat-editor]');
+    var templateRiwayat = document.getElementById('riwayat-template');
+
+    if (wadahRiwayat && templateRiwayat) {
+      var nomorRiwayat = 0;
+
+      wadahRiwayat.querySelectorAll('input[name]').forEach(function (input) {
+        var cocok = /\[baru_(\d+)\]/.exec(input.name);
+        if (cocok) nomorRiwayat = Math.max(nomorRiwayat, parseInt(cocok[1], 10) + 1);
+      });
+
+      document.querySelector('[data-tambah-riwayat]')?.addEventListener('click', function () {
+        var salinan = templateRiwayat.content.cloneNode(true);
+        var kunci = 'baru_' + (nomorRiwayat++);
+
+        salinan.querySelectorAll('input[name]').forEach(function (input) {
+          input.name = input.name.replace('__BARU__', kunci);
+        });
+
+        wadahRiwayat.appendChild(salinan);
+        wadahRiwayat.lastElementChild?.querySelector('input')?.focus();
+      });
+
+      document.addEventListener('click', function (e) {
+        var hapus = e.target.closest('[data-hapus-riwayat]');
+        if (! hapus) return;
+
+        var baris = hapus.closest('[data-riwayat-item]');
+        if (! baris) return;
+
+        var id = baris.dataset.id;
+        var wadahHapus = document.querySelector('[data-riwayat-hapus]');
+
+        if (id && wadahHapus) {
+          var input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'riwayat_hapus[]';
+          input.value = id;
+          wadahHapus.appendChild(input);
+        }
+
+        baris.remove();
+      });
+    }
   })();
 </script>
 @endpush
