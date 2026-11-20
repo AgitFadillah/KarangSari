@@ -16,7 +16,7 @@ Warga mengajukan surat keterangan secara daring dan memantau statusnya tanpa mem
 
 Situs live: **<https://desa-karangsari.up.railway.app>**
 
-[Tentang](#tentang-proyek) &middot; [Fitur](#fitur) &middot; [Layanan Surat](#layanan-surat) &middot; [Alur Pengajuan](#alur-pengajuan-surat) &middot; [Instalasi](#instalasi) &middot; [Pengujian](#pengujian) &middot; [Keamanan](#keamanan) &middot; [Deploy](#deploy-ke-railway)
+[Tentang](#tentang-proyek) &middot; [Fitur](#fitur) &middot; [Layanan Surat](#layanan-surat) &middot; [Alur Pengajuan](#alur-pengajuan-surat) &middot; [Instalasi](#instalasi) &middot; [Pengujian](#pengujian) &middot; [Keamanan](#keamanan) &middot; [Deploy](#deploy-ke-railway) &middot; [Tim](#tim-pengembang)
 
 </div>
 
@@ -547,6 +547,19 @@ Aplikasi tetap berjalan penuh tanpanya:
 - Kop surat sudah menjadi gambar di `backend/public/images/kop-surat.png`
 
 Nama berkas asli hanya disimpan sebagai keterangan asal-usul di kolom `sumber`.
+
+---
+
+## Tim Pengembang
+
+Website ini dikembangkan oleh **Kelompok 2** mahasiswa Program Studi Teknik Informatika, Fakultas Teknologi Industri, Institut Teknologi Sumatera (ITERA), sebagai projek mata kuliah Kapita Selekta Informatika, bekerja sama dengan Pemerintah Desa Karang Sari.
+
+| No | Nama | Peran |
+| :--- | :--- | :--- |
+| 1 | Refin Agus Saputra | Project Manager |
+| 2 | Agit Fadillah | Front End |
+| 3 | Muhammad Faiz Ashfaq | UI/UX |
+| 4 | Farid Rizky Fauzan | Back End |
 
 ---
 
