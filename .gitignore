@@ -106,4 +106,7 @@ _ide_helper.php
 # template surat resmi, kop surat). Isinya bukan bagian dari kode aplikasi dan
 # tidak dipublikasikan di repositori ini. Salin sendiri bila ingin menjalankan
 # migrasi/seed yang menyebut nama berkasnya (hanya sebagai label).
-/docs/
+# Ditulis "/docs/*" dan bukan "/docs/" agar git masih menelusuri isi folder
+# sehingga pengecualian gambar dokumentasi di bawah dapat berlaku.
+/docs/*
+!/docs/tangkapan-layar/
